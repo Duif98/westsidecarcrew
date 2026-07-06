@@ -1,0 +1,37 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
+const IG = "https://www.instagram.com/westsidecarcrew/";
+
+export default function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <header className={`nav ${scrolled ? "scrolled" : ""}`}>
+      <div className="nav-inner">
+        <a href="#top" className="wordmark" aria-label="West Side Car Crew — til toppen">
+          <span className="dot" />
+          <span className="wm-full">West Side Car Crew</span>
+          <span className="wm-abbr">WSCC</span>
+        </a>
+        <nav className="nav-links" aria-label="Primær">
+          <a href="#crewet" className="hide-sm">
+            Crewet
+          </a>
+          <a href="#garagen">Garagen</a>
+          <a href={IG} target="_blank" rel="noopener noreferrer" className="ig">
+            Instagram
+          </a>
+        </nav>
+      </div>
+    </header>
+  );
+}
