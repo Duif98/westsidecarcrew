@@ -67,7 +67,7 @@ export default function Lightbox({ car, startIndex = 0, onClose }) {
       className="lb"
       role="dialog"
       aria-modal="true"
-      aria-label={`${car.make} ${car.model} galleri`}
+      aria-label={`${car.make} ${car.model} gallery`}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -83,7 +83,7 @@ export default function Lightbox({ car, startIndex = 0, onClose }) {
             {car.spec}
           </div>
         </div>
-        <button ref={closeRef} className="lb-close" onClick={onClose} aria-label="Luk galleri">
+        <button ref={closeRef} className="lb-close" onClick={onClose} aria-label="Close gallery">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
             <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
           </svg>
@@ -92,17 +92,17 @@ export default function Lightbox({ car, startIndex = 0, onClose }) {
 
       <div className="lb-stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {n > 1 && (
-          <button className="lb-nav prev" onClick={() => go(-1)} aria-label="Forrige billede">
+          <button className="lb-nav prev" onClick={() => go(-1)} aria-label="Previous image">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
               <path d="M15 5l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         )}
 
-        <img key={i} src={full(photos[i])} alt={`${car.make} ${car.model} — billede ${i + 1}`} />
+        <img key={i} src={full(photos[i])} alt={`${car.make} ${car.model} — image ${i + 1}`} />
 
         {n > 1 && (
-          <button className="lb-nav next" onClick={() => go(1)} aria-label="Næste billede">
+          <button className="lb-nav next" onClick={() => go(1)} aria-label="Next image">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
               <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -121,7 +121,7 @@ export default function Lightbox({ car, startIndex = 0, onClose }) {
                 key={p.src}
                 className={`lb-thumb ${idx === i ? "active" : ""}`}
                 onClick={() => setI(idx)}
-                aria-label={`Gå til billede ${idx + 1}`}
+                aria-label={`Go to image ${idx + 1}`}
                 aria-current={idx === i}
               >
                 <img src={thumb(p)} alt="" loading="lazy" />

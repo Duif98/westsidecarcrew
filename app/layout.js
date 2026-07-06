@@ -25,14 +25,14 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata = {
-  title: "West Side Car Crew — Bilentusiaster fra vestkysten",
+  title: "West Side Car Crew — Car enthusiasts from the west coast",
   description:
-    "West Side Car Crew er en vennegruppe af bilentusiaster fra Esbjerg og Fredericia, grundlagt i 2022. Se garagen: BMW M4, Nissan GT-R, AMG C63 S, Corvette Z06 og flere.",
+    "West Side Car Crew is a group of friends and car enthusiasts from Esbjerg and Fredericia, founded in 2022. See the garage: BMW M4, Nissan GT-R, AMG C63 S, Corvette Z06 and more.",
   metadataBase: new URL("https://westsidecarcrew.github.io"),
   openGraph: {
     title: "West Side Car Crew",
     description:
-      "En vennegruppe af bilentusiaster fra vestkysten. Se garagen.",
+      "A group of friends and car enthusiasts from the west coast. See the garage.",
     images: [{ url: asset("/og.jpg"), width: 1200, height: 630 }],
     type: "website",
   },
@@ -49,7 +49,7 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="da" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>{children}</body>
     </html>
   );

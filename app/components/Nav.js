@@ -17,16 +17,16 @@ export default function Nav() {
   return (
     <header className={`nav ${scrolled ? "scrolled" : ""}`}>
       <div className="nav-inner">
-        <a href="#top" className="wordmark" aria-label="West Side Car Crew — til toppen">
+        <a href="#top" className="wordmark" aria-label="West Side Car Crew — to top">
           <span className="dot" />
           <span className="wm-full">West Side Car Crew</span>
           <span className="wm-abbr">WSCC</span>
         </a>
-        <nav className="nav-links" aria-label="Primær">
+        <nav className="nav-links" aria-label="Primary">
           <a href="#crewet" className="hide-sm">
-            Crewet
+            The Crew
           </a>
-          <a href="#garagen">Garagen</a>
+          <a href="#garagen">The Garage</a>
           <a href={IG} target="_blank" rel="noopener noreferrer" className="ig">
             Instagram
           </a>

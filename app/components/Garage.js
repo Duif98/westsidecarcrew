@@ -15,11 +15,11 @@ export default function Garage() {
     <section className="section garage" id="garagen">
       <div className="wrap">
         <Reveal className="section-head" as="div">
-          <span className="overline">Garagen</span>
-          <h2>Ni biler. Én besætning.</h2>
+          <span className="overline">The Garage</span>
+          <h2>Nine cars. One crew.</h2>
           <p>
-            Fra klassisk amerikaner til japansk ikon. Tryk på en bil for at åbne
-            galleriet.
+            From classic American muscle to a Japanese icon. Tap a car to open
+            its gallery.
           </p>
         </Reveal>
 
@@ -31,7 +31,7 @@ export default function Garage() {
               className={`card ${FEATURE.has(idx) ? "feature" : ""}`}
               delay={(idx % 3) * 90}
               onClick={() => setOpen(car)}
-              aria-label={`Åbn galleri: ${car.make} ${car.model}${
+              aria-label={`Open gallery: ${car.make} ${car.model}${
                 car.owner ? " — " + car.owner : ""
               }`}
             >

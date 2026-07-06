@@ -33,7 +33,7 @@ export default function Hero() {
       <div className="hero-media" ref={mediaRef}>
         <img
           src={asset("/hero.webp")}
-          alt="Mineralgrå BMW M4 på guldfælge foran Lillebæltsbroen i solnedgang"
+          alt="Mineral grey BMW M4 on gold wheels in front of the Little Belt Bridge at sunset"
           fetchPriority="high"
         />
       </div>
@@ -54,27 +54,27 @@ export default function Hero() {
           </span>
         </h1>
         <p className="hero-sub rise" style={{ animationDelay: "0.42s" }}>
-          En vennegruppe fra vestkysten. Ni biler, én garage — samlet om benzin,
-          saltvand og respekt for hinandens jern.
+          A group of friends from the west coast. Nine cars, one garage — united
+          by fuel, salt air and respect for each other&rsquo;s builds.
         </p>
 
         <div className="hero-meta rise" style={{ animationDelay: "0.54s" }}>
           <div className="stat">
             <b>{cars.length}</b>
-            <span>Biler i garagen</span>
+            <span>Cars in the garage</span>
           </div>
           <div className="stat">
             <b>2022</b>
-            <span>Grundlagt</span>
+            <span>Founded</span>
           </div>
           <div className="stat">
             <b>{totalPhotos}</b>
-            <span>Billeder</span>
+            <span>Photos</span>
           </div>
         </div>
       </div>
 
-      <a className="hero-scroll" href="#crewet" aria-label="Scroll til crewet">
+      <a className="hero-scroll" href="#crewet" aria-label="Scroll to the crew">
         <span>Scroll</span>
         <span className="line" />
       </a>

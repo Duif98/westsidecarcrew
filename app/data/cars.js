@@ -7,30 +7,30 @@ const CARS = [
     make: "Nissan GT-R",
     model: "R35",
     owner: "Mark",
-    spec: "Carbon · Sølv",
-    tags: ["Carbon-hjelm", "APR-vinge", "Coilovers"],
+    spec: "Carbon · Silver",
+    tags: ["Carbon hood", "APR wing", "Coilovers"],
     blurb:
-      "Godzilla ved Lillebælt. Carbon-hjelm, fast vinge og en firehjulstrækker der spytter mod broen.",
+      "Godzilla by the Little Belt. Carbon hood, fixed wing and all-wheel drive launching toward the bridge.",
   },
   {
     slug: "duif-m4",
     make: "BMW M4",
     model: "F82",
     owner: "Duif",
-    spec: "Alpinhvid",
-    tags: ["S55 Twin-Turbo", "Carbon-læbe", "M-udstødning"],
+    spec: "Alpine White",
+    tags: ["S55 Twin-Turbo", "Carbon lip", "M exhaust"],
     blurb:
-      "Alpinhvid F82 mod rå beton. Ren silhuet, sort tag og den karakteristiske M4-hofte.",
+      "Alpine White F82 against raw concrete. Clean silhouette, black roof and that signature M4 haunch.",
   },
   {
     slug: "c63s",
     make: "Mercedes-AMG",
     model: "C63 S Coupé",
     owner: "Sneff",
-    spec: "Mat grå",
-    tags: ["4.0 V8 Biturbo", "Mat wrap", "AMG"],
+    spec: "Matte grey",
+    tags: ["4.0 V8 Biturbo", "Matte wrap", "AMG"],
     blurb:
-      "Matgrå AMG gemt i skovkanten. Bred bagpart, biturbo-V8 og en lyd der får træerne til at ryste.",
+      "Matte-grey AMG tucked into the treeline. Wide hips, a biturbo V8 and a soundtrack that shakes the branches.",
   },
   {
     slug: "corvette",
@@ -38,19 +38,19 @@ const CARS = [
     model: "C6 Z06",
     owner: "Duif",
     spec: "Torch Red",
-    tags: ["7.0 LS7 V8", "505 hk", "Targa"],
+    tags: ["7.0 LS7 V8", "505 hp", "Targa"],
     blurb:
-      "Amerikansk muskel i knaldrød. LS7-storblok, let som en fjer og højlydt som en tordenvejr.",
+      "American muscle in bright red. LS7 big block, feather-light and loud as a thunderstorm.",
   },
   {
     slug: "lukas-m4",
     make: "BMW M4",
     model: "F82",
     owner: "Lukas",
-    spec: "Mineralgrå · Guld",
-    tags: ["Guldfælge", "Sænket", "Angel Eyes"],
+    spec: "Mineral Grey · Gold",
+    tags: ["Gold wheels", "Lowered", "Angel Eyes"],
     blurb:
-      "Mineralgrå på guld foran Lillebæltsbroen i gyldent lys. Crewets forsidebil, uden diskussion.",
+      "Mineral grey on gold in front of the Little Belt Bridge at golden hour. The crew's cover car, no debate.",
   },
   {
     slug: "hausmann-lincoln",
@@ -60,37 +60,37 @@ const CARS = [
     spec: "Suicide doors",
     tags: ["V8", "Suicide doors", "Whitewalls"],
     blurb:
-      "Ægte klassisk amerikaner fra ’67. Selvmordsdøre, hvide dæk og kilometervis af krom.",
+      "A genuine '67 American classic. Suicide doors, whitewall tyres and miles of chrome.",
   },
   {
     slug: "s8",
     make: "Audi S8",
     model: "D3",
     owner: "Thomas",
-    spec: "Daytonagrå · V10",
+    spec: "Daytona Grey · V10",
     tags: ["5.2 V10", "Quattro", "Sleeper"],
     blurb:
-      "Lamborghini-V10 i jakkesæt. En rolig direktør på motorvejen — og en ulv når det gælder.",
+      "A Lamborghini V10 in a business suit. A calm executive on the motorway — and a wolf when it counts.",
   },
   {
     slug: "nic-leon",
     make: "SEAT Leon",
     model: "Cupra Mk1",
     owner: "Nic",
-    spec: "Recaro · Rød",
-    tags: ["1.8T", "Recaro", "Sænket"],
+    spec: "Recaro · Red",
+    tags: ["1.8T", "Recaro", "Lowered"],
     blurb:
-      "Sleeperen fra Cupra-æraen. Recaro-skaller, dyb rød lak og turbo-hvæs mellem træerne.",
+      "The sleeper from the Cupra era. Recaro buckets, deep red paint and turbo hiss between the trees.",
   },
   {
     slug: "panamera",
     make: "Porsche Panamera",
     model: "971",
     owner: "Dennis",
-    spec: "Volcanogrå",
-    tags: ["V6/V8", "GT-linje", "Fastback"],
+    spec: "Volcano Grey",
+    tags: ["V6/V8", "GT line", "Fastback"],
     blurb:
-      "Fire døre, ingen undskyldninger. Panameraens fastback-linje foran garageportene.",
+      "Four doors, no apologies. The Panamera's fastback line in front of the garage doors.",
   },
 ];
 
