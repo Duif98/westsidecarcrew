@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Reveal from "./Reveal";
 import Lightbox from "./Lightbox";
+import CommunityGallery from "./CommunityGallery";
 import { asset } from "../lib/asset";
 import { cars } from "../data/cars";
 
@@ -61,6 +62,8 @@ export default function Garage() {
             </Reveal>
           ))}
         </div>
+
+        <CommunityGallery />
       </div>
 
       {open && <Lightbox car={open} onClose={() => setOpen(null)} />}

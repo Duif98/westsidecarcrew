@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useAuth } from "../lib/AuthProvider";
 
 const IG = "https://www.instagram.com/westsidecarcrew/";
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const { session } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -26,10 +29,13 @@ export default function Nav() {
           <a href="#crewet" className="hide-sm">
             The Crew
           </a>
-          <a href="#garagen">The Garage</a>
-          <a href={IG} target="_blank" rel="noopener noreferrer" className="ig">
+          <a href="#garagen" className="hide-sm">The Garage</a>
+          <a href={IG} target="_blank" rel="noopener noreferrer" className="hide-sm">
             Instagram
           </a>
+          <Link href={session ? "/medlem" : "/login"} className="ig">
+            {session ? "Medlem" : "Log ind"}
+          </Link>
         </nav>
       </div>
     </header>
