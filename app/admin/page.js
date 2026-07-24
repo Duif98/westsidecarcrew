@@ -9,6 +9,7 @@ import { enrichPhotos, deletePhoto, setApproved } from "../lib/photos";
 import { getAlbums, setAlbumCover, setPhotoAlbum } from "../lib/albums";
 import PhotoGrid from "../components/PhotoGrid";
 import PhotoLightbox from "../components/PhotoLightbox";
+import PostManager from "../components/PostManager";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -64,8 +65,11 @@ export default function AdminPage() {
 
       <div className="wrap member-body">
         <span className="overline">Admin</span>
-        <h1 className="member-title">Godkend & vælg cover</h1>
-        <p className="member-note">Godkend billeder til forsiden, og vælg hvilket billede der skal være bilens cover (thumbnail).</p>
+        <h1 className="member-title">Admin</h1>
+
+        <PostManager userId={user.id} />
+
+        <p className="member-note" style={{ marginTop: "1.5rem" }}>Godkend billeder til forsiden, og vælg hvilket billede der skal være bilens cover (thumbnail).</p>
 
         <div className="member-section">
           <span className="overline">Afventer godkendelse ({pending.length})</span>

@@ -1,5 +1,6 @@
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
+import NewsBoard from "./components/NewsBoard";
 import About from "./components/About";
 import Garage from "./components/Garage";
 import Footer from "./components/Footer";
@@ -10,6 +11,7 @@ export default function Page() {
       <Nav />
       <main>
         <Hero />
+        <NewsBoard />
         <About />
         <Garage />
       </main>
