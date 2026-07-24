@@ -10,11 +10,31 @@ import { supabase } from "../lib/supabaseClient";
 import { getAlbums } from "../lib/albums";
 import { withUrls } from "../lib/photos";
 
-const FEATURE = new Set([0, 5]); // wider editorial tiles
+// Deterministic shuffle so the order is stable within a visit but rotates
+// between visits (which car sits in the wide/top tiles changes over time).
+function shuffle(arr, seed) {
+  const a = [...arr];
+  let s = seed >>> 0;
+  const rand = () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
 
 export default function Garage() {
   const [open, setOpen] = useState(null); // { items, title, subtitle }
   const [extra, setExtra] = useState({ bySlug: {}, covers: {}, newAlbums: [] });
+  const [seed, setSeed] = useState(null);
+
+  // Set the shuffle seed after mount (keeps SSR/first render stable -> no hydration mismatch).
+  useEffect(() => { setSeed(Math.floor(Math.random() * 1e9)); }, []);
 
   useEffect(() => {
     let active = true;
@@ -54,29 +74,36 @@ export default function Garage() {
       alt: `${car.make} ${car.model}`,
     }));
     const uploadItems = (slug) => (extra.bySlug[slug] || []).map((p) => ({ full: p.url, thumb: p.url, alt: p.car || "" }));
+    // Put the chosen cover first, so it's the card thumbnail AND the first image on open.
+    const coverFirst = (items, coverUrl) => {
+      const ci = items.findIndex((it) => it.full === coverUrl);
+      return ci > 0 ? [items[ci], ...items.slice(0, ci), ...items.slice(ci + 1)] : items;
+    };
 
-    const curated = cars.map((car, idx) => {
-      const items = [...repoItems(car), ...uploadItems(car.slug)];
+    const curated = cars.map((car) => {
+      const coverUrl = extra.covers[car.slug] || asset(`/cars/${car.slug}/thumb/${car.cover}`);
+      const items = coverFirst([...repoItems(car), ...uploadItems(car.slug)], coverUrl);
       return {
-        key: car.slug, feature: FEATURE.has(idx),
-        coverUrl: extra.covers[car.slug] || asset(`/cars/${car.slug}/thumb/${car.cover}`),
+        key: car.slug, coverUrl,
         tag: car.spec, title: car.make, model: car.model, owner: car.owner,
         count: items.length, items,
         lbTitle: car.make, lbSubtitle: [car.owner, car.spec].filter(Boolean).join(" · "),
       };
     });
     const news = extra.newAlbums.map((a) => {
-      const items = uploadItems(a.slug);
+      const raw = uploadItems(a.slug);
+      const coverUrl = extra.covers[a.slug] || raw[0]?.full;
+      const items = coverFirst(raw, coverUrl);
       return {
-        key: a.slug, feature: false,
-        coverUrl: extra.covers[a.slug] || items[0]?.full,
+        key: a.slug, coverUrl,
         tag: "Crew album", title: a.title, model: "", owner: a.owner_name,
         count: items.length, items,
         lbTitle: a.title, lbSubtitle: a.owner_name || "",
       };
     });
-    return [...curated, ...news];
-  }, [extra]);
+    const orderedCurated = seed == null ? curated : shuffle(curated, seed);
+    return [...orderedCurated, ...news];
+  }, [extra, seed]);
 
   return (
     <section className="section garage" id="garagen">
@@ -92,7 +119,7 @@ export default function Garage() {
             <Reveal
               key={s.key}
               as="button"
-              className={`card ${s.feature ? "feature" : ""}`}
+              className={`card ${idx === 0 || idx === 5 ? "feature" : ""}`}
               delay={(idx % 3) * 90}
               onClick={() => setOpen({ items: s.items, title: s.lbTitle, subtitle: s.lbSubtitle })}
               aria-label={`Open gallery: ${s.title}${s.owner ? " — " + s.owner : ""}`}
