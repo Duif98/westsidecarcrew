@@ -25,6 +25,7 @@ export default function CommunityGallery() {
         .select("*, profiles!photos_user_id_fkey(username)")
         .eq("visibility", "public")
         .eq("approved", true)
+        .is("album_id", null)
         .order("created_at", { ascending: false })
         .limit(24);
       if (!active) return;

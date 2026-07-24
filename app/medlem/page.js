@@ -6,6 +6,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { uploadPhoto, enrichPhotos, deletePhoto } from "../lib/photos";
+import { getAlbums, createAlbum } from "../lib/albums";
 import PhotoGrid from "../components/PhotoGrid";
 import PhotoLightbox from "../components/PhotoLightbox";
 import InviteButton from "../components/InviteButton";
@@ -14,16 +15,22 @@ export default function MedlemPage() {
   const router = useRouter();
   const { session, user, profile, loading, isAdmin, signOut } = useAuth();
   const [all, setAll] = useState([]);
+  const [albums, setAlbums] = useState([]);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [car, setCar] = useState("");
   const [caption, setCaption] = useState("");
   const [isPublic, setIsPublic] = useState(false);
+  const [albumSel, setAlbumSel] = useState(""); // "" | album id | "__new__"
+  const [newTitle, setNewTitle] = useState("");
+  const [newOwner, setNewOwner] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const [lb, setLb] = useState(null); // { photos, index }
 
   useEffect(() => { if (!loading && !session) router.replace("/login"); }, [loading, session, router]);
+
+  useEffect(() => { if (session) getAlbums().then(setAlbums); }, [session]);
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -49,9 +56,17 @@ export default function MedlemPage() {
     if (!file) { setMsg("Vælg et billede først."); return; }
     setBusy(true); setMsg("");
     try {
-      await uploadPhoto({ file, isPublic, car, caption, userId: user.id });
+      let albumId = albumSel && albumSel !== "__new__" ? albumSel : null;
+      if (albumSel === "__new__") {
+        if (!newTitle.trim()) { setMsg("Giv det nye album et navn."); setBusy(false); return; }
+        const created = await createAlbum({ title: newTitle, owner: newOwner, userId: user.id });
+        albumId = created.id;
+        setAlbums(await getAlbums());
+      }
+      await uploadPhoto({ file, isPublic, car, caption, userId: user.id, albumId });
       if (preview) URL.revokeObjectURL(preview);
       setFile(null); setPreview(null); setCar(""); setCaption(""); setIsPublic(false);
+      setAlbumSel(""); setNewTitle(""); setNewOwner("");
       e.target.reset();
       setMsg(isPublic ? "✓ Uploadet i fuld kvalitet. Afventer godkendelse til forsiden." : "✓ Uploadet i fuld kvalitet (privat – kun for medlemmer).");
       await load();
@@ -109,6 +124,21 @@ export default function MedlemPage() {
             <label>Bil <input value={car} onChange={(e) => setCar(e.target.value)} placeholder="fx BMW M4 F82" /></label>
             <label>Tekst (valgfri) <input value={caption} onChange={(e) => setCaption(e.target.value)} placeholder="fx Alpinhvid, sommer 2025" /></label>
           </div>
+          <label className="album-select">Bil-album <span className="muted-hint">— hvilken bils showcase skal billedet ind under?</span>
+            <select value={albumSel} onChange={(e) => setAlbumSel(e.target.value)}>
+              <option value="">Intet album (kun mit galleri)</option>
+              {albums.map((a) => (
+                <option key={a.id} value={a.id}>{a.title}{a.owner_name ? ` · ${a.owner_name}` : ""}</option>
+              ))}
+              <option value="__new__">➕ Opret nyt bil-album…</option>
+            </select>
+          </label>
+          {albumSel === "__new__" && (
+            <div className="upload-grid">
+              <label>Nyt album – navn <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="fx Audi RS6" /></label>
+              <label>Ejer (valgfri) <input value={newOwner} onChange={(e) => setNewOwner(e.target.value)} placeholder="fx Kasper" /></label>
+            </div>
+          )}
           <label className="check-row">
             <input type="checkbox" checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
             <span><b>Offentligt billede</b> – må vises i Garagen på forsiden (efter admin-godkendelse). Lades feltet stå tomt, er billedet <b>privat</b> og kun synligt for indloggede medlemmer.</span>

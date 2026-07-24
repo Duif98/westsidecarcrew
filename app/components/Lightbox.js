@@ -2,26 +2,21 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { asset } from "../lib/asset";
 
-export default function Lightbox({ car, startIndex = 0, onClose }) {
+// Generic gallery lightbox. `items` is [{ full, thumb, alt }] with URLs already
+// resolved by the caller, so it works for both repo and uploaded photos.
+export default function Lightbox({ items, title, subtitle, startIndex = 0, onClose }) {
   const [i, setI] = useState(startIndex);
   const [mounted, setMounted] = useState(false);
   const closeRef = useRef(null);
   const thumbsRef = useRef(null);
   const touchX = useRef(null);
+  const n = items.length;
+
+  const go = useCallback((dir) => setI((p) => (p + dir + n) % n), [n]);
 
   useEffect(() => setMounted(true), []);
 
-  const photos = car.photos;
-  const n = photos.length;
-
-  const go = useCallback(
-    (dir) => setI((p) => (p + dir + n) % n),
-    [n]
-  );
-
-  // Keyboard controls
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") onClose();
@@ -29,31 +24,21 @@ export default function Lightbox({ car, startIndex = 0, onClose }) {
       else if (e.key === "ArrowLeft") go(-1);
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [go, onClose]);
-
-  // Lock body scroll + focus close button
-  useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     closeRef.current?.focus();
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, []);
+    return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
+  }, [go, onClose]);
 
-  // Keep active thumbnail in view
   useEffect(() => {
-    const strip = thumbsRef.current;
-    const active = strip?.querySelector(".lb-thumb.active");
+    const active = thumbsRef.current?.querySelector(".lb-thumb.active");
     active?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
   }, [i]);
 
-  // Preload neighbours
   const neighbours = useMemo(() => {
     if (n < 2) return [];
-    return [photos[(i + 1) % n], photos[(i - 1 + n) % n]];
-  }, [i, n, photos]);
+    return [items[(i + 1) % n], items[(i - 1 + n) % n]];
+  }, [i, n, items]);
 
   const onTouchStart = (e) => (touchX.current = e.touches[0].clientX);
   const onTouchEnd = (e) => {
@@ -63,34 +48,17 @@ export default function Lightbox({ car, startIndex = 0, onClose }) {
     touchX.current = null;
   };
 
-  const full = (p) => asset(`/cars/${car.slug}/${p.src}`);
-  const thumb = (p) => asset(`/cars/${car.slug}/thumb/${p.src}`);
+  if (!mounted || !n) return null;
 
-  if (!mounted) return null;
-
-  // Portal to <body> so it sits above the sticky nav (close button was hidden).
   return createPortal(
-    <div
-      className="lb"
-      role="dialog"
-      aria-modal="true"
-      aria-label={`${car.make} ${car.model} gallery`}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
+    <div className="lb" role="dialog" aria-modal="true" aria-label={`${title} galleri`}
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="lb-top">
         <div className="lb-title">
-          <div className="make">
-            {car.make} <span style={{ color: "var(--muted)" }}>{car.model}</span>
-          </div>
-          <div className="meta">
-            {car.owner && <span className="owner">{car.owner}</span>}
-            {car.owner && " · "}
-            {car.spec}
-          </div>
+          <div className="make">{title}</div>
+          {subtitle && <div className="meta">{subtitle}</div>}
         </div>
-        <button ref={closeRef} className="lb-close" onClick={onClose} aria-label="Close gallery">
+        <button ref={closeRef} className="lb-close" onClick={onClose} aria-label="Luk galleri">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
             <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
           </svg>
@@ -99,50 +67,33 @@ export default function Lightbox({ car, startIndex = 0, onClose }) {
 
       <div className="lb-stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {n > 1 && (
-          <button className="lb-nav prev" onClick={() => go(-1)} aria-label="Previous image">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M15 5l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <button className="lb-nav prev" onClick={() => go(-1)} aria-label="Forrige">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M15 5l-7 7 7 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
         )}
-
-        <img key={i} src={full(photos[i])} alt={`${car.make} ${car.model} — image ${i + 1}`} />
-
+        <img key={i} src={items[i].full} alt={items[i].alt || title} />
         {n > 1 && (
-          <button className="lb-nav next" onClick={() => go(1)} aria-label="Next image">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-              <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <button className="lb-nav next" onClick={() => go(1)} aria-label="Næste">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
         )}
       </div>
 
       <div className="lb-bottom">
-        <div className="lb-counter">
-          <b>{String(i + 1).padStart(2, "0")}</b> / {String(n).padStart(2, "0")}
-        </div>
+        <div className="lb-counter"><b>{String(i + 1).padStart(2, "0")}</b> / {String(n).padStart(2, "0")}</div>
         {n > 1 && (
           <div className="lb-thumbs" ref={thumbsRef}>
-            {photos.map((p, idx) => (
-              <button
-                key={p.src}
-                className={`lb-thumb ${idx === i ? "active" : ""}`}
-                onClick={() => setI(idx)}
-                aria-label={`Go to image ${idx + 1}`}
-                aria-current={idx === i}
-              >
-                <img src={thumb(p)} alt="" loading="lazy" />
+            {items.map((it, idx) => (
+              <button key={idx} className={`lb-thumb ${idx === i ? "active" : ""}`} onClick={() => setI(idx)} aria-label={`Gå til billede ${idx + 1}`} aria-current={idx === i}>
+                <img src={it.thumb || it.full} alt="" loading="lazy" />
               </button>
             ))}
           </div>
         )}
       </div>
 
-      {/* hidden preloads */}
       <div style={{ display: "none" }} aria-hidden="true">
-        {neighbours.map((p) => (
-          <img key={p.src} src={full(p)} alt="" />
-        ))}
+        {neighbours.map((p, k) => <img key={k} src={p.full} alt="" />)}
       </div>
     </div>,
     document.body

@@ -1042,3 +1042,13 @@ a.btn-gold { text-decoration: none; }
 .plb-owner { font-family: var(--font-mono), monospace; font-size: 0.72rem; color: var(--muted); margin-top: 0.25rem; }
 .plb-owner .plb-idx, .plb-owner .plb-cap { color: var(--faint); }
 .plb-bar .like-btn { font-size: 0.95rem; border: 1px solid var(--line-2); padding: 0.5rem 0.85rem; }
+
+/* ============ Album select + admin cover ============ */
+.album-select { display: flex; flex-direction: column; gap: 0.4rem; font-family: var(--font-mono), monospace; font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.album-select .muted-hint { text-transform: none; letter-spacing: 0; color: var(--faint); font-family: var(--font-body), sans-serif; font-size: 0.8rem; }
+.album-select select, .upload-grid select { font-family: var(--font-body), sans-serif; font-size: 1rem; color: var(--text); background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; padding: 0.8rem 0.9rem; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a6a89f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 34px; }
+.album-select select:focus, .upload-grid select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,119,0.16); }
+.album-label { font-family: var(--font-mono), monospace; font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold); background: rgba(201,168,119,0.12); border: 1px solid var(--gold-deep); border-radius: 100px; padding: 0.4rem 0.65rem; display: inline-flex; align-items: center; }
+.album-label.none { color: var(--faint); background: none; border-color: var(--line); }
+.ph-actions { flex-wrap: wrap; }
+.ph-btn.cover-on { border-color: var(--gold); color: var(--gold); background: rgba(201,168,119,0.14); }
