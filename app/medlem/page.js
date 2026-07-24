@@ -5,19 +5,23 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
-import { uploadPhoto, withUrls, deletePhoto } from "../lib/photos";
+import { uploadPhoto, enrichPhotos, deletePhoto } from "../lib/photos";
 import PhotoGrid from "../components/PhotoGrid";
+import PhotoLightbox from "../components/PhotoLightbox";
+import InviteButton from "../components/InviteButton";
 
 export default function MedlemPage() {
   const router = useRouter();
   const { session, user, profile, loading, isAdmin, signOut } = useAuth();
   const [all, setAll] = useState([]);
   const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [car, setCar] = useState("");
   const [caption, setCaption] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+  const [lb, setLb] = useState(null); // { photos, index }
 
   useEffect(() => { if (!loading && !session) router.replace("/login"); }, [loading, session, router]);
 
@@ -26,10 +30,19 @@ export default function MedlemPage() {
       .from("photos")
       .select("*, profiles(username)")
       .order("created_at", { ascending: false });
-    setAll(await withUrls(data || []));
-  }, []);
+    setAll(await enrichPhotos(data || [], user?.id));
+  }, [user?.id]);
 
   useEffect(() => { if (session) load(); }, [session, load]);
+
+  const pickFile = (f) => {
+    if (preview) URL.revokeObjectURL(preview);
+    if (f && !f.type.startsWith("image/")) { setMsg("Vælg en billedfil (jpg, png, heic …)."); setFile(null); setPreview(null); return; }
+    if (f && f.size > 50 * 1024 * 1024) { setMsg("Filen er for stor (max 50 MB). Er det mon en video?"); setFile(null); setPreview(null); return; }
+    setMsg("");
+    setFile(f || null);
+    setPreview(f ? URL.createObjectURL(f) : null);
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -37,9 +50,10 @@ export default function MedlemPage() {
     setBusy(true); setMsg("");
     try {
       await uploadPhoto({ file, isPublic, car, caption, userId: user.id });
-      setFile(null); setCar(""); setCaption(""); setIsPublic(false);
+      if (preview) URL.revokeObjectURL(preview);
+      setFile(null); setPreview(null); setCar(""); setCaption(""); setIsPublic(false);
       e.target.reset();
-      setMsg(isPublic ? "✓ Uploadet. Afventer godkendelse til forsiden." : "✓ Uploadet (privat – kun for medlemmer).");
+      setMsg(isPublic ? "✓ Uploadet i fuld kvalitet. Afventer godkendelse til forsiden." : "✓ Uploadet i fuld kvalitet (privat – kun for medlemmer).");
       await load();
     } catch (e2) { setMsg(e2.message); }
     finally { setBusy(false); }
@@ -53,6 +67,7 @@ export default function MedlemPage() {
   if (loading || !session) return <main className="member"><div className="wrap" style={{ paddingTop: 120 }}>Indlæser…</div></main>;
 
   const mine = all.filter((p) => p.user_id === user.id);
+  const likeProps = { userId: user.id, canLike: true };
 
   return (
     <main className="member">
@@ -68,13 +83,27 @@ export default function MedlemPage() {
       </div>
 
       <div className="wrap member-body">
-        <span className="overline">Min garage</span>
-        <h1 className="member-title">Upload din bil</h1>
+        <div className="member-head">
+          <div>
+            <span className="overline">Min garage</span>
+            <h1 className="member-title">Upload din bil</h1>
+          </div>
+          <InviteButton />
+        </div>
+        <p className="onboard">
+          Velkommen, @{profile?.username} 👋 Vælg et billede, giv det en titel, og bestem om det er{" "}
+          <b>offentligt</b> (kan vises på forsiden efter godkendelse) eller <b>privat</b> (kun for crewet).
+          Billeder uploades altid i <b>fuld kvalitet</b>.
+        </p>
 
         <form className="upload-card" onSubmit={submit}>
           <label className="file-drop">
-            <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-            <span>{file ? file.name : "Vælg et billede…"}</span>
+            <input type="file" accept="image/*" onChange={(e) => pickFile(e.target.files?.[0] || null)} />
+            {preview ? (
+              <img className="file-preview" src={preview} alt="Forhåndsvisning" />
+            ) : (
+              <span>Vælg eller tag et billede…</span>
+            )}
           </label>
           <div className="upload-grid">
             <label>Bil <input value={car} onChange={(e) => setCar(e.target.value)} placeholder="fx BMW M4 F82" /></label>
@@ -90,15 +119,27 @@ export default function MedlemPage() {
 
         <div className="member-section">
           <span className="overline">Mine billeder</span>
-          <PhotoGrid photos={mine} showStatus onDelete={remove} />
+          {mine.length ? (
+            <PhotoGrid photos={mine} showStatus onDelete={remove} onOpen={(i) => setLb({ photos: mine, index: i })} {...likeProps} />
+          ) : (
+            <p className="ph-empty">Du har ikke uploadet endnu — vælg et billede ovenfor 👆</p>
+          )}
         </div>
 
         <div className="member-section">
           <span className="overline">Crewets billeder</span>
           <p className="member-note">Alle billeder — også private — er synlige her for indloggede medlemmer.</p>
-          <PhotoGrid photos={all} showStatus />
+          {all.length ? (
+            <PhotoGrid photos={all} showStatus onOpen={(i) => setLb({ photos: all, index: i })} {...likeProps} />
+          ) : (
+            <p className="ph-empty">Ingen billeder endnu. Vær den første til at vise din bil! 🚗</p>
+          )}
         </div>
       </div>
+
+      {lb && (
+        <PhotoLightbox photos={lb.photos} index={lb.index} onClose={() => setLb(null)} userId={user.id} canLike />
+      )}
     </main>
   );
 }

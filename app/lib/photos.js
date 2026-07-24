@@ -51,3 +51,43 @@ export async function setApproved(id, approved) {
   const { error } = await supabase.from("photos").update({ approved }).eq("id", id);
   if (error) throw new Error(error.message);
 }
+
+// Attach like counts + whether the current user liked. Fail-safe: if the likes
+// table isn't set up yet, photos still render with zero likes.
+export async function withLikes(rows, userId) {
+  if (!rows.length) return rows;
+  try {
+    const ids = rows.map((r) => r.id);
+    const { data, error } = await supabase.from("likes").select("photo_id, user_id").in("photo_id", ids);
+    if (error) throw error;
+    const counts = {}, mine = new Set();
+    (data || []).forEach((l) => {
+      counts[l.photo_id] = (counts[l.photo_id] || 0) + 1;
+      if (userId && l.user_id === userId) mine.add(l.photo_id);
+    });
+    return rows.map((r) => ({ ...r, likeCount: counts[r.id] || 0, likedByMe: mine.has(r.id) }));
+  } catch {
+    return rows.map((r) => ({ ...r, likeCount: 0, likedByMe: false }));
+  }
+}
+
+// Resolve URLs and likes in one call.
+export async function enrichPhotos(rows, userId) {
+  return withLikes(await withUrls(rows), userId);
+}
+
+export async function toggleLike(photoId, userId, currentlyLiked) {
+  if (currentlyLiked) {
+    const { error } = await supabase.from("likes").delete().eq("photo_id", photoId).eq("user_id", userId);
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await supabase.from("likes").insert({ photo_id: photoId, user_id: userId });
+    if (error) throw new Error(error.message);
+  }
+}
+
+export async function getCrewCode() {
+  const { data, error } = await supabase.rpc("crew_code");
+  if (error) throw new Error(error.message);
+  return data;
+}

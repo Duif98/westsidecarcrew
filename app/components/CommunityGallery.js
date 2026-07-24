@@ -2,13 +2,20 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabaseClient";
-import { withUrls } from "../lib/photos";
+import { enrichPhotos } from "../lib/photos";
+import { useAuth } from "../lib/AuthProvider";
 import Reveal from "./Reveal";
+import LikeButton from "./LikeButton";
+import PhotoLightbox from "./PhotoLightbox";
 
 export default function CommunityGallery() {
+  const router = useRouter();
+  const { user } = useAuth();
   const [photos, setPhotos] = useState([]);
   const [ready, setReady] = useState(false);
+  const [lb, setLb] = useState(null);
 
   useEffect(() => {
     let active = true;
@@ -21,14 +28,15 @@ export default function CommunityGallery() {
         .order("created_at", { ascending: false })
         .limit(24);
       if (!active) return;
-      setPhotos(await withUrls(data || []));
+      setPhotos(await enrichPhotos(data || [], user?.id));
       setReady(true);
     })();
     return () => { active = false; };
-  }, []);
+  }, [user?.id]);
 
-  // Nothing to show yet — stay invisible so the page looks intentional.
   if (!ready || photos.length === 0) return null;
+
+  const needLogin = () => router.push("/login");
 
   return (
     <div className="community" id="crew-billeder">
@@ -38,16 +46,32 @@ export default function CommunityGallery() {
         <p>Uploadet af crewet selv. <Link href="/login" className="c-link">Log ind</Link> for at se alle billeder og dele dine egne.</p>
       </Reveal>
       <div className="community-grid">
-        {photos.map((p) => (
+        {photos.map((p, idx) => (
           <figure className="c-card" key={p.id}>
-            <img src={p.url} alt={p.car || "Bil"} loading="lazy" />
+            <button className="c-imgbtn" onClick={() => setLb({ index: idx })} aria-label={`Åbn ${p.car || "billede"}`}>
+              <img src={p.url} alt={p.car || "Bil"} loading="lazy" />
+            </button>
             <figcaption>
-              <span className="c-car">{p.car || "Uden titel"}</span>
-              <span className="c-owner">@{p.profiles?.username || "medlem"}</span>
+              <div className="c-textcol">
+                <span className="c-car">{p.car || "Uden titel"}</span>
+                <span className="c-owner">@{p.profiles?.username || "medlem"}</span>
+              </div>
+              <LikeButton photo={p} userId={user?.id} canLike={!!user} onNeedLogin={needLogin} />
             </figcaption>
           </figure>
         ))}
       </div>
+
+      {lb && (
+        <PhotoLightbox
+          photos={photos}
+          index={lb.index}
+          onClose={() => setLb(null)}
+          userId={user?.id}
+          canLike={!!user}
+          onNeedLogin={needLogin}
+        />
+      )}
     </div>
   );
 }

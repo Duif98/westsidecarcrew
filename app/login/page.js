@@ -15,6 +15,13 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
   const [info, setInfo] = useState("");
+  const [invited, setInvited] = useState(false);
+
+  // Prefill the crew code from an invite link (…/login?code=…).
+  useEffect(() => {
+    const code = new URLSearchParams(window.location.search).get("code");
+    if (code) { setMode("signup"); setInvited(true); setF((p) => ({ ...p, code })); }
+  }, []);
 
   // Already signed in with a profile → go to member area.
   useEffect(() => {
@@ -84,7 +91,7 @@ export default function LoginPage() {
         <h1 className="auth-title">{mode === "login" ? "Log ind" : mode === "signup" ? "Bliv medlem" : "Nulstil adgangskode"}</h1>
         <p className="auth-sub">
           {mode === "login" ? "Log ind for at se og uploade billeder."
-            : mode === "signup" ? "Opret din profil med crewets kode."
+            : mode === "signup" ? (invited ? "Du er inviteret ✨ Koden er udfyldt — vælg bare brugernavn, email og adgangskode." : "Opret din profil med crewets kode.")
             : "Indtast din email, så sender vi et link til at vælge en ny adgangskode."}
         </p>
 

@@ -996,3 +996,49 @@ a.btn-gold { text-decoration: none; }
 .c-car { font-weight: 600; font-size: 0.9rem; }
 .c-owner { font-family: var(--font-mono), monospace; font-size: 0.66rem; color: var(--gold); }
 .c-link { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ============ Invite / onboarding / preview ============ */
+.member-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+.invite-btn { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); background: rgba(201,168,119,0.1); border: 1px solid var(--gold-deep); padding: 0.75rem 1.15rem; border-radius: 100px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.invite-btn:hover { background: var(--gold); color: #100c04; }
+.invite-btn:disabled { opacity: 0.6; cursor: default; }
+.onboard { color: var(--muted); font-size: 0.95rem; line-height: 1.6; max-width: 62ch; margin-top: -0.6rem; }
+.onboard b { color: var(--text); font-weight: 600; }
+.file-preview { width: 100%; max-height: 280px; object-fit: contain; border-radius: 10px; }
+
+/* ============ Like button ============ */
+.like-btn { display: inline-flex; align-items: center; gap: 0.35rem; background: none; border: none; color: var(--muted); cursor: pointer; padding: 0.3rem 0.45rem; border-radius: 100px; transition: color 0.2s, transform 0.08s; font-family: var(--font-mono), monospace; font-size: 0.74rem; }
+.like-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.like-btn.liked { color: #e0526a; }
+.like-btn:active { transform: scale(0.88); }
+.like-count { font-variant-numeric: tabular-nums; }
+
+/* ph card as button + meta row */
+.ph-imgwrap { border: none; padding: 0; width: 100%; display: block; cursor: pointer; }
+.ph-metarow { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: 0.3rem; }
+.ph-owner { font-family: var(--font-mono), monospace; font-size: 0.68rem; color: var(--gold); margin: 0; }
+
+/* community card clickable + like */
+.c-imgbtn { position: absolute; inset: 0; z-index: 1; border: none; padding: 0; background: none; cursor: pointer; }
+.c-imgbtn img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.9s var(--ease); }
+.c-card:hover .c-imgbtn img { transform: scale(1.05); }
+.c-card figcaption { z-index: 2; }
+.c-textcol { display: flex; flex-direction: column; gap: 0.1rem; }
+
+/* ============ Photo lightbox ============ */
+.plb { position: fixed; inset: 0; z-index: 1000; background: rgba(6,7,9,0.94); backdrop-filter: blur(16px); display: flex; flex-direction: column; animation: plbIn 0.3s var(--ease); }
+@keyframes plbIn { from { opacity: 0; } to { opacity: 1; } }
+.plb-close { position: absolute; top: 1rem; right: 1rem; z-index: 3; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(255,255,255,0.05); color: var(--text); display: grid; place-items: center; cursor: pointer; transition: background 0.2s, transform 0.2s; }
+.plb-close:hover { background: rgba(255,255,255,0.14); transform: rotate(90deg); }
+.plb-stage { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 3rem 1rem 0; position: relative; }
+.plb-stage img { max-width: min(1100px, 94vw); max-height: 100%; object-fit: contain; border-radius: 8px; animation: plbIn 0.35s var(--ease); }
+.plb-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--line-2); background: rgba(10,11,13,0.6); color: var(--text); display: grid; place-items: center; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.plb-nav.prev { left: 1rem; }
+.plb-nav.next { right: 1rem; }
+.plb-nav:hover { background: var(--gold); color: #100c04; }
+@media (max-width: 620px) { .plb-nav { display: none; } }
+.plb-bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.1rem var(--pad) calc(1.1rem + env(safe-area-inset-bottom)); max-width: 1100px; width: 100%; margin: 0 auto; }
+.plb-car { font-family: var(--font-display), serif; font-size: clamp(1.2rem, 3vw, 1.6rem); }
+.plb-owner { font-family: var(--font-mono), monospace; font-size: 0.72rem; color: var(--muted); margin-top: 0.25rem; }
+.plb-owner .plb-idx, .plb-owner .plb-cap { color: var(--faint); }
+.plb-bar .like-btn { font-size: 0.95rem; border: 1px solid var(--line-2); padding: 0.5rem 0.85rem; }

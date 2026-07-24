@@ -5,13 +5,15 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
-import { withUrls, deletePhoto, setApproved } from "../lib/photos";
+import { enrichPhotos, deletePhoto, setApproved } from "../lib/photos";
 import PhotoGrid from "../components/PhotoGrid";
+import PhotoLightbox from "../components/PhotoLightbox";
 
 export default function AdminPage() {
   const router = useRouter();
-  const { session, loading, isAdmin, profile } = useAuth();
+  const { session, user, loading, isAdmin, profile } = useAuth();
   const [photos, setPhotos] = useState([]);
+  const [lb, setLb] = useState(null);
 
   useEffect(() => {
     if (loading) return;
@@ -25,8 +27,8 @@ export default function AdminPage() {
       .select("*, profiles(username)")
       .eq("visibility", "public")
       .order("created_at", { ascending: false });
-    setPhotos(await withUrls(data || []));
-  }, []);
+    setPhotos(await enrichPhotos(data || [], user?.id));
+  }, [user?.id]);
 
   useEffect(() => { if (isAdmin) load(); }, [isAdmin, load]);
 
@@ -55,24 +57,42 @@ export default function AdminPage() {
 
         <div className="member-section">
           <span className="overline">Afventer godkendelse ({pending.length})</span>
-          <PhotoGrid
-            photos={pending}
-            showStatus
-            onDelete={remove}
-            renderActions={(p) => <button className="ph-btn ok" onClick={() => approve(p.id, true)}>Godkend</button>}
-          />
+          {pending.length ? (
+            <PhotoGrid
+              photos={pending}
+              showStatus
+              onDelete={remove}
+              onOpen={(i) => setLb({ photos: pending, index: i })}
+              userId={user?.id}
+              canLike
+              renderActions={(p) => <button className="ph-btn ok" onClick={() => approve(p.id, true)}>Godkend</button>}
+            />
+          ) : (
+            <p className="ph-empty">Ingen billeder afventer godkendelse. 👍</p>
+          )}
         </div>
 
         <div className="member-section">
           <span className="overline">På forsiden ({live.length})</span>
-          <PhotoGrid
-            photos={live}
-            showStatus
-            onDelete={remove}
-            renderActions={(p) => <button className="ph-btn" onClick={() => approve(p.id, false)}>Fjern fra forside</button>}
-          />
+          {live.length ? (
+            <PhotoGrid
+              photos={live}
+              showStatus
+              onDelete={remove}
+              onOpen={(i) => setLb({ photos: live, index: i })}
+              userId={user?.id}
+              canLike
+              renderActions={(p) => <button className="ph-btn" onClick={() => approve(p.id, false)}>Fjern fra forside</button>}
+            />
+          ) : (
+            <p className="ph-empty">Ingen billeder på forsiden endnu.</p>
+          )}
         </div>
       </div>
+
+      {lb && (
+        <PhotoLightbox photos={lb.photos} index={lb.index} onClose={() => setLb(null)} userId={user?.id} canLike />
+      )}
     </main>
   );
 }
