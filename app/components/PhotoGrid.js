@@ -8,7 +8,7 @@ function statusChip(p) {
   return { txt: "Afventer godkendelse", cls: "wait" };
 }
 
-export default function PhotoGrid({ photos, showStatus, onDelete, renderActions, onOpen, userId, canLike, onNeedLogin }) {
+export default function PhotoGrid({ photos, showStatus, onDelete, renderActions, onOpen, userId, canLike, onNeedLogin, albums, onSetAlbum }) {
   if (!photos.length) return null;
   return (
     <div className="ph-grid">
@@ -28,6 +28,17 @@ export default function PhotoGrid({ photos, showStatus, onDelete, renderActions,
                 <LikeButton photo={p} userId={userId} canLike={canLike} onNeedLogin={onNeedLogin} />
               </div>
             </figcaption>
+            {albums && onSetAlbum && (
+              <label className="ph-album">
+                <span>Album</span>
+                <select value={p.album_id || ""} onClick={(e) => e.stopPropagation()} onChange={(e) => onSetAlbum(p, e.target.value || null)}>
+                  <option value="">Intet album</option>
+                  {albums.map((a) => (
+                    <option key={a.id} value={a.id}>{a.title}{a.owner_name ? ` · ${a.owner_name}` : ""}</option>
+                  ))}
+                </select>
+              </label>
+            )}
             {(onDelete || renderActions) && (
               <div className="ph-actions">
                 {renderActions && renderActions(p)}

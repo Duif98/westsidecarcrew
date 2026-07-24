@@ -25,3 +25,10 @@ export async function setAlbumCover(albumId, photoId) {
   const { error } = await supabase.from("albums").update({ cover_photo_id: photoId }).eq("id", albumId);
   if (error) throw new Error(error.message);
 }
+
+// Move an existing photo into an album (or out of one, with albumId = null).
+// RLS lets the photo's owner or an admin do this.
+export async function setPhotoAlbum(photoId, albumId) {
+  const { error } = await supabase.from("photos").update({ album_id: albumId || null }).eq("id", photoId);
+  if (error) throw new Error(error.message);
+}

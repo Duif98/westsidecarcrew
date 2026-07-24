@@ -1052,3 +1052,9 @@ a.btn-gold { text-decoration: none; }
 .album-label.none { color: var(--faint); background: none; border-color: var(--line); }
 .ph-actions { flex-wrap: wrap; }
 .ph-btn.cover-on { border-color: var(--gold); color: var(--gold); background: rgba(201,168,119,0.14); }
+
+/* Per-photo album picker */
+.ph-album { display: flex; flex-direction: column; gap: 0.35rem; padding: 0 0.9rem 0.7rem; }
+.ph-album > span { font-family: var(--font-mono), monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+.ph-album select { font-family: var(--font-body), sans-serif; font-size: 0.82rem; color: var(--text); background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 8px; padding: 0.5rem 0.6rem; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a6a89f' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+.ph-album select:focus { outline: none; border-color: var(--gold); }

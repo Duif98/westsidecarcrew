@@ -6,7 +6,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { enrichPhotos, deletePhoto, setApproved } from "../lib/photos";
-import { getAlbums, setAlbumCover } from "../lib/albums";
+import { getAlbums, setAlbumCover, setPhotoAlbum } from "../lib/albums";
 import PhotoGrid from "../components/PhotoGrid";
 import PhotoLightbox from "../components/PhotoLightbox";
 
@@ -39,6 +39,7 @@ export default function AdminPage() {
   const approve = async (id, val) => { await setApproved(id, val); await load(); };
   const remove = async (p) => { if (confirm("Slet billedet helt?")) { await deletePhoto(p); await load(); } };
   const chooseCover = async (p) => { await setAlbumCover(p.album_id, p.id); await load(); };
+  const changeAlbum = async (p, albumId) => { await setPhotoAlbum(p.id, albumId); await load(); };
 
   if (loading || !session || !isAdmin) return <main className="member"><div className="wrap" style={{ paddingTop: 120 }}>Indlæser…</div></main>;
 
@@ -71,7 +72,7 @@ export default function AdminPage() {
             <PhotoGrid
               photos={pending} showStatus onDelete={remove}
               onOpen={(i) => setLb({ photos: pending, index: i })}
-              userId={user?.id} canLike
+              userId={user?.id} canLike albums={albums} onSetAlbum={changeAlbum}
               renderActions={(p) => (<>{albumTag(p)}<button className="ph-btn ok" onClick={() => approve(p.id, true)}>Godkend</button></>)}
             />
           ) : <p className="ph-empty">Ingen billeder afventer godkendelse. 👍</p>}
@@ -83,7 +84,7 @@ export default function AdminPage() {
             <PhotoGrid
               photos={live} showStatus onDelete={remove}
               onOpen={(i) => setLb({ photos: live, index: i })}
-              userId={user?.id} canLike
+              userId={user?.id} canLike albums={albums} onSetAlbum={changeAlbum}
               renderActions={(p) => (
                 <>
                   {albumTag(p)}

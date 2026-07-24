@@ -6,7 +6,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { uploadPhoto, enrichPhotos, deletePhoto } from "../lib/photos";
-import { getAlbums, createAlbum } from "../lib/albums";
+import { getAlbums, createAlbum, setPhotoAlbum } from "../lib/albums";
 import PhotoGrid from "../components/PhotoGrid";
 import PhotoLightbox from "../components/PhotoLightbox";
 import InviteButton from "../components/InviteButton";
@@ -79,6 +79,8 @@ export default function MedlemPage() {
     await deletePhoto(p); await load();
   };
 
+  const changeAlbum = async (p, albumId) => { await setPhotoAlbum(p.id, albumId); await load(); };
+
   if (loading || !session) return <main className="member"><div className="wrap" style={{ paddingTop: 120 }}>Indlæser…</div></main>;
 
   const mine = all.filter((p) => p.user_id === user.id);
@@ -150,7 +152,7 @@ export default function MedlemPage() {
         <div className="member-section">
           <span className="overline">Mine billeder</span>
           {mine.length ? (
-            <PhotoGrid photos={mine} showStatus onDelete={remove} onOpen={(i) => setLb({ photos: mine, index: i })} {...likeProps} />
+            <PhotoGrid photos={mine} showStatus onDelete={remove} onOpen={(i) => setLb({ photos: mine, index: i })} albums={albums} onSetAlbum={changeAlbum} {...likeProps} />
           ) : (
             <p className="ph-empty">Du har ikke uploadet endnu — vælg et billede ovenfor 👆</p>
           )}
