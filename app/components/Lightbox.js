@@ -1,13 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { asset } from "../lib/asset";
 
 export default function Lightbox({ car, startIndex = 0, onClose }) {
   const [i, setI] = useState(startIndex);
+  const [mounted, setMounted] = useState(false);
   const closeRef = useRef(null);
   const thumbsRef = useRef(null);
   const touchX = useRef(null);
+
+  useEffect(() => setMounted(true), []);
 
   const photos = car.photos;
   const n = photos.length;
@@ -62,7 +66,10 @@ export default function Lightbox({ car, startIndex = 0, onClose }) {
   const full = (p) => asset(`/cars/${car.slug}/${p.src}`);
   const thumb = (p) => asset(`/cars/${car.slug}/thumb/${p.src}`);
 
-  return (
+  if (!mounted) return null;
+
+  // Portal to <body> so it sits above the sticky nav (close button was hidden).
+  return createPortal(
     <div
       className="lb"
       role="dialog"
@@ -137,6 +144,7 @@ export default function Lightbox({ car, startIndex = 0, onClose }) {
           <img key={p.src} src={full(p)} alt="" />
         ))}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
