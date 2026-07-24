@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getPosts } from "../lib/posts";
 import Reveal from "./Reveal";
 
-const fmtDate = (t) => new Date(t).toLocaleDateString("da-DK", { day: "numeric", month: "long", year: "numeric" });
+const fmtDate = (t) => new Date(t).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 export default function NewsBoard() {
   const [posts, setPosts] = useState([]);
@@ -22,8 +22,8 @@ export default function NewsBoard() {
     <section className="section newsboard" id="nyheder">
       <div className="wrap">
         <Reveal className="section-head" as="div">
-          <span className="overline">Opslagstavle</span>
-          <h2>Nyt fra crewet</h2>
+          <span className="overline">Notice board</span>
+          <h2>News from the crew</h2>
         </Reveal>
 
         <div className="news-grid">
@@ -40,7 +40,7 @@ export default function NewsBoard() {
                 </div>
               )}
               <div className="news-body">
-                {p.pinned && <span className="news-pin">Fastgjort</span>}
+                {p.pinned && <span className="news-pin">Pinned</span>}
                 <h3 className="news-title">{p.title}</h3>
                 {p.body && <p className="news-text">{p.body}</p>}
                 <div className="news-meta">

@@ -34,7 +34,7 @@ export default function Nav() {
             Instagram
           </a>
           <Link href={session ? "/medlem" : "/login"} className="ig">
-            {session ? "Medlem" : "Log ind"}
+            {session ? "Member" : "Log in"}
           </Link>
         </nav>
       </div>

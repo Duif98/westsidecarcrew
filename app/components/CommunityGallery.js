@@ -42,9 +42,9 @@ export default function CommunityGallery() {
   return (
     <div className="community" id="crew-billeder">
       <Reveal className="section-head" as="div">
-        <span className="overline">Fra crewet</span>
-        <h2>Medlemmernes billeder</h2>
-        <p>Uploadet af crewet selv. <Link href="/login" className="c-link">Log ind</Link> for at se alle billeder og dele dine egne.</p>
+        <span className="overline">From the crew</span>
+        <h2>Members&rsquo; photos</h2>
+        <p>Uploaded by the crew. <Link href="/login" className="c-link">Log in</Link> to see every photo and share your own.</p>
       </Reveal>
       <div className="community-grid">
         {photos.map((p, idx) => (
