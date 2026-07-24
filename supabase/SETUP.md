@@ -25,6 +25,17 @@ Under **Authentication → Sign In / Providers → Email**:
 - Disse to er allerede lagt ind i sitet (`app/lib/supabaseClient.js`). Anon-nøglen er
   offentlig af design og beskyttet af sikkerhedsreglerne — helt trygt at have i koden.
 
+## 4b. URL'er til "glemt adgangskode" (nødvendigt for reset-links)
+Under **Authentication → URL Configuration**:
+- **Site URL:** `https://duif98.github.io/westsidecarcrew`
+- **Redirect URLs** (tilføj begge, så reset-linket må åbne siden):
+  - `https://duif98.github.io/westsidecarcrew/reset/`
+  - `http://localhost:3000/reset/` (til lokal test)
+
+> Emails sendes via Supabase' indbyggede SMTP, som på gratis-planen er **rate-begrænset**
+> (nogle få i timen) og kan lande i spam. Fint til en vennegruppe; ved behov kan der senere
+> sættes en egen SMTP op under **Authentication → Emails**.
+
 ## 5. Gør dig selv til admin
 Efter du har oprettet din egen profil på sitet første gang:
 - **SQL Editor → New query**, kør (skift til dit brugernavn):

@@ -934,6 +934,10 @@ a {
 .auth-msg { font-size: 0.85rem; padding: 0.7rem 0.9rem; border-radius: 10px; line-height: 1.45; }
 .auth-msg.err { background: rgba(214,59,47,0.12); color: #f0a99f; border: 1px solid rgba(214,59,47,0.3); }
 .auth-msg.ok { background: rgba(201,168,119,0.12); color: var(--gold-bright); border: 1px solid rgba(201,168,119,0.3); }
+.auth-alt { margin-top: 1.1rem; text-align: center; }
+.auth-alt button { background: none; border: none; color: var(--muted); font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.06em; cursor: pointer; transition: color 0.2s; }
+.auth-alt button:hover { color: var(--gold-bright); }
+a.btn-gold { text-decoration: none; }
 
 /* Member / admin shell */
 .member { min-height: 100svh; position: relative; z-index: 2; }

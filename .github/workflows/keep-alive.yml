@@ -12,8 +12,10 @@ jobs:
     steps:
       - name: Ping Supabase
         run: |
-          curl -X GET \
+          # Query a real table so it counts as genuine database activity.
+          curl -fsS -X GET \
             -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/?select=1" \
-            --connect-timeout 5 \
-            --max-time 10
+            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
+            "${{ secrets.SUPABASE_URL }}/rest/v1/profiles?select=id&limit=1" \
+            --connect-timeout 10 \
+            --max-time 20

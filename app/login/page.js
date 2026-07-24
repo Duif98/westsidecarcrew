@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
+import { BASE_PATH } from "../lib/asset";
 
 export default function LoginPage() {
   const router = useRouter();
   const { session, profile, loading } = useAuth();
-  const [mode, setMode] = useState("login"); // 'login' | 'signup'
+  const [mode, setMode] = useState("login"); // 'login' | 'signup' | 'forgot'
   const [f, setF] = useState({ username: "", email: "", password: "", code: "" });
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -60,22 +61,39 @@ export default function LoginPage() {
   const submit = async (e) => {
     e.preventDefault();
     setErr(""); setInfo(""); setBusy(true);
-    try { mode === "login" ? await doLogin() : await doSignup(); }
+    try {
+      if (mode === "login") await doLogin();
+      else if (mode === "signup") await doSignup();
+      else await doForgot();
+    }
     catch (e2) { setErr(e2.message); }
     finally { setBusy(false); }
+  };
+
+  const doForgot = async () => {
+    const redirectTo = `${window.location.origin}${BASE_PATH}/reset/`;
+    const { error } = await supabase.auth.resetPasswordForEmail(f.email.trim(), { redirectTo });
+    if (error) throw new Error(error.message);
+    setInfo("Vi har sendt et link til at nulstille din adgangskode – tjek din indbakke (og evt. spam).");
   };
 
   return (
     <main className="auth-wrap">
       <div className="auth-card">
         <Link href="/" className="auth-home">← West Side Car Crew</Link>
-        <h1 className="auth-title">{mode === "login" ? "Log ind" : "Bliv medlem"}</h1>
-        <p className="auth-sub">{mode === "login" ? "Log ind for at se og uploade billeder." : "Opret din profil med crewets kode."}</p>
+        <h1 className="auth-title">{mode === "login" ? "Log ind" : mode === "signup" ? "Bliv medlem" : "Nulstil adgangskode"}</h1>
+        <p className="auth-sub">
+          {mode === "login" ? "Log ind for at se og uploade billeder."
+            : mode === "signup" ? "Opret din profil med crewets kode."
+            : "Indtast din email, så sender vi et link til at vælge en ny adgangskode."}
+        </p>
 
-        <div className="auth-tabs">
-          <button className={mode === "login" ? "on" : ""} onClick={() => { setMode("login"); setErr(""); }} type="button">Log ind</button>
-          <button className={mode === "signup" ? "on" : ""} onClick={() => { setMode("signup"); setErr(""); }} type="button">Opret</button>
-        </div>
+        {mode !== "forgot" && (
+          <div className="auth-tabs">
+            <button className={mode === "login" ? "on" : ""} onClick={() => { setMode("login"); setErr(""); setInfo(""); }} type="button">Log ind</button>
+            <button className={mode === "signup" ? "on" : ""} onClick={() => { setMode("signup"); setErr(""); setInfo(""); }} type="button">Opret</button>
+          </div>
+        )}
 
         <form onSubmit={submit} className="auth-form">
           {mode === "signup" && (
@@ -86,9 +104,11 @@ export default function LoginPage() {
           <label>Email
             <input type="email" value={f.email} onChange={set("email")} autoComplete="email" required />
           </label>
-          <label>Adgangskode
-            <input type="password" value={f.password} onChange={set("password")} autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={6} required />
-          </label>
+          {mode !== "forgot" && (
+            <label>Adgangskode
+              <input type="password" value={f.password} onChange={set("password")} autoComplete={mode === "login" ? "current-password" : "new-password"} minLength={6} required />
+            </label>
+          )}
           {mode === "signup" && (
             <label>Oprettelses-kode
               <input value={f.code} onChange={set("code")} placeholder="Crewets kode" required />
@@ -99,9 +119,18 @@ export default function LoginPage() {
           {info && <div className="auth-msg ok">{info}</div>}
 
           <button className="btn-gold" type="submit" disabled={busy}>
-            {busy ? "Vent…" : mode === "login" ? "Log ind" : "Opret profil"}
+            {busy ? "Vent…" : mode === "login" ? "Log ind" : mode === "signup" ? "Opret profil" : "Send nulstillingslink"}
           </button>
         </form>
+
+        <div className="auth-alt">
+          {mode === "login" && (
+            <button type="button" onClick={() => { setMode("forgot"); setErr(""); setInfo(""); }}>Glemt adgangskode?</button>
+          )}
+          {mode === "forgot" && (
+            <button type="button" onClick={() => { setMode("login"); setErr(""); setInfo(""); }}>← Tilbage til login</button>
+          )}
+        </div>
       </div>
     </main>
   );
