@@ -22,7 +22,7 @@ export default function CommunityGallery() {
     (async () => {
       const { data } = await supabase
         .from("photos")
-        .select("*, profiles(username)")
+        .select("*, profiles!photos_user_id_fkey(username)")
         .eq("visibility", "public")
         .eq("approved", true)
         .order("created_at", { ascending: false })

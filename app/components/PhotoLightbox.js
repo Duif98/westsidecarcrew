@@ -1,15 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import LikeButton from "./LikeButton";
 
 export default function PhotoLightbox({ photos, index, onClose, userId, canLike, onNeedLogin }) {
   const [i, setI] = useState(index);
+  const [mounted, setMounted] = useState(false);
   const touchX = useRef(null);
   const n = photos.length;
   const p = photos[i];
 
   const go = useCallback((d) => setI((v) => (v + d + n) % n), [n]);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const onKey = (e) => {
@@ -31,7 +35,11 @@ export default function PhotoLightbox({ photos, index, onClose, userId, canLike,
     touchX.current = null;
   };
 
-  return (
+  if (!mounted) return null;
+
+  // Rendered on <body> via a portal so it escapes any section stacking context
+  // and always sits above the sticky nav.
+  return createPortal(
     <div className="plb" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <button className="plb-close" onClick={onClose} aria-label="Luk">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
@@ -62,6 +70,7 @@ export default function PhotoLightbox({ photos, index, onClose, userId, canLike,
         </div>
         {p && <LikeButton photo={p} userId={userId} canLike={canLike} onNeedLogin={onNeedLogin} />}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

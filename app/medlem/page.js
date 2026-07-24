@@ -28,7 +28,7 @@ export default function MedlemPage() {
   const load = useCallback(async () => {
     const { data } = await supabase
       .from("photos")
-      .select("*, profiles(username)")
+      .select("*, profiles!photos_user_id_fkey(username)")
       .order("created_at", { ascending: false });
     setAll(await enrichPhotos(data || [], user?.id));
   }, [user?.id]);
