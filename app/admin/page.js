@@ -56,6 +56,7 @@ export default function AdminPage() {
         <div className="wrap member-bar-inner">
           <Link href="/" className="wordmark"><span className="dot" /> West Side Car Crew</Link>
           <div className="member-actions">
+            <Link href="/chat" className="mlink">Chat</Link>
             <Link href="/medlem" className="mlink">Medlem</Link>
           </div>
         </div>
