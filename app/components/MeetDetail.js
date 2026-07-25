@@ -14,6 +14,15 @@ import MeetWeather from "./MeetWeather";
 const fmt = (t) =>
   new Date(t).toLocaleString("da-DK", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
 
+// yr.no's hourly-table takes ?i=<whole days from today> to open the right day.
+const yrDayIndex = (iso) => {
+  const d = new Date(iso);
+  const start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.max(0, Math.round((start - today) / 86400000));
+};
+
 const STATUS = [
   { key: "yes", label: "Kommer", emoji: "✅" },
   { key: "maybe", label: "Måske", emoji: "🤔" },
@@ -133,12 +142,12 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
         {typeof event.lat === "number" && typeof event.lng === "number" && (
           <a
             className="md-yr"
-            href={`https://www.yr.no/en/forecast/daily-table/${event.lat.toFixed(4)},${event.lng.toFixed(4)}`}
+            href={`https://www.yr.no/en/forecast/hourly-table/${event.lat.toFixed(4)},${event.lng.toFixed(4)}/?i=${yrDayIndex(event.starts_at)}`}
             target="_blank"
             rel="noopener noreferrer"
           >
             <span className="md-yr-icon">🌦</span>
-            <span>Se fuld vejrudsigt på yr.no</span>
+            <span>Se timevejr for dagen på yr.no</span>
             <span className="md-yr-arrow">↗</span>
           </a>
         )}
