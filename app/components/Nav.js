@@ -11,10 +11,10 @@ const IG = "https://www.instagram.com/westsidecarcrew/";
 const LINKS = [
   { href: "/#crewet", label: "The Crew" },
   { href: "/#garagen", label: "The Garage" },
-  { href: "/medlemmer", label: "Medlemmer" },
+  { href: "/medlemmer", label: "Members" },
   { href: "/events", label: "Meets" },
   { href: "/calendar", label: "Calendar" },
-  { href: "/kort", label: "Kort" },
+  { href: "/kort", label: "Map" },
 ];
 
 export default function Nav() {

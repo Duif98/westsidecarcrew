@@ -14,10 +14,10 @@ const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(pa
 const LINKS = [
   { href: "/#crewet", label: "The Crew" },
   { href: "/#garagen", label: "The Garage" },
-  { href: "/medlemmer", label: "Medlemmer" },
+  { href: "/medlemmer", label: "Members" },
   { href: "/events", label: "Meets" },
   { href: "/calendar", label: "Calendar" },
-  { href: "/kort", label: "Kort" },
+  { href: "/kort", label: "Map" },
 ];
 
 // Global mobile menu — a fixed hamburger + slide-over drawer, rendered on every
@@ -41,7 +41,7 @@ export default function NavMenu() {
 
   return (
     <>
-      <button className="menu-fab" aria-label={open ? "Luk menu" : "Åbn menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button className="menu-fab" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <span /><span /><span />
         {session && total > 0 && !open && <span className="nav-badge menu-fab-badge">{total > 9 ? "9+" : total}</span>}
       </button>
@@ -56,8 +56,8 @@ export default function NavMenu() {
                   : (session && profile?.username ? profile.username.slice(0, 2).toUpperCase() : "?")}
               </span>
               <span>
-                <b>{session ? `@${profile?.username || "medlem"}` : "Log ind"}</b>
-                <span className="nav-m-sub">{session ? "Se din profil" : "Bliv en del af crewet"}</span>
+                <b>{session ? `@${profile?.username || "member"}` : "Log in"}</b>
+                <span className="nav-m-sub">{session ? "View your profile" : "Join the crew"}</span>
               </span>
               {session && total > 0 && <span className="nav-badge" style={{ position: "static" }}>{total > 9 ? "9+" : total}</span>}
             </Link>
@@ -70,7 +70,7 @@ export default function NavMenu() {
               <>
                 <div className="nav-m-sep" />
                 <Link href="/chat" className="nav-m-link" onClick={close}>Crew chat</Link>
-                <Link href="/upload" className="nav-m-link" onClick={close}>Upload billeder</Link>
+                <Link href="/upload" className="nav-m-link" onClick={close}>Upload photos</Link>
                 <Link href="/leaderboard" className="nav-m-link" onClick={close}>Leaderboard</Link>
                 {isAdmin && <Link href="/admin" className="nav-m-link" onClick={close}>Admin</Link>}
               </>
@@ -79,8 +79,8 @@ export default function NavMenu() {
             <a href={IG} target="_blank" rel="noopener noreferrer" className="nav-m-link" onClick={close}>Instagram ↗</a>
 
             {session
-              ? <button className="nav-m-link nav-m-logout" onClick={logout}>Log ud</button>
-              : <Link href="/login" className="nav-m-link" onClick={close}>Log ind</Link>}
+              ? <button className="nav-m-link nav-m-logout" onClick={logout}>Log out</button>
+              : <Link href="/login" className="nav-m-link" onClick={close}>Log in</Link>}
           </div>
         </div>,
         document.body
