@@ -15,14 +15,12 @@ export default function KortPage() {
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(null);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const { data } = await supabase.from("events").select("*").order("starts_at", { ascending: true });
-      if (active) { setEvents(data || []); setReady(true); }
-    })();
-    return () => { active = false; };
-  }, []);
+  const loadEvents = async () => {
+    const { data } = await supabase.from("events").select("*").order("starts_at", { ascending: true });
+    setEvents(data || []);
+    setReady(true);
+  };
+  useEffect(() => { loadEvents(); }, []);
 
   const pinned = events.filter((e) => typeof e.lat === "number" && typeof e.lng === "number");
   const noPin = events.filter((e) => !(typeof e.lat === "number" && typeof e.lng === "number"));
@@ -63,7 +61,7 @@ export default function KortPage() {
         )}
       </div>
 
-      {open && <MeetDetail event={open} onClose={() => setOpen(null)} />}
+      {open && <MeetDetail event={open} onClose={() => setOpen(null)} onUpdated={(u) => { setOpen(u); loadEvents(); }} onDeleted={loadEvents} />}
     </main>
   );
 }

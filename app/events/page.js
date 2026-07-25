@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
+import MeetForm from "../components/MeetForm";
 
 const fmt = (t) =>
   new Date(t).toLocaleString("da-DK", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -22,10 +23,7 @@ export default function EventsPage() {
   const [events, setEvents] = useState([]);
   const [rsvps, setRsvps] = useState({}); // { [eventId]: [{user_id, status, username}] }
   const [ready, setReady] = useState(false);
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ title: "", date: "", time: "", location: "", location_url: "", description: "" });
-  const [saving, setSaving] = useState(false);
-  const [err, setErr] = useState("");
+  const [formOpen, setFormOpen] = useState(null); // null | { event? }
 
   const load = async () => {
     const { data: evs } = await supabase
@@ -71,27 +69,6 @@ export default function EventsPage() {
     await supabase.from("event_rsvps").upsert({ event_id: eventId, user_id: user.id, status }, { onConflict: "event_id,user_id" });
   };
 
-  const createEvent = async (e) => {
-    e.preventDefault();
-    setErr("");
-    if (!form.title.trim() || !form.date) { setErr("Titel og dato skal udfyldes."); return; }
-    setSaving(true);
-    const starts_at = new Date(`${form.date}T${form.time || "12:00"}`).toISOString();
-    const { error } = await supabase.from("events").insert({
-      title: form.title.trim().slice(0, 120),
-      description: form.description.trim() || null,
-      location: form.location.trim() || null,
-      location_url: form.location_url.trim() || null,
-      starts_at,
-      created_by: user.id,
-    });
-    setSaving(false);
-    if (error) { setErr(error.message); return; }
-    setForm({ title: "", date: "", time: "", location: "", location_url: "", description: "" });
-    setShowForm(false);
-    load();
-  };
-
   const removeEvent = async (id) => {
     if (!confirm("Slet dette meet?")) return;
     setEvents((p) => p.filter((e) => e.id !== id));
@@ -107,6 +84,7 @@ export default function EventsPage() {
           <Link href="/" className="wordmark"><span className="dot" /> West Side Car Crew</Link>
           <div className="member-actions">
             <Link href="/calendar" className="mlink">📅 Kalender</Link>
+            <Link href="/kort" className="mlink">🗺️ Kort</Link>
             {session ? <Link href="/medlem" className="mlink">‹ Medlem</Link> : <Link href="/login" className="mlink">Log ind</Link>}
           </div>
         </div>
@@ -119,34 +97,9 @@ export default function EventsPage() {
             <h1 className="member-title">Kommende meets</h1>
           </div>
           {session && (
-            <button className="btn-gold" onClick={() => setShowForm((s) => !s)}>
-              {showForm ? "Luk" : "+ Nyt meet"}
-            </button>
+            <button className="btn-gold" onClick={() => setFormOpen({})}>+ Nyt meet</button>
           )}
         </div>
-
-        {showForm && (
-          <form className="event-form" onSubmit={createEvent}>
-            <div className="ef-grid">
-              <label className="post-field ef-full"><span>Titel</span>
-                <input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="fx Søndagscruise til havnen" maxLength={120} /></label>
-              <label className="post-field"><span>Dato</span>
-                <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} /></label>
-              <label className="post-field"><span>Tidspunkt</span>
-                <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} /></label>
-              <label className="post-field ef-full"><span>Sted</span>
-                <input value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} placeholder="fx P-plads ved Esbjerg havn" /></label>
-              <label className="post-field ef-full"><span>Kort-link (valgfrit)</span>
-                <input value={form.location_url} onChange={(e) => setForm({ ...form, location_url: e.target.value })} placeholder="https://maps.google.com/…" /></label>
-              <label className="post-field ef-full"><span>Beskrivelse</span>
-                <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="Hvad sker der?" /></label>
-            </div>
-            {err && <p className="ef-err">{err}</p>}
-            <div className="post-actions">
-              <button className="btn-gold" type="submit" disabled={saving}>{saving ? "Gemmer…" : "Opret meet"}</button>
-            </div>
-          </form>
-        )}
 
         {ready && events.length === 0 && (
           <div className="events-empty">
@@ -172,7 +125,12 @@ export default function EventsPage() {
                 <div className="event-main">
                   <div className="event-top">
                     <h2>{ev.title}</h2>
-                    {canManage && <button className="event-del" onClick={() => removeEvent(ev.id)} aria-label="Slet meet">✕</button>}
+                    {canManage && (
+                      <div className="event-actions">
+                        <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.3rem 0.7rem" }} onClick={() => setFormOpen({ event: ev })}>✎ Rediger</button>
+                        <button className="event-del" onClick={() => removeEvent(ev.id)} aria-label="Slet meet">✕</button>
+                      </div>
+                    )}
                   </div>
                   <p className="event-when">🗓 {fmt(ev.starts_at)}</p>
                   {ev.location && (
@@ -204,6 +162,15 @@ export default function EventsPage() {
           })}
         </div>
       </div>
+
+      {formOpen && (
+        <MeetForm
+          event={formOpen.event}
+          onClose={() => setFormOpen(null)}
+          onCreated={() => load()}
+          onSaved={() => load()}
+        />
+      )}
     </main>
   );
 }

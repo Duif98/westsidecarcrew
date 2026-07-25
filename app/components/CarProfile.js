@@ -23,10 +23,20 @@ export default function CarProfile({ album, curated, onClose }) {
   const [entry, setEntry] = useState({ title: "", date: new Date().toISOString().slice(0, 10), body: "" });
   const [entryFile, setEntryFile] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [claimedBy, setClaimedBy] = useState(album.created_by);
   const fileRef = useRef(null);
 
   const isAdmin = !!profile?.is_admin;
-  const canEdit = !!user && (album.created_by === user.id || isAdmin);
+  const canEdit = !!user && (claimedBy === user.id || isAdmin);
+  const canClaim = !!user && !claimedBy && album.is_curated;
+
+  const claim = async () => {
+    setBusy(true);
+    const { error } = await supabase.rpc("claim_album", { p_album_id: album.id });
+    setBusy(false);
+    if (error) { alert(error.message); return; }
+    setClaimedBy(user.id);
+  };
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -125,6 +135,12 @@ export default function CarProfile({ album, curated, onClose }) {
           <span className="overline">Bil-profil</span>
           <h2>{title}</h2>
           {sub && <p className="cp-sub">{sub}</p>}
+          {canClaim && (
+            <button className="btn-gold cp-claim" onClick={claim} disabled={busy}>
+              {busy ? "…" : "🚗 Claim denne bil (den er min)"}
+            </button>
+          )}
+          {claimedBy && claimedBy === user?.id && <p className="cp-claimed">✓ Din bil</p>}
         </header>
 
         {specRows.length > 0 ? (

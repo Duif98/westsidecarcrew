@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { supabase } from "../lib/supabaseClient";
+import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
+const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 const scoreOf = (r) => r.likes_received * 3 + r.photos * 2 + r.comments;
 
 export default function MembersPage() {
@@ -17,13 +18,20 @@ export default function MembersPage() {
     let active = true;
     (async () => {
       const [{ data: profs }, { data: albums }, { data: board }] = await Promise.all([
-        supabase.from("profiles").select("id, username, created_at, is_admin"),
-        supabase.from("albums").select("id, created_by").not("created_by", "is", null),
+        supabase.from("profiles").select("*"),
+        supabase.from("albums").select("id, created_by, is_curated, owner_name"),
         supabase.rpc("leaderboard"),
       ]);
       if (!active) return;
+      // A member's cars = albums they created + curated cars whose owner matches
+      // their username (same rule the profile page uses, so the counts agree).
+      const byName = {};
+      (profs || []).forEach((p) => (byName[p.username] = p.id));
       const carCount = {};
-      (albums || []).forEach((a) => { carCount[a.created_by] = (carCount[a.created_by] || 0) + 1; });
+      (albums || []).forEach((a) => {
+        const ownerId = a.created_by || (a.is_curated && a.owner_name ? byName[a.owner_name] : null);
+        if (ownerId) carCount[ownerId] = (carCount[ownerId] || 0) + 1;
+      });
 
       // Rank for medals (same score as leaderboard).
       const ranked = (board || []).map((r) => ({ ...r, score: scoreOf(r) })).sort((a, b) => b.score - a.score);
@@ -70,7 +78,7 @@ export default function MembersPage() {
         <div className="members-grid">
           {members.map((m) => (
             <Link href={`/profil?u=${encodeURIComponent(m.username)}`} className="mcard" key={m.id}>
-              <div className="mcard-avatar">{m.username.slice(0, 2).toUpperCase()}</div>
+              <div className="mcard-avatar">{m.avatar_path ? <img src={avatarUrl(m.avatar_path)} alt="" /> : m.username.slice(0, 2).toUpperCase()}</div>
               <div className="mcard-info">
                 <span className="mcard-name">@{m.username}{typeof m.rank === "number" && m.rank < 3 ? ` ${MEDALS[m.rank]}` : ""}</span>
                 <span className="mcard-meta">

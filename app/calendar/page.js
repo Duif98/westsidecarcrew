@@ -115,7 +115,7 @@ export default function CalendarPage() {
         )}
       </div>
 
-      {open && <MeetDetail event={open} onClose={() => setOpen(null)} />}
+      {open && <MeetDetail event={open} onClose={() => setOpen(null)} onUpdated={loadEvents} onDeleted={loadEvents} />}
       {creating && (
         <MeetForm
           presetDate={creating.date}

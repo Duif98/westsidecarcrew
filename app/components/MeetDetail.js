@@ -8,6 +8,7 @@ import { useAuth } from "../lib/AuthProvider";
 import { enrichPhotos, uploadPhoto } from "../lib/photos";
 import PhotoLightbox from "./PhotoLightbox";
 import MeetMap from "./MeetMap";
+import MeetForm from "./MeetForm";
 
 const fmt = (t) =>
   new Date(t).toLocaleString("da-DK", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -20,14 +21,25 @@ const STATUS = [
 
 // Full details + RSVP for a single meet. Rendered as a portal dialog so it can
 // be opened from the calendar (or anywhere).
-export default function MeetDetail({ event, onClose }) {
+export default function MeetDetail({ event: initialEvent, onClose, onUpdated, onDeleted }) {
   const { session, user, profile } = useAuth();
+  const [event, setEvent] = useState(initialEvent);
   const [mounted, setMounted] = useState(false);
   const [rsvps, setRsvps] = useState([]);
   const [photos, setPhotos] = useState([]);
   const [lb, setLb] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [editing, setEditing] = useState(false);
   const fileRef = useRef(null);
+  const isAdmin = !!profile?.is_admin;
+  const canManage = !!user && (event.created_by === user.id || isAdmin);
+
+  const removeMeet = async () => {
+    if (!confirm("Slet dette meet?")) return;
+    await supabase.from("events").delete().eq("id", event.id);
+    onDeleted?.(event.id);
+    onClose();
+  };
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -101,6 +113,12 @@ export default function MeetDetail({ event, onClose }) {
 
         <span className="overline">Meet</span>
         <h2 className="md-title">{event.title}</h2>
+        {canManage && (
+          <div className="md-manage">
+            <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.35rem 0.8rem" }} onClick={() => setEditing(true)}>✎ Rediger</button>
+            <button className="ph-btn del" style={{ flex: "none", width: "auto", padding: "0.35rem 0.8rem" }} onClick={removeMeet}>Slet</button>
+          </div>
+        )}
         <p className="md-when">🗓 {fmt(event.starts_at)}</p>
         {event.location && (
           <p className="md-where">📍 {event.location_url
@@ -167,6 +185,13 @@ export default function MeetDetail({ event, onClose }) {
       </div>
 
       {lb && <PhotoLightbox photos={photos} index={lb.index} onClose={() => setLb(null)} userId={user?.id} canLike={!!session} onNeedLogin={() => { window.location.href = "/login"; }} />}
+      {editing && (
+        <MeetForm
+          event={event}
+          onClose={() => setEditing(false)}
+          onSaved={(updated) => { setEvent(updated); onUpdated?.(updated); }}
+        />
+      )}
     </div>,
     document.body
   );

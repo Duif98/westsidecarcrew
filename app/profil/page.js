@@ -1,23 +1,25 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "../lib/supabaseClient";
+import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { enrichPhotos, withUrls } from "../lib/photos";
 import { cars } from "../data/cars";
 import { asset } from "../lib/asset";
 import CarProfile from "../components/CarProfile";
 import PhotoLightbox from "../components/PhotoLightbox";
+import ProfileWall from "../components/ProfileWall";
 
 const memberSince = (t) => new Date(t).toLocaleDateString("da-DK", { month: "long", year: "numeric" });
 const carsBySlug = Object.fromEntries(cars.map((c) => [c.slug, c]));
+const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
 function ProfileInner() {
   const params = useSearchParams();
   const username = params.get("u");
-  const { session, user } = useAuth();
+  const { session, user, refreshProfile } = useAuth();
   const [profile, setProfile] = useState(null);
   const [albums, setAlbums] = useState([]);
   const [covers, setCovers] = useState({});
@@ -28,6 +30,39 @@ function ProfileInner() {
   const [notFound, setNotFound] = useState(false);
   const [carOpen, setCarOpen] = useState(null);
   const [lb, setLb] = useState(null);
+  const [editing, setEditing] = useState(false);
+  const [edit, setEdit] = useState({ bio: "", location: "" });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const avatarRef = useRef(null);
+
+  const me = !!user && profile?.id === user.id;
+
+  const openEditor = () => {
+    setEdit({ bio: profile.bio || "", location: profile.location || "" });
+    setAvatarFile(null);
+    setEditing(true);
+  };
+
+  const saveProfile = async () => {
+    setSavingProfile(true);
+    try {
+      let avatar_path = profile.avatar_path || null;
+      if (avatarFile) {
+        const ext = (avatarFile.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+        avatar_path = `${user.id}/avatar/${crypto.randomUUID()}.${ext}`;
+        const up = await supabase.storage.from(PUBLIC_BUCKET).upload(avatar_path, avatarFile, { cacheControl: "3600", contentType: avatarFile.type });
+        if (up.error) throw up.error;
+      }
+      const { error } = await supabase.rpc("update_my_profile", { p_bio: edit.bio, p_location: edit.location, p_avatar_path: avatar_path });
+      if (error) throw error;
+      setProfile((p) => ({ ...p, bio: edit.bio.trim() || null, location: edit.location.trim() || null, avatar_path }));
+      setEditing(false);
+      refreshProfile?.();
+    } catch (err) {
+      alert("Kunne ikke gemme profil: " + (err.message || err));
+    } finally { setSavingProfile(false); }
+  };
 
   useEffect(() => {
     if (!username) { setNotFound(true); setReady(true); return; }
@@ -106,18 +141,53 @@ function ProfileInner() {
   return (
     <div className="wrap profil-body">
       <div className="profil-head">
-        <div className="profil-avatar">{initials}</div>
+        <div className="profil-avatar">
+          {profile.avatar_path ? <img src={avatarUrl(profile.avatar_path)} alt={profile.username} /> : initials}
+        </div>
         <div className="profil-id">
           <span className="overline">Medlem</span>
           <h1 className="member-title">@{profile.username}</h1>
-          <p className="profil-since">Medlem siden {memberSince(profile.created_at)}</p>
+          <p className="profil-since">
+            Medlem siden {memberSince(profile.created_at)}
+            {profile.location ? ` · 📍 ${profile.location}` : ""}
+          </p>
           {badges.length > 0 && (
             <div className="profil-badges">
               {badges.map((b) => <span key={b.t} className="lb-badge" title={b.t}>{b.e} {b.t}</span>)}
             </div>
           )}
+          {me && !editing && <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.4rem 0.9rem", marginTop: "0.7rem" }} onClick={openEditor}>✎ Rediger profil</button>}
         </div>
       </div>
+
+      {profile.bio && !editing && <p className="profil-bio">{profile.bio}</p>}
+
+      {me && editing && (
+        <div className="profil-editor">
+          <div className="pe-avatar-row">
+            <div className="profil-avatar sm">{avatarFile ? <img src={URL.createObjectURL(avatarFile)} alt="" /> : (profile.avatar_path ? <img src={avatarUrl(profile.avatar_path)} alt="" /> : initials)}</div>
+            <input ref={avatarRef} type="file" accept="image/*" hidden onChange={(e) => setAvatarFile(e.target.files?.[0] || null)} />
+            <button type="button" className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.45rem 0.9rem" }} onClick={() => avatarRef.current?.click()}>Skift profilbillede</button>
+          </div>
+          <label className="post-field"><span>Om mig</span>
+            <textarea rows={3} value={edit.bio} onChange={(e) => setEdit({ ...edit, bio: e.target.value })} placeholder="Fortæl lidt om dig selv og dine biler…" maxLength={600} /></label>
+          <label className="post-field"><span>Hvor hører du til</span>
+            <input value={edit.location} onChange={(e) => setEdit({ ...edit, location: e.target.value })} placeholder="fx Esbjerg" maxLength={80} /></label>
+          <div className="post-actions">
+            <button className="btn-gold" style={{ width: "auto" }} onClick={saveProfile} disabled={savingProfile}>{savingProfile ? "Gemmer…" : "Gem profil"}</button>
+            <button className="ph-btn" style={{ flex: "none", width: "auto" }} onClick={() => setEditing(false)}>Annullér</button>
+          </div>
+        </div>
+      )}
+
+      {me && (
+        <div className="profil-tools">
+          <Link href="/chat" className="ptool">💬 Chat</Link>
+          <Link href="/upload" className="ptool">📸 Upload</Link>
+          <Link href="/leaderboard" className="ptool">🏆 Leaderboard</Link>
+          {profile.is_admin && <Link href="/admin" className="ptool">🛠 Admin</Link>}
+        </div>
+      )}
 
       <div className="profil-stats">
         <div className="pstat"><b>{stats?.photos ?? 0}</b><span>Billeder</span></div>
@@ -164,6 +234,8 @@ function ProfileInner() {
       {albums.length === 0 && photos.length === 0 && (
         <p className="muted" style={{ marginTop: "2rem" }}>@{profile.username} har ikke delt biler eller billeder endnu.</p>
       )}
+
+      <ProfileWall ownerId={profile.id} ownerName={profile.username} />
 
       {carOpen && <CarProfile album={carOpen.album} curated={carOpen.curated} onClose={() => setCarOpen(null)} />}
       {lb && <PhotoLightbox photos={photos} index={lb.index} onClose={() => setLb(null)} userId={user?.id} canLike={!!session} onNeedLogin={() => { window.location.href = "/login"; }} />}

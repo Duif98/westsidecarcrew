@@ -6,13 +6,20 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import MapPicker from "./MapPicker";
 
-// Create-a-meet popup, open to any logged-in member. `presetDate` (YYYY-MM-DD)
-// prefills the date, e.g. when opened by clicking a day in the calendar.
-export default function MeetForm({ presetDate = "", onClose, onCreated }) {
+const pad = (n) => String(n).padStart(2, "0");
+const toDate = (iso) => { const d = new Date(iso); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; };
+const toTime = (iso) => { const d = new Date(iso); return `${pad(d.getHours())}:${pad(d.getMinutes())}`; };
+
+// Create- or edit-a-meet popup, open to any logged-in member (own meets) and
+// admins (any). `presetDate` prefills the date on create; pass `event` to edit.
+export default function MeetForm({ presetDate = "", event = null, onClose, onCreated, onSaved }) {
   const { user } = useAuth();
+  const editing = !!event;
   const [mounted, setMounted] = useState(false);
-  const [f, setF] = useState({ title: "", date: presetDate, time: "", location: "", location_url: "", description: "" });
-  const [pin, setPin] = useState(null); // { lat, lng }
+  const [f, setF] = useState(editing
+    ? { title: event.title || "", date: toDate(event.starts_at), time: toTime(event.starts_at), location: event.location || "", location_url: event.location_url || "", description: event.description || "" }
+    : { title: "", date: presetDate, time: "", location: "", location_url: "", description: "" });
+  const [pin, setPin] = useState(editing && typeof event.lat === "number" && typeof event.lng === "number" ? { lat: event.lat, lng: event.lng } : null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
@@ -29,7 +36,7 @@ export default function MeetForm({ presetDate = "", onClose, onCreated }) {
     if (!f.title.trim() || !f.date) { setErr("Titel og dato skal udfyldes."); return; }
     setBusy(true);
     const starts_at = new Date(`${f.date}T${f.time || "12:00"}`).toISOString();
-    const { data, error } = await supabase.from("events").insert({
+    const payload = {
       title: f.title.trim().slice(0, 120),
       description: f.description.trim() || null,
       location: f.location.trim() || null,
@@ -37,11 +44,14 @@ export default function MeetForm({ presetDate = "", onClose, onCreated }) {
       lat: pin?.lat ?? null,
       lng: pin?.lng ?? null,
       starts_at,
-      created_by: user.id,
-    }).select().single();
+    };
+    const q = editing
+      ? supabase.from("events").update(payload).eq("id", event.id).select().single()
+      : supabase.from("events").insert({ ...payload, created_by: user.id }).select().single();
+    const { data, error } = await q;
     setBusy(false);
     if (error) { setErr(error.message); return; }
-    onCreated?.(data);
+    if (editing) onSaved?.(data); else onCreated?.(data);
     onClose();
   };
 
@@ -51,8 +61,8 @@ export default function MeetForm({ presetDate = "", onClose, onCreated }) {
     <div className="md" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="md-panel">
         <button className="md-close" onClick={onClose} aria-label="Luk">✕</button>
-        <span className="overline">Nyt meet</span>
-        <h2 className="md-title">Planlæg et meet</h2>
+        <span className="overline">{editing ? "Rediger meet" : "Nyt meet"}</span>
+        <h2 className="md-title">{editing ? "Rediger meet" : "Planlæg et meet"}</h2>
 
         <form className="event-form" onSubmit={submit} style={{ background: "none", border: "none", padding: 0, marginTop: "1rem" }}>
           <div className="ef-grid">
@@ -81,7 +91,7 @@ export default function MeetForm({ presetDate = "", onClose, onCreated }) {
 
           {err && <p className="ef-err">{err}</p>}
           <div className="post-actions" style={{ marginTop: "0.9rem" }}>
-            <button className="btn-gold" type="submit" disabled={busy}>{busy ? "Gemmer…" : "Opret meet"}</button>
+            <button className="btn-gold" type="submit" disabled={busy}>{busy ? "Gemmer…" : editing ? "Gem ændringer" : "Opret meet"}</button>
             <button type="button" className="ph-btn" onClick={onClose}>Annullér</button>
           </div>
         </form>

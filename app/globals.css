@@ -1237,6 +1237,7 @@ a.btn-gold { text-decoration: none; }
 .event-top h2 { font-family: var(--font-display), serif; font-weight: 400; font-size: clamp(1.2rem, 3vw, 1.6rem); letter-spacing: -0.01em; }
 .event-del { flex: none; font-size: 0.8rem; color: var(--faint); background: none; border: none; cursor: pointer; padding: 0.2rem; transition: color 0.2s; }
 .event-del:hover { color: #d98a7a; }
+.event-actions { display: flex; align-items: center; gap: 0.5rem; flex: none; }
 .event-when, .event-where { color: var(--muted); font-size: 0.9rem; margin-top: 0.3rem; }
 .event-desc { color: var(--text); font-size: 0.95rem; margin-top: 0.6rem; }
 .event-going { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; align-items: baseline; margin-top: 0.8rem; }
@@ -1342,6 +1343,23 @@ a.btn-gold { text-decoration: none; }
 .nav-member { position: relative; }
 .nav-badge { position: absolute; top: -7px; right: -10px; min-width: 17px; height: 17px; padding: 0 4px; border-radius: 100px; background: #d9534f; color: #fff; font-family: var(--font-mono), monospace; font-size: 0.6rem; font-weight: 700; line-height: 17px; text-align: center; box-shadow: 0 0 0 2px var(--bg); }
 .nav.scrolled .nav-badge { box-shadow: 0 0 0 2px var(--bg-1); }
+
+/* ---------- Mobile hamburger nav ---------- */
+.nav-burger { display: none; position: relative; width: 42px; height: 42px; border: 1px solid var(--line-2); border-radius: 10px; background: rgba(10,11,13,0.5); flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; }
+.nav-burger span { display: block; width: 18px; height: 2px; border-radius: 2px; background: var(--text); }
+.burger-badge { top: -6px; right: -6px; }
+@media (max-width: 620px) {
+  .nav-burger { display: flex; }
+  .nav-links { gap: 0; }
+}
+.nav-mobile { position: fixed; inset: 0; z-index: calc(var(--z-nav) + 1); background: rgba(6,7,9,0.6); backdrop-filter: blur(6px); animation: plbIn 0.2s var(--ease); }
+.nav-mobile-panel { position: absolute; top: 0; right: 0; height: 100%; width: min(320px, 86vw); background: var(--bg-1); border-left: 1px solid var(--line-2); padding: calc(1.2rem + env(safe-area-inset-top)) 1.1rem 1.4rem; display: flex; flex-direction: column; gap: 0.3rem; overflow-y: auto; animation: cpSlide 0.28s var(--ease); }
+.nav-m-profile { display: flex; align-items: center; gap: 0.7rem; padding: 0.9rem; border-radius: 14px; background: var(--bg-2); border: 1px solid var(--line-2); margin-bottom: 0.7rem; }
+.nav-m-avatar { flex: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-mono), monospace; font-size: 0.85rem; color: var(--gold-bright); background: radial-gradient(120% 120% at 30% 20%, rgba(201,168,119,0.26), var(--bg-3)); border: 1px solid var(--gold-deep); }
+.nav-m-profile b { display: block; font-family: var(--font-mono), monospace; font-size: 0.9rem; color: var(--gold); }
+.nav-m-sub { display: block; font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; }
+.nav-m-link { font-family: var(--font-mono), monospace; font-size: 0.9rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text); padding: 0.85rem 0.9rem; border-radius: 10px; transition: background 0.15s; }
+.nav-m-link:hover, .nav-m-link:active { background: var(--bg-2); color: var(--gold); }
 .hub-badge { position: absolute; top: clamp(1rem, 3vw, 1.6rem); right: clamp(1rem, 3vw, 1.6rem); z-index: 2; display: inline-flex; align-items: center; background: #d9534f; color: #fff; font-family: var(--font-mono), monospace; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.03em; padding: 0.25rem 0.6rem; border-radius: 100px; box-shadow: 0 4px 14px rgba(217,83,79,0.4); }
 
 /* ---------- Calendar ---------- */
@@ -1437,6 +1455,38 @@ a.btn-gold { text-decoration: none; }
 .mcard-go { flex: none; color: var(--faint); transition: color 0.2s, transform 0.2s; }
 .mcard:hover .mcard-go { color: var(--gold); transform: translateX(3px); }
 
+/* ---------- Profile: avatar, bio, editor, tools, wall ---------- */
+.profil-avatar { overflow: hidden; }
+.profil-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profil-avatar.sm { width: 60px; height: 60px; font-size: 1.2rem; flex: none; }
+.mcard-avatar { overflow: hidden; }
+.mcard-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.nav-m-avatar { overflow: hidden; }
+.nav-m-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.profil-bio { color: var(--muted); font-size: 0.98rem; margin-top: 1.2rem; max-width: 60ch; white-space: pre-wrap; }
+.profil-editor { margin-top: 1.4rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; padding: 1.2rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.pe-avatar-row { display: flex; align-items: center; gap: 1rem; }
+.profil-tools { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.4rem; }
+.ptool { font-family: var(--font-mono), monospace; font-size: 0.78rem; letter-spacing: 0.04em; color: var(--text); background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 100px; padding: 0.5rem 0.95rem; transition: border-color 0.2s, color 0.2s; }
+.ptool:hover { border-color: var(--gold); color: var(--gold-bright); }
+.cp-claim { width: auto; margin-top: 0.8rem; }
+.cp-claimed { color: #5ab478; font-family: var(--font-mono), monospace; font-size: 0.72rem; margin-top: 0.6rem; }
+
+.wall-form { margin: 0.4rem 0 1.3rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 0.9rem; }
+.wall-form textarea { width: 100%; font-family: var(--font-body), sans-serif; font-size: 0.95rem; color: var(--text); background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; padding: 0.7rem 0.85rem; resize: vertical; }
+.wall-form textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,119,0.16); }
+.wall-form-actions { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.6rem; }
+.wall-list { display: flex; flex-direction: column; gap: 0.9rem; }
+.wall-post { display: flex; gap: 0.75rem; }
+.wall-av { flex: none; width: 40px; height: 40px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; font-family: var(--font-mono), monospace; font-size: 0.78rem; color: var(--gold-bright); background: radial-gradient(120% 120% at 30% 20%, rgba(201,168,119,0.24), var(--bg-3)); border: 1px solid var(--gold-deep); }
+.wall-av img { width: 100%; height: 100%; object-fit: cover; }
+.wall-post-body { flex: 1; min-width: 0; background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 0.7rem 0.9rem; }
+.wall-post-head { display: flex; align-items: center; gap: 0.6rem; }
+.wall-post-head b { font-family: var(--font-mono), monospace; font-size: 0.8rem; color: var(--gold); }
+.wall-time { font-family: var(--font-mono), monospace; font-size: 0.62rem; color: var(--faint); }
+.wall-text { font-size: 0.95rem; margin-top: 0.35rem; white-space: pre-wrap; word-break: break-word; }
+.wall-img { max-width: 100%; border-radius: 10px; margin-top: 0.6rem; border: 1px solid var(--line); }
+
 /* ---------- Meet photo album ---------- */
 .md-photos { margin-top: 1.6rem; border-top: 1px solid var(--line); padding-top: 1.2rem; }
 .md-photos-head { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; margin-bottom: 0.8rem; }
@@ -1467,5 +1517,8 @@ a.btn-gold { text-decoration: none; }
 .mf-map-hint { font-size: 0.72rem; color: var(--faint); margin-top: 0.4rem; }
 .md-map { margin-top: 1rem; }
 .md-map .meet-map { height: 170px; }
+.md-manage { display: flex; gap: 0.5rem; margin: 0.6rem 0 0.2rem; }
+.ph-btn.del { border-color: rgba(217,138,122,0.5); color: #d98a7a; }
+.ph-btn.del:hover { background: rgba(217,138,122,0.14); color: #e6a496; }
 .lb-namelink { color: inherit; text-decoration: none; }
 .lb-namelink:hover { color: var(--gold-bright); text-decoration: underline; }
