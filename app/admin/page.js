@@ -11,6 +11,7 @@ import PhotoGrid from "../components/PhotoGrid";
 import PhotoLightbox from "../components/PhotoLightbox";
 import PostManager from "../components/PostManager";
 import EventManager from "../components/EventManager";
+import CarManager from "../components/CarManager";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -71,6 +72,8 @@ export default function AdminPage() {
         <PostManager userId={user.id} />
 
         <EventManager userId={user.id} />
+
+        <CarManager />
 
         <p className="member-note" style={{ marginTop: "1.5rem" }}>Godkend billeder til forsiden, og vælg hvilket billede der skal være bilens cover (thumbnail).</p>
 

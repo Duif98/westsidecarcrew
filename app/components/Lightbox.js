@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import CarProfile from "./CarProfile";
 import { useT } from "../lib/i18n";
 
 // Generic gallery lightbox. `items` is [{ full, thumb, alt }] with URLs already
@@ -11,7 +10,6 @@ export default function Lightbox({ items, title, subtitle, startIndex = 0, onClo
   const { t } = useT();
   const [i, setI] = useState(startIndex);
   const [mounted, setMounted] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
   const closeRef = useRef(null);
   const thumbsRef = useRef(null);
   const touchX = useRef(null);
@@ -63,12 +61,6 @@ export default function Lightbox({ items, title, subtitle, startIndex = 0, onClo
           {subtitle && <div className="meta">{subtitle}</div>}
         </div>
         <div className="lb-top-actions">
-          {album && (
-            <button className="lb-info" onClick={() => setShowProfile(true)} aria-label={t("lightbox.profileAria")}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" strokeLinecap="round" /></svg>
-              <span className="lb-info-txt">{t("lightbox.profile")}</span>
-            </button>
-          )}
           <button ref={closeRef} className="lb-close" onClick={onClose} aria-label={t("lightbox.close")}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
               <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
@@ -76,8 +68,6 @@ export default function Lightbox({ items, title, subtitle, startIndex = 0, onClo
           </button>
         </div>
       </div>
-
-      {showProfile && album && <CarProfile album={album} curated={curated} onClose={() => setShowProfile(false)} />}
 
       <div className="lb-stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {n > 1 && (
