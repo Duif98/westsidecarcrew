@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useAuth } from "../lib/AuthProvider";
 import { useUnread } from "../lib/useUnread";
@@ -22,8 +23,11 @@ const LINKS = [
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { session, user, profile } = useAuth();
   const { total } = useUnread(session, user?.id);
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -73,7 +77,7 @@ export default function Nav() {
         </nav>
       </div>
 
-      {menuOpen && (
+      {mounted && menuOpen && createPortal(
         <div className="nav-mobile" onClick={(e) => { if (e.target === e.currentTarget) close(); }}>
           <div className="nav-mobile-panel">
             <Link href={profileHref} className="nav-m-profile" onClick={close}>
@@ -96,7 +100,8 @@ export default function Nav() {
             {session && <Link href="/upload" className="nav-m-link" onClick={close}>Upload billeder</Link>}
             <a href={IG} target="_blank" rel="noopener noreferrer" className="nav-m-link" onClick={close}>Instagram ↗</a>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
