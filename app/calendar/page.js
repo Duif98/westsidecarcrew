@@ -6,6 +6,8 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import MeetDetail from "../components/MeetDetail";
 import MeetForm from "../components/MeetForm";
+import WeatherIcon from "../components/WeatherIcon";
+import { fetchMeetWeather } from "../lib/weather";
 
 const WEEKDAYS = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
 const MONTHS = ["Januar", "Februar", "Marts", "April", "Maj", "Juni", "Juli", "August", "September", "Oktober", "November", "December"];
@@ -34,6 +36,27 @@ export default function CalendarPage() {
     events.forEach((e) => { (map[eventKey(e.starts_at)] ||= []).push(e); });
     return map;
   }, [events]);
+
+  // Fetch a forecast for each day that has a meet with coordinates (within the
+  // ~9-day window). Keyed by dateKey; weather.js caches per coord so repeats are
+  // cheap. Days that are past / too far out just never get an entry.
+  const [wxByDay, setWxByDay] = useState({});
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const results = {};
+      for (const [day, evs] of Object.entries(byDay)) {
+        const e = evs.find((x) => typeof x.lat === "number" && typeof x.lng === "number");
+        if (!e) continue;
+        try {
+          const wx = await fetchMeetWeather(e.lat, e.lng, e.starts_at);
+          if (wx && !wx.past && !wx.tooFar) results[day] = wx;
+        } catch {}
+      }
+      if (active) setWxByDay(results);
+    })();
+    return () => { active = false; };
+  }, [byDay]);
 
   // Build a Monday-first grid covering the visible month (with spillover days).
   const weeks = useMemo(() => {
@@ -87,9 +110,10 @@ export default function CalendarPage() {
             const key = dateKey(d);
             const inMonth = d.getMonth() === cursor.getMonth();
             const dayEvents = byDay[key] || [];
+            const wx = wxByDay[key];
             return (
               <div
-                className={`cal-cell ${inMonth ? "" : "out"} ${key === todayKey ? "today" : ""} ${dayEvents.length ? "has" : ""} ${session ? "clickable" : ""}`}
+                className={`cal-cell ${inMonth ? "" : "out"} ${key === todayKey ? "today" : ""} ${dayEvents.length ? "has" : ""} ${wx ? "wx-cell wx-" + wx.category : ""} ${session ? "clickable" : ""}`}
                 key={key}
                 onClick={session ? () => setCreating({ date: key }) : undefined}
                 role={session ? "button" : undefined}
@@ -97,6 +121,19 @@ export default function CalendarPage() {
               >
                 <span className="cal-daynum">{d.getDate()}</span>
                 {session && <span className="cal-add" aria-hidden="true">+</span>}
+                {wx && (
+                  <div className="cal-wx" title={`${wx.label}${wx.temp != null ? ` · ${wx.temp}°` : ""}`}>
+                    <div className="cal-wx-top">
+                      <WeatherIcon category={wx.category} size={26} />
+                      {wx.temp != null && <span className="cal-wx-temp">{wx.temp}°</span>}
+                    </div>
+                    <div className="cal-wx-stats">
+                      {wx.precipProb != null && <span>💧 {wx.precipProb}%</span>}
+                      {wx.precip != null && wx.precip > 0 && <span>{wx.precip} mm</span>}
+                      {wx.wind != null && <span>💨 {wx.wind} m/s</span>}
+                    </div>
+                  </div>
+                )}
                 <div className="cal-events">
                   {dayEvents.map((e) => (
                     <button key={e.id} className="cal-chip" onClick={(ev) => { ev.stopPropagation(); setOpen(e); }} title={e.title}>

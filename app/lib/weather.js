@@ -3,7 +3,9 @@
 // fetch happens client-side. MET asks that we (1) truncate coordinates to 4
 // decimals and (2) cache responses instead of hammering the API — both handled
 // below. The forecast reaches ~9.5 days ahead; meets further out (or in the
-// past) return null so the UI shows nothing.
+// past) return a flag so the UI shows nothing.
+// We use the "complete" product (not "compact") because it carries
+// probability_of_precipitation, which we show in the calendar.
 
 const FORECAST_DAYS = 9;
 const CACHE_MS = 30 * 60 * 1000; // reuse a coordinate's forecast for 30 min
@@ -30,19 +32,38 @@ const SYMBOLS = {
   heavysnow: ["❄️", "Kraftig sne"],
 };
 
+const base = (code) => (code || "").replace(/_(day|night|polartwilight)$/, "");
+
 export function symbolMeta(code) {
   if (!code) return ["🌡", "—"];
-  const base = code.replace(/_(day|night|polartwilight)$/, "");
-  if (SYMBOLS[base]) return SYMBOLS[base];
-  if (base.includes("thunder")) return ["⛈", "Torden"];
-  if (base.includes("snow")) return ["❄️", "Sne"];
-  if (base.includes("sleet")) return ["🌨", "Slud"];
-  if (base.includes("rain")) return ["🌧", "Regn"];
-  if (base.includes("cloud")) return ["☁️", "Skyet"];
-  if (base.includes("fair")) return ["🌤", "Let skyet"];
-  if (base.includes("clear")) return ["☀️", "Klart"];
-  if (base.includes("fog")) return ["🌫", "Tåge"];
+  const b = base(code);
+  if (SYMBOLS[b]) return SYMBOLS[b];
+  if (b.includes("thunder")) return ["⛈", "Torden"];
+  if (b.includes("snow")) return ["❄️", "Sne"];
+  if (b.includes("sleet")) return ["🌨", "Slud"];
+  if (b.includes("rain")) return ["🌧", "Regn"];
+  if (b.includes("cloud")) return ["☁️", "Skyet"];
+  if (b.includes("fair")) return ["🌤", "Let skyet"];
+  if (b.includes("clear")) return ["☀️", "Klart"];
+  if (b.includes("fog")) return ["🌫", "Tåge"];
   return ["🌡", "—"];
+}
+
+// A coarse category used to pick a drawn (SVG) weather icon.
+// clear = sun · partly = sun+cloud · cloudy = cloud · rain = cloud+rain ·
+// plus snow / sleet / thunder / fog.
+export function symbolCategory(code) {
+  const b = base(code);
+  if (!b) return "cloudy";
+  if (b.includes("thunder")) return "thunder";
+  if (b.includes("snow")) return "snow";
+  if (b.includes("sleet")) return "sleet";
+  if (b.includes("rain") || b.includes("drizzle")) return "rain";
+  if (b === "fog") return "fog";
+  if (b === "partlycloudy") return "partly";
+  if (b === "cloudy") return "cloudy";
+  if (b === "fair" || b === "clearsky") return "clear";
+  return "cloudy";
 }
 
 async function getForecast(lat, lng) {
@@ -55,7 +76,7 @@ async function getForecast(lat, lng) {
     if (cached && Date.now() - cached.at < CACHE_MS) return cached.data;
   } catch {}
 
-  const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${la}&lon=${lo}`;
+  const url = `https://api.met.no/weatherapi/locationforecast/2.0/complete?lat=${la}&lon=${lo}`;
   const res = await fetch(url);
   if (!res.ok) throw new Error("weather " + res.status);
   const data = await res.json();
@@ -65,8 +86,9 @@ async function getForecast(lat, lng) {
   return data;
 }
 
-// Returns { temp, emoji, label, wind, precip } for the meet's start time,
-// or null when there's no forecast to show (no coords, too far out, or past).
+// Returns weather for the meet's start time, or a { past } / { tooFar } flag
+// when there's no forecast to show. On success:
+// { temp, wind, precip, precipProb, emoji, label, category }.
 export async function fetchMeetWeather(lat, lng, startsAt) {
   if (typeof lat !== "number" || typeof lng !== "number") return null;
   const target = new Date(startsAt).getTime();
@@ -89,13 +111,17 @@ export async function fetchMeetWeather(lat, lng, startsAt) {
 
   const inst = best.data?.instant?.details || {};
   const period = best.data?.next_1_hours || best.data?.next_6_hours || best.data?.next_12_hours || {};
-  const [emoji, label] = symbolMeta(period.summary?.symbol_code);
+  const code = period.summary?.symbol_code;
+  const [emoji, label] = symbolMeta(code);
 
   return {
     temp: typeof inst.air_temperature === "number" ? Math.round(inst.air_temperature) : null,
     wind: typeof inst.wind_speed === "number" ? Math.round(inst.wind_speed) : null,
     precip: period.details?.precipitation_amount ?? null,
+    precipProb: typeof period.details?.probability_of_precipitation === "number"
+      ? Math.round(period.details.probability_of_precipitation) : null,
     emoji,
     label,
+    category: symbolCategory(code),
   };
 }

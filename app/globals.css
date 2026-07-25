@@ -1401,12 +1401,41 @@ a.btn-gold { text-decoration: none; }
 .cal-add { position: absolute; top: 0.35rem; left: 0.4rem; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 0.9rem; line-height: 1; color: var(--gold); background: rgba(201,168,119,0.14); border: 1px solid var(--gold-deep); opacity: 0; transition: opacity 0.15s; pointer-events: none; }
 .cal-cell.clickable:hover .cal-add { opacity: 1; }
 @media (hover: none) { .cal-add { display: none; } }
+
+/* ---- Meet-day weather in the calendar ---- */
+/* Category-tinted background so a rainy day reads at a glance. */
+.cal-cell.wx-clear   { background: linear-gradient(155deg, rgba(233,185,73,0.16), var(--bg-3)); }
+.cal-cell.wx-partly  { background: linear-gradient(155deg, rgba(233,185,73,0.10), var(--bg-3)); }
+.cal-cell.wx-cloudy,
+.cal-cell.wx-fog     { background: linear-gradient(155deg, rgba(154,160,168,0.14), var(--bg-3)); }
+.cal-cell.wx-rain,
+.cal-cell.wx-sleet   { background: linear-gradient(155deg, rgba(111,180,230,0.18), var(--bg-3)); }
+.cal-cell.wx-snow    { background: linear-gradient(155deg, rgba(234,243,251,0.16), var(--bg-3)); }
+.cal-cell.wx-thunder { background: linear-gradient(155deg, rgba(178,150,220,0.18), var(--bg-3)); }
+
+.cal-wx { display: flex; flex-direction: column; gap: 1px; margin-top: -0.15rem; }
+.cal-wx-top { display: flex; align-items: center; gap: 0.25rem; }
+.cal-wx .wx-icon { flex: none; }
+.cal-wx-temp { font-family: var(--font-mono), monospace; font-size: 0.86rem; font-weight: 700; color: var(--gold-bright); }
+.cal-wx-stats { display: flex; flex-wrap: wrap; gap: 0.1rem 0.4rem; font-family: var(--font-mono), monospace; font-size: 0.5rem; color: var(--muted); line-height: 1.15; }
+.cal-wx-stats span { white-space: nowrap; }
+
+/* Animated rain / snow inside the icon. */
+@keyframes wxDrop { 0% { transform: translateY(-3px); opacity: 0; } 25% { opacity: 1; } 100% { transform: translateY(5px); opacity: 0; } }
+@keyframes wxFlake { 0% { transform: translateY(-2px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(6px); opacity: 0; } }
+.wx-drop { animation: wxDrop 0.9s linear infinite; }
+.wx-flake { animation: wxFlake 1.7s ease-in infinite; }
+@media (prefers-reduced-motion: reduce) { .wx-drop, .wx-flake { animation: none; opacity: 0.9; } }
+
 @media (max-width: 560px) {
   .cal-grid { gap: 3px; }
   .cal-cell { min-height: 62px; padding: 0.25rem; border-radius: 7px; }
   .cal-chip-time { display: none; }
   .cal-chip { padding: 0.15rem 0.25rem; }
   .cal-chip-title { font-size: 0.6rem; }
+  .cal-wx-stats { display: none; }
+  .cal-wx .wx-icon { width: 20px; height: 20px; }
+  .cal-wx-temp { font-size: 0.72rem; }
 }
 
 /* ---------- Meet detail popup ---------- */
