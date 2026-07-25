@@ -1316,6 +1316,10 @@ a.btn-gold { text-decoration: none; }
 .cie-form { margin-top: 0.8rem; }
 .cie-save { width: auto; margin-top: 0.5rem; }
 
+/* ---------- Profile: add a car ---------- */
+.acf { background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 1rem; display: flex; flex-direction: column; gap: 0.9rem; }
+.acf .file-drop { min-height: 150px; }
+
 /* ---------- Car profile / build thread ---------- */
 .lb-top-actions { display: flex; align-items: center; gap: 0.6rem; flex: none; }
 .lb-info { display: inline-flex; align-items: center; gap: 0.4rem; height: 46px; padding: 0 1rem; border-radius: 100px; border: 1px solid var(--line-2); background: rgba(255,255,255,0.04); color: var(--text); cursor: pointer; transition: background 0.2s, border-color 0.2s; }

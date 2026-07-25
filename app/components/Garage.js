@@ -99,16 +99,19 @@ export default function Garage() {
       const raw = uploadItems(a.slug);
       const coverUrl = extra.covers[a.slug] || raw[0]?.full;
       const items = coverFirst(raw, coverUrl);
+      const specTag = [a.model_year, a.power_hp ? `${a.power_hp} hk` : null].filter(Boolean).join(" · ");
       return {
         key: a.slug, coverUrl,
-        tag: t("garage.crewAlbum"), title: a.title, model: "", owner: a.owner_name,
+        tag: specTag || t("garage.crewAlbum"), title: a.make || a.title, model: a.model || "", owner: a.owner_name,
         count: items.length, items,
-        lbTitle: a.title, lbSubtitle: a.owner_name || "",
+        lbTitle: a.make || a.title, lbSubtitle: [a.owner_name, a.model].filter(Boolean).join(" · "),
         album: extra.albumBySlug[a.slug], curated: null,
       };
     });
-    const orderedCurated = seed == null ? curated : shuffle(curated, seed);
-    return [...orderedCurated, ...news];
+    // Member cars sit in the same pool as the curated ones and shuffle together,
+    // so an added car can land anywhere in the rotation (incl. a feature tile).
+    const pool = [...curated, ...news];
+    return seed == null ? pool : shuffle(pool, seed);
   }, [extra, seed, t]);
 
   return (

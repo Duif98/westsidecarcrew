@@ -13,6 +13,7 @@ import PhotoLightbox from "../components/PhotoLightbox";
 import ProfileWall from "../components/ProfileWall";
 import AvatarCropper from "../components/AvatarCropper";
 import CarInfoEditor from "../components/CarInfoEditor";
+import AddCarForm from "../components/AddCarForm";
 
 const specLine = (a) => [a.model_year, a.engine, a.power_hp ? `${a.power_hp} hk` : null, a.drivetrain].filter(Boolean).join(" · ");
 
@@ -244,6 +245,14 @@ function ProfileInner() {
               );
             })}
           </div>
+        </section>
+      )}
+
+      {me && (
+        <section className="profil-section">
+          <span className="overline">Tilføj bil</span>
+          <p className="muted" style={{ fontSize: "0.88rem", margin: "0 0 0.9rem" }}>Har du en bil mere? Tilføj den med et billede og specs — og evt. dit VIN. Når billedet er godkendt, ryger bilen med i rotationen på forsiden på lige fod med de andre.</p>
+          <AddCarForm userId={user.id} ownerName={profile.username} onCreated={() => setReloadKey((k) => k + 1)} />
         </section>
       )}
 

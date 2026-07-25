@@ -13,6 +13,7 @@ export default function CarInfoEditor({ album, onSaved }) {
   const [form, setForm] = useState({
     make: album.make || "", model: album.model || "", model_year: album.model_year || "",
     power_hp: album.power_hp || "", drivetrain: album.drivetrain || "", engine: album.engine || "", mods: album.mods || "",
+    vin: album.vin || "",
   });
 
   const save = async () => {
@@ -25,6 +26,7 @@ export default function CarInfoEditor({ album, onSaved }) {
       drivetrain: form.drivetrain.trim() || null,
       engine: form.engine.trim() || null,
       mods: form.mods.trim() || null,
+      vin: form.vin.trim().toUpperCase() || null,
     };
     const { error } = await supabase.from("albums").update(patch).eq("id", album.id);
     setBusy(false);
@@ -48,6 +50,7 @@ export default function CarInfoEditor({ album, onSaved }) {
             <label className="post-field"><span>Motor</span><input value={form.engine} onChange={(e) => setForm({ ...form, engine: e.target.value })} placeholder="3.0 R6 Twin-Turbo" /></label>
             <label className="post-field"><span>Drivlinje</span><input value={form.drivetrain} onChange={(e) => setForm({ ...form, drivetrain: e.target.value })} placeholder="RWD" /></label>
             <label className="post-field ef-full"><span>Modifikationer</span><textarea rows={2} value={form.mods} onChange={(e) => setForm({ ...form, mods: e.target.value })} placeholder="Downpipe, coilovers, stage 2…" /></label>
+            <label className="post-field ef-full"><span>VIN (valgfri — låser reservedelskataloget op)</span><input value={form.vin} onChange={(e) => setForm({ ...form, vin: e.target.value.toUpperCase() })} placeholder="17 tegn" maxLength={17} spellCheck={false} style={{ fontFamily: "var(--font-mono), monospace", letterSpacing: "0.05em" }} /></label>
           </div>
           <button className="btn-gold cie-save" onClick={save} disabled={busy}>{busy ? "Gemmer…" : "Gem bil-info"}</button>
         </div>
