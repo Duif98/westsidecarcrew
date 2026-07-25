@@ -52,7 +52,7 @@ export default function Nav() {
 
         <nav className="nav-links" aria-label="Primary">
           {LINKS.map((l) => (
-            <a key={l.href} href={l.href} className="hide-sm">{l.label}</a>
+            <Link key={l.href} href={l.href} className="hide-sm">{l.label}</Link>
           ))}
           <a href={IG} target="_blank" rel="noopener noreferrer" className="hide-sm">Instagram</a>
           <Link href={profileHref} className="ig nav-member hide-sm">
@@ -90,7 +90,7 @@ export default function Nav() {
             </Link>
 
             {LINKS.map((l) => (
-              <a key={l.href} href={l.href} className="nav-m-link" onClick={close}>{l.label}</a>
+              <Link key={l.href} href={l.href} className="nav-m-link" onClick={close}>{l.label}</Link>
             ))}
             {session && <Link href="/chat" className="nav-m-link" onClick={close}>Crew chat</Link>}
             {session && <Link href="/upload" className="nav-m-link" onClick={close}>Upload billeder</Link>}
