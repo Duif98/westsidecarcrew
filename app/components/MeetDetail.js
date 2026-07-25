@@ -9,6 +9,7 @@ import { enrichPhotos, uploadPhoto } from "../lib/photos";
 import PhotoLightbox from "./PhotoLightbox";
 import MeetMap from "./MeetMap";
 import MeetForm from "./MeetForm";
+import MeetWeather from "./MeetWeather";
 
 const fmt = (t) =>
   new Date(t).toLocaleString("da-DK", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -126,6 +127,8 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
             : event.location}</p>
         )}
         {event.description && <p className="md-desc">{event.description}</p>}
+
+        <MeetWeather lat={event.lat} lng={event.lng} startsAt={event.starts_at} />
 
         {typeof event.lat === "number" && typeof event.lng === "number" && (
           <div className="md-map">

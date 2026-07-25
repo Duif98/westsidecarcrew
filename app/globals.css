@@ -1417,6 +1417,15 @@ a.btn-gold { text-decoration: none; }
 .md-title { font-family: var(--font-display), serif; font-weight: 400; font-size: clamp(1.6rem, 5vw, 2.2rem); letter-spacing: -0.02em; margin: 0.4rem 0 0.7rem; }
 .md-when, .md-where { color: var(--muted); font-size: 0.95rem; margin-top: 0.35rem; }
 .md-desc { color: var(--text); font-size: 0.98rem; margin-top: 1rem; white-space: pre-wrap; }
+.md-wx { display: flex; align-items: center; gap: 0.7rem; margin-top: 1rem; padding: 0.7rem 0.9rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; font-size: 0.92rem; }
+.md-wx-emoji { font-size: 1.5rem; line-height: 1; }
+.md-wx-main { display: flex; align-items: baseline; gap: 0.45rem; }
+.md-wx-main b { font-family: var(--font-display), serif; font-size: 1.25rem; color: var(--gold-bright); font-weight: 400; }
+.md-wx-main span { color: var(--text); }
+.md-wx-meta { display: flex; gap: 0.7rem; color: var(--muted); margin-left: auto; white-space: nowrap; }
+.md-wx-src { font-family: var(--font-mono), monospace; font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); align-self: flex-start; }
+.md-wx-soon { color: var(--muted); }
+@media (max-width: 460px) { .md-wx { flex-wrap: wrap; } .md-wx-meta { margin-left: 0; width: 100%; } .md-wx-src { position: absolute; opacity: 0; } }
 .md-going { margin-top: 1.6rem; border-top: 1px solid var(--line); padding-top: 1.2rem; }
 .md-going-lists p { font-size: 0.92rem; color: var(--muted); margin-bottom: 0.35rem; }
 .md-going-lists b { color: var(--text); font-weight: 500; }
