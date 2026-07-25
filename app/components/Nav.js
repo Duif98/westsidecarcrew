@@ -33,6 +33,7 @@ export default function Nav() {
           </a>
           <a href="#garagen" className="hide-sm">The Garage</a>
           <Link href="/events" className="hide-sm">Meets</Link>
+          <Link href="/calendar" className="hide-sm">Calendar</Link>
           <a href={IG} target="_blank" rel="noopener noreferrer" className="hide-sm">
             Instagram
           </a>

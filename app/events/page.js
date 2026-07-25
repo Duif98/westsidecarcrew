@@ -106,6 +106,7 @@ export default function EventsPage() {
         <div className="wrap member-bar-inner">
           <Link href="/" className="wordmark"><span className="dot" /> West Side Car Crew</Link>
           <div className="member-actions">
+            <Link href="/calendar" className="mlink">📅 Kalender</Link>
             {session ? <Link href="/medlem" className="mlink">‹ Medlem</Link> : <Link href="/login" className="mlink">Log ind</Link>}
           </div>
         </div>
