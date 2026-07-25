@@ -70,6 +70,15 @@ export default function MedlemHub() {
             <span className="hub-card-sub">Se hvem der fører på likes og aktivitet</span>
             <span className="hub-go">Se ranglisten →</span>
           </Link>
+
+          <Link href="/reservedelskatalog" className="hub-card parts">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4l-6 6a1.5 1.5 0 0 0 2.1 2.1l6-6a4 4 0 0 0 5.4-5.4l-2.3 2.3-2.1-2.1z" /></svg>
+            </span>
+            <span className="hub-card-title">Reservedelskatalog</span>
+            <span className="hub-card-sub">Slå originale reservedele op til din bil via VIN</span>
+            <span className="hub-go">Åbn katalog →</span>
+          </Link>
         </div>
       </div>
     </main>

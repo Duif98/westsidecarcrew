@@ -1264,6 +1264,34 @@ a.btn-gold { text-decoration: none; }
 /* Member-hub accent variants */
 .hub-card.events::after { background: radial-gradient(120% 90% at 80% 0%, rgba(120,160,210,0.14), transparent 60%); }
 .hub-card.board::after { background: radial-gradient(120% 90% at 80% 0%, rgba(210,180,120,0.16), transparent 60%); }
+.hub-card.parts::after { background: radial-gradient(120% 90% at 80% 0%, rgba(201,168,119,0.14), transparent 60%); }
+
+/* ---------- Parts catalog (members only) ---------- */
+.pk-body { padding-block: clamp(2.5rem, 8vw, 5rem); }
+.pk-title { font-family: var(--font-display), serif; font-weight: 340; font-size: clamp(1.9rem, 5.5vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; margin: 0.5rem 0 0.8rem; }
+.pk-intro { color: var(--muted); font-size: 0.98rem; max-width: 56ch; margin-bottom: clamp(1.6rem, 4vw, 2.4rem); }
+.pk-empty { color: var(--faint); font-size: 0.95rem; }
+.pk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: clamp(0.8rem, 1.8vw, 1.1rem); }
+.pk-card { position: relative; text-align: left; display: flex; flex-direction: column; gap: 0.35rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 1.1rem 1.2rem 1rem; cursor: pointer; transition: border-color 0.2s, transform 0.2s, background 0.2s; }
+.pk-card:hover { border-color: var(--gold); transform: translateY(-2px); background: var(--bg-1); }
+.pk-card.mine { border-color: var(--gold-deep); }
+.pk-badge { position: absolute; top: 0.9rem; right: 0.9rem; font-family: var(--font-mono), monospace; font-size: 0.56rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold-bright); background: rgba(201,168,119,0.14); border: 1px solid var(--gold-deep); border-radius: 100px; padding: 0.25rem 0.55rem; }
+.pk-car { font-size: 1.15rem; font-weight: 500; }
+.pk-meta { display: flex; align-items: center; gap: 0.5rem; color: var(--muted); font-size: 0.85rem; }
+.pk-owner { color: var(--gold); }
+.pk-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--line-2); }
+.pk-go { margin-top: 0.5rem; font-family: var(--font-mono), monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
+.pk-card:hover .pk-go { color: var(--gold); }
+.pk-back { background: none; border: none; color: var(--muted); font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.06em; cursor: pointer; padding: 0; margin-bottom: 0.4rem; transition: color 0.2s; }
+.pk-back:hover { color: var(--text); }
+.pk-detail { background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; padding: clamp(1.2rem, 3vw, 1.6rem); max-width: 560px; }
+.pk-vin { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 1.2rem; }
+.pk-vin span { font-family: var(--font-mono), monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+.pk-vin b { font-family: var(--font-mono), monospace; font-size: 1.05rem; letter-spacing: 0.06em; color: var(--gold-bright); }
+.pk-links { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.pk-hint { color: var(--faint); font-size: 0.8rem; margin-top: 1rem; max-width: 52ch; }
+.pk-uploadlink { color: var(--gold); text-decoration: none; }
+.pk-uploadlink:hover { color: var(--gold-bright); text-decoration: underline; }
 
 /* ---------- Car profile / build thread ---------- */
 .lb-top-actions { display: flex; align-items: center; gap: 0.6rem; flex: none; }
