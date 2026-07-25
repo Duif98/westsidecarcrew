@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "./supabaseClient";
 
 // Lightweight in-app notifications for a static site: we remember, per browser,
@@ -28,6 +28,10 @@ export function markSeen(area) {
 // Returns { chat, events, posts, total } unread counts for the logged-in member.
 export function useUnread(session, userId) {
   const [counts, setCounts] = useState({ chat: 0, events: 0, posts: 0, total: 0 });
+  // Unique per hook instance so multiple mounts (e.g. Nav + NavMenu) don't
+  // collide on one shared realtime channel (which throws "cannot add callbacks
+  // after subscribe()").
+  const channelName = useRef(`wscc-notify-${Math.random().toString(36).slice(2)}`);
 
   const refresh = useCallback(async () => {
     if (!session) { setCounts({ chat: 0, events: 0, posts: 0, total: 0 }); return; }
@@ -64,7 +68,7 @@ export function useUnread(session, userId) {
     if (!session) return;
 
     const channel = supabase
-      .channel("wscc-notify")
+      .channel(channelName.current)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "messages" }, refresh)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "events" }, refresh)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "posts" }, refresh)
