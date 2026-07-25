@@ -5,7 +5,9 @@ import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
+import { yrUrl } from "../lib/weather";
 import MeetForm from "../components/MeetForm";
+import MeetWeather from "../components/MeetWeather";
 
 const fmt = (t) =>
   new Date(t).toLocaleString("da-DK", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -139,6 +141,15 @@ export default function EventsPage() {
                       : ev.location}</p>
                   )}
                   {ev.description && <p className="event-desc">{ev.description}</p>}
+
+                  <MeetWeather lat={ev.lat} lng={ev.lng} startsAt={ev.starts_at} />
+                  {typeof ev.lat === "number" && typeof ev.lng === "number" && (
+                    <a className="md-yr" href={yrUrl(ev.lat, ev.lng, ev.starts_at)} target="_blank" rel="noopener noreferrer">
+                      <span className="md-yr-icon">🌦</span>
+                      <span>Se timevejr for dagen på yr.no</span>
+                      <span className="md-yr-arrow">↗</span>
+                    </a>
+                  )}
 
                   <div className="event-going">
                     <span className="eg-count">✅ {yes.length} kommer{maybe.length ? ` · 🤔 ${maybe.length} måske` : ""}</span>

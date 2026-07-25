@@ -10,6 +10,19 @@
 const FORECAST_DAYS = 9;
 const CACHE_MS = 30 * 60 * 1000; // reuse a coordinate's forecast for 30 min
 
+// Deep-link to yr.no's hour-by-hour table for a meet. ?i=<whole days from
+// today> opens the meet's own day rather than the 10-day overview. Returns null
+// when the meet has no coordinates. Works the same on desktop and mobile.
+export function yrUrl(lat, lng, startsAt) {
+  if (typeof lat !== "number" || typeof lng !== "number") return null;
+  const d = new Date(startsAt);
+  const start = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const i = Math.max(0, Math.round((start - today) / 86400000));
+  return `https://www.yr.no/en/forecast/hourly-table/${lat.toFixed(4)},${lng.toFixed(4)}/?i=${i}`;
+}
+
 // Map a MET symbol_code (minus its _day/_night/_polartwilight suffix) to an
 // emoji + Danish label. Falls back to substring matching for the many
 // light/heavy variants so we never show a blank.
