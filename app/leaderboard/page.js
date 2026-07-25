@@ -72,7 +72,7 @@ export default function LeaderboardPage() {
               <div className={`lb-row ${r.user_id === user?.id ? "me" : ""} ${i < 3 ? "podium" : ""}`} key={r.user_id}>
                 <div className="lb-rank">{i < 3 ? MEDALS[i] : <span className="lb-num">{i + 1}</span>}</div>
                 <div className="lb-who">
-                  <div className="lb-name">@{r.username}{r.user_id === user?.id ? <span className="lb-you"> dig</span> : null}</div>
+                  <div className="lb-name"><Link href={`/profil?u=${encodeURIComponent(r.username)}`} className="lb-namelink">@{r.username}</Link>{r.user_id === user?.id ? <span className="lb-you"> dig</span> : null}</div>
                   <div className="lb-badges">
                     {badgeFor(r.user_id).map((b) => <span key={b.t} className="lb-badge" title={b.t}>{b.e} {b.t}</span>)}
                   </div>

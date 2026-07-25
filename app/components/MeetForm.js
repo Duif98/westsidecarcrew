@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
+import MapPicker from "./MapPicker";
 
 // Create-a-meet popup, open to any logged-in member. `presetDate` (YYYY-MM-DD)
 // prefills the date, e.g. when opened by clicking a day in the calendar.
@@ -11,6 +12,7 @@ export default function MeetForm({ presetDate = "", onClose, onCreated }) {
   const { user } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [f, setF] = useState({ title: "", date: presetDate, time: "", location: "", location_url: "", description: "" });
+  const [pin, setPin] = useState(null); // { lat, lng }
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
 
@@ -32,6 +34,8 @@ export default function MeetForm({ presetDate = "", onClose, onCreated }) {
       description: f.description.trim() || null,
       location: f.location.trim() || null,
       location_url: f.location_url.trim() || null,
+      lat: pin?.lat ?? null,
+      lng: pin?.lng ?? null,
       starts_at,
       created_by: user.id,
     }).select().single();
@@ -65,6 +69,16 @@ export default function MeetForm({ presetDate = "", onClose, onCreated }) {
             <label className="post-field ef-full"><span>Beskrivelse</span>
               <textarea rows={3} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} placeholder="Hvad sker der?" /></label>
           </div>
+
+          <div className="mf-map">
+            <div className="mf-map-head">
+              <span className="post-field" style={{ margin: 0 }}><span>Placering på kort (valgfrit)</span></span>
+              {pin && <button type="button" className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.3rem 0.7rem" }} onClick={() => setPin(null)}>Ryd nål</button>}
+            </div>
+            <MapPicker lat={pin?.lat} lng={pin?.lng} onChange={setPin} />
+            <p className="mf-map-hint">{pin ? "📍 Nål sat — meetet vises på kortet." : "Klik på kortet for at sætte en nål."}</p>
+          </div>
+
           {err && <p className="ef-err">{err}</p>}
           <div className="post-actions" style={{ marginTop: "0.9rem" }}>
             <button className="btn-gold" type="submit" disabled={busy}>{busy ? "Gemmer…" : "Opret meet"}</button>

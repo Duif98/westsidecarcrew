@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
+import { enrichPhotos, uploadPhoto } from "../lib/photos";
+import PhotoLightbox from "./PhotoLightbox";
+import MeetMap from "./MeetMap";
 
 const fmt = (t) =>
   new Date(t).toLocaleString("da-DK", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -21,6 +24,10 @@ export default function MeetDetail({ event, onClose }) {
   const { session, user, profile } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [rsvps, setRsvps] = useState([]);
+  const [photos, setPhotos] = useState([]);
+  const [lb, setLb] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef(null);
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -40,6 +47,34 @@ export default function MeetDetail({ event, onClose }) {
     })();
     return () => { active = false; };
   }, [event.id]);
+
+  const loadPhotos = async () => {
+    const { data } = await supabase
+      .from("photos")
+      .select("*, profiles!photos_user_id_fkey(username)")
+      .eq("event_id", event.id)
+      .order("created_at", { ascending: false });
+    setPhotos(await enrichPhotos(data || [], user?.id));
+  };
+  useEffect(() => { loadPhotos(); }, [event.id, user?.id]);
+
+  const onFiles = async (e) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = "";
+    if (!files.length || uploading) return;
+    setUploading(true);
+    try {
+      for (const file of files) {
+        if (!file.type.startsWith("image/")) continue;
+        await uploadPhoto({ file, isPublic: true, car: event.title, userId: user.id, eventId: event.id });
+      }
+      await loadPhotos();
+    } catch (err) {
+      alert("Kunne ikke uploade: " + (err.message || err));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const setRsvp = async (status) => {
     if (!user) return;
@@ -74,6 +109,12 @@ export default function MeetDetail({ event, onClose }) {
         )}
         {event.description && <p className="md-desc">{event.description}</p>}
 
+        {typeof event.lat === "number" && typeof event.lng === "number" && (
+          <div className="md-map">
+            <MeetMap events={[event]} onSelect={() => {}} />
+          </div>
+        )}
+
         <div className="md-going">
           <span className="cp-label">Hvem kommer</span>
           {yes.length === 0 && maybe.length === 0
@@ -97,7 +138,35 @@ export default function MeetDetail({ event, onClose }) {
         ) : (
           <p className="muted rsvp-login"><Link href="/login" className="c-link">Log ind</Link> for at tilmelde dig.</p>
         )}
+
+        <div className="md-photos">
+          <div className="md-photos-head">
+            <span className="cp-label" style={{ margin: 0 }}>Billeder fra meet{photos.length ? ` (${photos.length})` : ""}</span>
+            {session && (
+              <>
+                <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={onFiles} />
+                <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.4rem 0.8rem" }} onClick={() => fileRef.current?.click()} disabled={uploading}>
+                  {uploading ? "Uploader…" : "+ Tilføj billeder"}
+                </button>
+              </>
+            )}
+          </div>
+          {photos.length === 0 ? (
+            <p className="md-empty">Ingen billeder endnu{session ? " — del dine fra dagen 📸" : "."}</p>
+          ) : (
+            <div className="md-photo-grid">
+              {photos.map((p, i) => (
+                <button className="md-photo" key={p.id} onClick={() => setLb({ index: i })} aria-label="Åbn billede">
+                  <img src={p.url} alt={p.car || "Meet-billede"} loading="lazy" />
+                  {!p.approved && <span className="md-photo-pending" title="Afventer godkendelse til offentlig visning">Afventer</span>}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
+
+      {lb && <PhotoLightbox photos={photos} index={lb.index} onClose={() => setLb(null)} userId={user?.id} canLike={!!session} onNeedLogin={() => { window.location.href = "/login"; }} />}
     </div>,
     document.body
   );

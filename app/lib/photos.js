@@ -1,7 +1,7 @@
 import { supabase, PUBLIC_BUCKET, PRIVATE_BUCKET } from "./supabaseClient";
 
 // Upload a file to the right bucket and record it in the photos table.
-export async function uploadPhoto({ file, isPublic, car, caption, userId, albumId }) {
+export async function uploadPhoto({ file, isPublic, car, caption, userId, albumId, eventId }) {
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
   const bucket = isPublic ? PUBLIC_BUCKET : PRIVATE_BUCKET;
   const path = `${userId}/${crypto.randomUUID()}.${ext}`;
@@ -22,6 +22,7 @@ export async function uploadPhoto({ file, isPublic, car, caption, userId, albumI
     car: car?.trim() || null,
     caption: caption?.trim() || null,
     album_id: albumId || null,
+    event_id: eventId || null,
   });
   if (error) {
     // roll back the orphaned file

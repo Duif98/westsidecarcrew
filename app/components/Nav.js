@@ -32,8 +32,10 @@ export default function Nav() {
             The Crew
           </a>
           <a href="#garagen" className="hide-sm">The Garage</a>
+          <Link href="/medlemmer" className="hide-sm">Medlemmer</Link>
           <Link href="/events" className="hide-sm">Meets</Link>
           <Link href="/calendar" className="hide-sm">Calendar</Link>
+          <Link href="/kort" className="hide-sm">Kort</Link>
           <a href={IG} target="_blank" rel="noopener noreferrer" className="hide-sm">
             Instagram
           </a>
