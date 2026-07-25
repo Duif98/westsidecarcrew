@@ -1308,6 +1308,14 @@ a.btn-gold { text-decoration: none; }
 .cm-vin .ph-btn { flex: none; width: auto; padding: 0.5rem 0.8rem; }
 @media (max-width: 640px) { .cm-row { grid-template-columns: 1fr; gap: 0.6rem; } }
 
+/* ---------- Profile: own-car info editor ---------- */
+.pcar-specs { font-family: var(--font-mono), monospace; font-size: 0.62rem; color: var(--gold); margin-top: 0.15rem; }
+.cie-list { display: flex; flex-direction: column; gap: 0.7rem; }
+.cie { background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 0.8rem 0.9rem; }
+.cie-toggle { flex: none; width: auto; padding: 0.45rem 0.9rem; }
+.cie-form { margin-top: 0.8rem; }
+.cie-save { width: auto; margin-top: 0.5rem; }
+
 /* ---------- Car profile / build thread ---------- */
 .lb-top-actions { display: flex; align-items: center; gap: 0.6rem; flex: none; }
 .lb-info { display: inline-flex; align-items: center; gap: 0.4rem; height: 46px; padding: 0 1rem; border-radius: 100px; border: 1px solid var(--line-2); background: rgba(255,255,255,0.04); color: var(--text); cursor: pointer; transition: background 0.2s, border-color 0.2s; }

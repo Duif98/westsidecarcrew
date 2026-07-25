@@ -12,6 +12,9 @@ import Lightbox from "../components/Lightbox";
 import PhotoLightbox from "../components/PhotoLightbox";
 import ProfileWall from "../components/ProfileWall";
 import AvatarCropper from "../components/AvatarCropper";
+import CarInfoEditor from "../components/CarInfoEditor";
+
+const specLine = (a) => [a.model_year, a.engine, a.power_hp ? `${a.power_hp} hk` : null, a.drivetrain].filter(Boolean).join(" · ");
 
 const memberSince = (t) => new Date(t).toLocaleDateString("da-DK", { month: "long", year: "numeric" });
 const carsBySlug = Object.fromEntries(cars.map((c) => [c.slug, c]));
@@ -235,10 +238,23 @@ function ProfileInner() {
                   <div className="pcar-body">
                     <span className="pcar-title">{a.make || a.title}</span>
                     <span className="pcar-sub">{items.length ? `${items.length} billeder` : (a.model || (car ? car.model : "") || "Ingen billeder endnu")}</span>
+                    {specLine(a) && <span className="pcar-specs">{specLine(a)}</span>}
                   </div>
                 </button>
               );
             })}
+          </div>
+        </section>
+      )}
+
+      {me && albums.some((a) => a.created_by === user.id) && (
+        <section className="profil-section">
+          <span className="overline">Bil-info</span>
+          <p className="muted" style={{ fontSize: "0.88rem", margin: "0 0 0.9rem" }}>Skriv specs på dine biler — mærke, model, motor, effekt og modifikationer. Vises i din garage.</p>
+          <div className="cie-list">
+            {albums.filter((a) => a.created_by === user.id).map((a) => (
+              <CarInfoEditor key={a.id} album={a} onSaved={(patch) => setAlbums((prev) => prev.map((x) => (x.id === a.id ? { ...x, ...patch } : x)))} />
+            ))}
           </div>
         </section>
       )}
