@@ -8,7 +8,7 @@ import { useAuth } from "../lib/AuthProvider";
 import { enrichPhotos, withUrls } from "../lib/photos";
 import { cars } from "../data/cars";
 import { asset } from "../lib/asset";
-import CarProfile from "../components/CarProfile";
+import Lightbox from "../components/Lightbox";
 import PhotoLightbox from "../components/PhotoLightbox";
 import ProfileWall from "../components/ProfileWall";
 import AvatarCropper from "../components/AvatarCropper";
@@ -27,9 +27,12 @@ function ProfileInner() {
   const [photos, setPhotos] = useState([]);
   const [stats, setStats] = useState(null);
   const [badges, setBadges] = useState([]);
+  const [itemsByAlbum, setItemsByAlbum] = useState({});
+  const [unclaimed, setUnclaimed] = useState([]);
+  const [reloadKey, setReloadKey] = useState(0);
   const [ready, setReady] = useState(false);
   const [notFound, setNotFound] = useState(false);
-  const [carOpen, setCarOpen] = useState(null);
+  const [gallery, setGallery] = useState(null);
   const [lb, setLb] = useState(null);
   const [editing, setEditing] = useState(false);
   const [edit, setEdit] = useState({ bio: "", location: "" });
@@ -66,6 +69,12 @@ function ProfileInner() {
     } finally { setSavingProfile(false); }
   };
 
+  const claimCar = async (albumId) => {
+    const { error } = await supabase.rpc("claim_album", { p_album_id: albumId });
+    if (error) { alert(error.message); return; }
+    setReloadKey((k) => k + 1); // re-load so the car moves into the garage
+  };
+
   useEffect(() => {
     if (!username) { setNotFound(true); setReady(true); return; }
     let active = true;
@@ -83,24 +92,35 @@ function ProfileInner() {
       const albumList = al || [];
       setAlbums(albumList);
 
-      // A cover per album: chosen cover photo, else first public photo, else the
-      // curated repo cover.
+      // For each car: a cover + the full showcase gallery (repo photos from the
+      // front page + any approved uploaded album photos).
       if (albumList.length) {
         const { data: albPhotos } = await supabase
           .from("photos")
-          .select("id, bucket, path, album_id")
+          .select("id, bucket, path, album_id, car")
           .in("album_id", albumList.map((a) => a.id))
           .eq("visibility", "public").eq("approved", true);
         const resolved = await withUrls(albPhotos || []);
-        const cov = {};
+        const cov = {}, items = {};
         albumList.forEach((a) => {
-          const mine = resolved.filter((p) => p.album_id === a.id);
-          const chosen = a.cover_photo_id ? mine.find((p) => p.id === a.cover_photo_id) : null;
           const car = carsBySlug[a.slug];
+          const repoItems = car
+            ? car.photos.map((p) => ({ full: asset(`/cars/${car.slug}/${p.src}`), thumb: asset(`/cars/${car.slug}/thumb/${p.src}`), alt: `${car.make} ${car.model}` }))
+            : [];
+          const mine = resolved.filter((p) => p.album_id === a.id);
+          const upItems = mine.map((p) => ({ full: p.url, thumb: p.url, alt: p.car || a.title }));
+          const chosen = a.cover_photo_id ? mine.find((p) => p.id === a.cover_photo_id) : null;
           cov[a.id] = chosen?.url || mine[0]?.url || (car ? asset(`/cars/${car.slug}/thumb/${car.cover}`) : null);
+          items[a.id] = [...repoItems, ...upItems];
         });
         setCovers(cov);
+        setItemsByAlbum(items);
       }
+
+      // Curated cars nobody has claimed yet (offered on your own profile).
+      const { data: free } = await supabase
+        .from("albums").select("*").eq("is_curated", true).is("created_by", null);
+      setUnclaimed(free || []);
 
       // Recent photos by this member.
       const { data: ph } = await supabase
@@ -128,7 +148,7 @@ function ProfileInner() {
       setReady(true);
     })();
     return () => { active = false; };
-  }, [username, user?.id]);
+  }, [username, user?.id, reloadKey]);
 
   const initials = useMemo(() => (username || "?").slice(0, 2).toUpperCase(), [username]);
 
@@ -204,18 +224,36 @@ function ProfileInner() {
           <div className="profil-cars">
             {albums.map((a) => {
               const car = carsBySlug[a.slug];
+              const items = itemsByAlbum[a.id] || [];
+              const curated = car ? { spec: car.spec, tags: car.tags, blurb: car.blurb, owner: car.owner } : null;
               return (
-                <button className="pcar" key={a.id} onClick={() => setCarOpen({ album: a, curated: car ? { spec: car.spec, tags: car.tags, blurb: car.blurb, owner: car.owner } : null })}>
+                <button className="pcar" key={a.id} disabled={items.length === 0}
+                  onClick={() => items.length && setGallery({ items, title: a.make || car?.make || a.title, subtitle: [a.model || car?.model, a.owner_name || car?.owner].filter(Boolean).join(" · "), album: a, curated })}>
                   {covers[a.id]
                     ? <img src={covers[a.id]} alt={a.title} loading="lazy" />
                     : <div className="pcar-noimg" />}
                   <div className="pcar-body">
                     <span className="pcar-title">{a.make || a.title}</span>
-                    <span className="pcar-sub">{a.model || (car ? car.model : "") || "Se profil →"}</span>
+                    <span className="pcar-sub">{items.length ? `${items.length} billeder` : (a.model || (car ? car.model : "") || "Ingen billeder endnu")}</span>
                   </div>
                 </button>
               );
             })}
+          </div>
+        </section>
+      )}
+
+      {me && unclaimed.length > 0 && (
+        <section className="profil-section">
+          <span className="overline">Claim en bil</span>
+          <p className="muted" style={{ fontSize: "0.88rem", margin: "0 0 0.9rem" }}>Er en af disse biler din? Claim den, så flytter den (og dens billeder) ind i din garage.</p>
+          <div className="claim-list">
+            {unclaimed.map((a) => (
+              <div className="claim-row" key={a.id}>
+                <span className="claim-name">{a.make || a.title}{a.owner_name ? <span className="claim-owner"> · {a.owner_name}</span> : ""}</span>
+                <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.4rem 0.9rem" }} onClick={() => claimCar(a.id)}>🚗 Claim</button>
+              </div>
+            ))}
           </div>
         </section>
       )}
@@ -247,7 +285,7 @@ function ProfileInner() {
 
       <ProfileWall ownerId={profile.id} ownerName={profile.username} />
 
-      {carOpen && <CarProfile album={carOpen.album} curated={carOpen.curated} onClose={() => setCarOpen(null)} />}
+      {gallery && <Lightbox items={gallery.items} title={gallery.title} subtitle={gallery.subtitle} album={gallery.album} curated={gallery.curated} onClose={() => setGallery(null)} />}
       {lb && <PhotoLightbox photos={photos} index={lb.index} onClose={() => setLb(null)} userId={user?.id} canLike={!!session} onNeedLogin={() => { window.location.href = "/login"; }} />}
     </div>
   );

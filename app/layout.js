@@ -1,6 +1,7 @@
 import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { asset } from "./lib/asset";
 import AuthProvider from "./lib/AuthProvider";
+import NavMenu from "./components/NavMenu";
 import "./globals.css";
 
 const display = Fraunces({
@@ -52,7 +53,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          {children}
+          <NavMenu />
+        </AuthProvider>
       </body>
     </html>
   );
