@@ -57,7 +57,15 @@ export default function CommunityGallery() {
                 <span className="c-car">{p.car || "Uden titel"}</span>
                 <span className="c-owner">@{p.profiles?.username || "medlem"}</span>
               </div>
-              <LikeButton photo={p} userId={user?.id} canLike={!!user} onNeedLogin={needLogin} />
+              <div className="c-meta">
+                {p.commentCount > 0 && (
+                  <span className="c-cmt" title={`${p.commentCount} kommentarer`}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8 8 0 0 1-11.3 7.3L4 21l1.7-5.7A8 8 0 1 1 21 12z" /></svg>
+                    {p.commentCount}
+                  </span>
+                )}
+                <LikeButton photo={p} userId={user?.id} canLike={!!user} onNeedLogin={needLogin} />
+              </div>
             </figcaption>
           </figure>
         ))}

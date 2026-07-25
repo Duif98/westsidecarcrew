@@ -2,12 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import CarProfile from "./CarProfile";
 
 // Generic gallery lightbox. `items` is [{ full, thumb, alt }] with URLs already
 // resolved by the caller, so it works for both repo and uploaded photos.
-export default function Lightbox({ items, title, subtitle, startIndex = 0, onClose }) {
+export default function Lightbox({ items, title, subtitle, startIndex = 0, onClose, album, curated }) {
   const [i, setI] = useState(startIndex);
   const [mounted, setMounted] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const closeRef = useRef(null);
   const thumbsRef = useRef(null);
   const touchX = useRef(null);
@@ -58,12 +60,22 @@ export default function Lightbox({ items, title, subtitle, startIndex = 0, onClo
           <div className="make">{title}</div>
           {subtitle && <div className="meta">{subtitle}</div>}
         </div>
-        <button ref={closeRef} className="lb-close" onClick={onClose} aria-label="Close gallery">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-            <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-          </svg>
-        </button>
+        <div className="lb-top-actions">
+          {album && (
+            <button className="lb-info" onClick={() => setShowProfile(true)} aria-label="Bil-profil & byggetråd">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" strokeLinecap="round" /></svg>
+              <span className="lb-info-txt">Profil</span>
+            </button>
+          )}
+          <button ref={closeRef} className="lb-close" onClick={onClose} aria-label="Close gallery">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
+              <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {showProfile && album && <CarProfile album={album} curated={curated} onClose={() => setShowProfile(false)} />}
 
       <div className="lb-stage" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         {n > 1 && (

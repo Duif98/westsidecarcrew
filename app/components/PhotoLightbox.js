@@ -3,13 +3,17 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import LikeButton from "./LikeButton";
+import Comments from "./Comments";
 
 export default function PhotoLightbox({ photos, index, onClose, userId, canLike, onNeedLogin }) {
   const [i, setI] = useState(index);
   const [mounted, setMounted] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [counts, setCounts] = useState({});
   const touchX = useRef(null);
   const n = photos.length;
   const p = photos[i];
+  const commentCount = counts[p?.id] ?? p?.commentCount ?? 0;
 
   const go = useCallback((d) => setI((v) => (v + d + n) % n), [n]);
 
@@ -68,8 +72,30 @@ export default function PhotoLightbox({ photos, index, onClose, userId, canLike,
             {n > 1 ? <span className="plb-idx"> · {i + 1}/{n}</span> : null}
           </div>
         </div>
-        {p && <LikeButton photo={p} userId={userId} canLike={canLike} onNeedLogin={onNeedLogin} />}
+        <div className="plb-actions">
+          <button
+            className={`plb-cbtn ${showComments ? "on" : ""}`}
+            onClick={() => setShowComments((s) => !s)}
+            aria-pressed={showComments}
+            aria-label="Kommentarer"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8 8 0 0 1-11.3 7.3L4 21l1.7-5.7A8 8 0 1 1 21 12z" /></svg>
+            {commentCount > 0 && <b>{commentCount}</b>}
+          </button>
+          {p && <LikeButton photo={p} userId={userId} canLike={canLike} onNeedLogin={onNeedLogin} />}
+        </div>
       </div>
+
+      {showComments && p && (
+        <div className="plb-comments">
+          <Comments
+            key={p.id}
+            photoId={p.id}
+            onNeedLogin={onNeedLogin}
+            onCountChange={(c) => setCounts((prev) => ({ ...prev, [p.id]: c }))}
+          />
+        </div>
+      )}
     </div>,
     document.body
   );

@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { getPosts } from "../lib/posts";
+import { useAuth } from "../lib/AuthProvider";
+import { markSeen } from "../lib/useUnread";
 import Reveal from "./Reveal";
 
 const fmtDate = (t) => new Date(t).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 export default function NewsBoard() {
+  const { session } = useAuth();
   const [posts, setPosts] = useState([]);
   const [ready, setReady] = useState(false);
 
@@ -15,6 +18,9 @@ export default function NewsBoard() {
     getPosts().then((p) => { if (active) { setPosts(p); setReady(true); } });
     return () => { active = false; };
   }, []);
+
+  // A member seeing the front-page board has caught up on posts.
+  useEffect(() => { if (ready && session) markSeen("posts"); }, [ready, session]);
 
   if (!ready || posts.length === 0) return null;
 

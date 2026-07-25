@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "../lib/AuthProvider";
+import { useUnread } from "../lib/useUnread";
 
 const IG = "https://www.instagram.com/westsidecarcrew/";
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
-  const { session } = useAuth();
+  const { session, user } = useAuth();
+  const { total } = useUnread(session, user?.id);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -30,11 +32,13 @@ export default function Nav() {
             The Crew
           </a>
           <a href="#garagen" className="hide-sm">The Garage</a>
+          <Link href="/events" className="hide-sm">Meets</Link>
           <a href={IG} target="_blank" rel="noopener noreferrer" className="hide-sm">
             Instagram
           </a>
-          <Link href={session ? "/medlem" : "/login"} className="ig">
+          <Link href={session ? "/medlem" : "/login"} className="ig nav-member">
             {session ? "Member" : "Log in"}
+            {session && total > 0 && <span className="nav-badge">{total > 9 ? "9+" : total}</span>}
           </Link>
         </nav>
       </div>

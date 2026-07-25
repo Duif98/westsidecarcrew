@@ -30,7 +30,7 @@ function shuffle(arr, seed) {
 
 export default function Garage() {
   const [open, setOpen] = useState(null); // { items, title, subtitle }
-  const [extra, setExtra] = useState({ bySlug: {}, covers: {}, newAlbums: [] });
+  const [extra, setExtra] = useState({ bySlug: {}, covers: {}, newAlbums: [], albumBySlug: {} });
   const [seed, setSeed] = useState(null);
 
   // Set the shuffle seed after mount (keeps SSR/first render stable -> no hydration mismatch).
@@ -62,7 +62,8 @@ export default function Garage() {
         }
       });
       const newAlbums = albums.filter((a) => !a.is_curated && bySlug[a.slug]?.length);
-      setExtra({ bySlug, covers, newAlbums });
+      const albumBySlug = Object.fromEntries(albums.map((a) => [a.slug, a]));
+      setExtra({ bySlug, covers, newAlbums, albumBySlug });
     })();
     return () => { active = false; };
   }, []);
@@ -88,6 +89,8 @@ export default function Garage() {
         tag: car.spec, title: car.make, model: car.model, owner: car.owner,
         count: items.length, items,
         lbTitle: car.make, lbSubtitle: [car.owner, car.spec].filter(Boolean).join(" · "),
+        album: extra.albumBySlug[car.slug],
+        curated: { spec: car.spec, tags: car.tags, blurb: car.blurb, owner: car.owner },
       };
     });
     const news = extra.newAlbums.map((a) => {
@@ -99,6 +102,7 @@ export default function Garage() {
         tag: "Crew album", title: a.title, model: "", owner: a.owner_name,
         count: items.length, items,
         lbTitle: a.title, lbSubtitle: a.owner_name || "",
+        album: extra.albumBySlug[a.slug], curated: null,
       };
     });
     const orderedCurated = seed == null ? curated : shuffle(curated, seed);
@@ -121,7 +125,7 @@ export default function Garage() {
               as="button"
               className={`card ${idx === 0 || idx === 5 ? "feature" : ""}`}
               delay={(idx % 3) * 90}
-              onClick={() => setOpen({ items: s.items, title: s.lbTitle, subtitle: s.lbSubtitle })}
+              onClick={() => setOpen({ items: s.items, title: s.lbTitle, subtitle: s.lbSubtitle, album: s.album, curated: s.curated })}
               aria-label={`Open gallery: ${s.title}${s.owner ? " — " + s.owner : ""}`}
             >
               {s.coverUrl && <img src={s.coverUrl} alt={`${s.title}${s.owner ? " — " + s.owner : ""}`} loading="lazy" />}
@@ -148,7 +152,7 @@ export default function Garage() {
         <CommunityGallery />
       </div>
 
-      {open && <Lightbox items={open.items} title={open.title} subtitle={open.subtitle} onClose={() => setOpen(null)} />}
+      {open && <Lightbox items={open.items} title={open.title} subtitle={open.subtitle} album={open.album} curated={open.curated} onClose={() => setOpen(null)} />}
     </section>
   );
 }

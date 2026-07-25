@@ -72,9 +72,25 @@ export async function withLikes(rows, userId) {
   }
 }
 
-// Resolve URLs and likes in one call.
+// Attach comment counts. Fail-safe: if the comments table isn't set up yet,
+// photos still render with zero comments.
+export async function withCommentCounts(rows) {
+  if (!rows.length) return rows;
+  try {
+    const ids = rows.map((r) => r.id);
+    const { data, error } = await supabase.from("comments").select("photo_id").in("photo_id", ids);
+    if (error) throw error;
+    const counts = {};
+    (data || []).forEach((c) => (counts[c.photo_id] = (counts[c.photo_id] || 0) + 1));
+    return rows.map((r) => ({ ...r, commentCount: counts[r.id] || 0 }));
+  } catch {
+    return rows.map((r) => ({ ...r, commentCount: 0 }));
+  }
+}
+
+// Resolve URLs, likes and comment counts in one call.
 export async function enrichPhotos(rows, userId) {
-  return withLikes(await withUrls(rows), userId);
+  return withCommentCounts(await withLikes(await withUrls(rows), userId));
 }
 
 export async function toggleLike(photoId, userId, currentlyLiked) {
