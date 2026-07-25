@@ -1367,6 +1367,15 @@ a.btn-gold { text-decoration: none; }
 .cal-chip-time { font-family: var(--font-mono), monospace; font-size: 0.56rem; color: var(--gold-bright); flex: none; }
 .cal-chip-title { font-size: 0.68rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cal-note { color: var(--faint); font-size: 0.9rem; margin-top: 1.4rem; }
+.cal-new { width: auto; padding: 0 1.1rem; height: 42px; white-space: nowrap; }
+.cal-hint { color: var(--faint); font-size: 0.78rem; margin: -0.6rem 0 1.1rem; }
+.cal-cell { position: relative; }
+.cal-cell.clickable { cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+.cal-cell.clickable:hover { border-color: var(--gold-deep); background: var(--bg-3); }
+.cal-cell.out.clickable:hover { background: rgba(255,255,255,0.02); }
+.cal-add { position: absolute; top: 0.35rem; left: 0.4rem; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; font-size: 0.9rem; line-height: 1; color: var(--gold); background: rgba(201,168,119,0.14); border: 1px solid var(--gold-deep); opacity: 0; transition: opacity 0.15s; pointer-events: none; }
+.cal-cell.clickable:hover .cal-add { opacity: 1; }
+@media (hover: none) { .cal-add { display: none; } }
 @media (max-width: 560px) {
   .cal-grid { gap: 3px; }
   .cal-cell { min-height: 62px; padding: 0.25rem; border-radius: 7px; }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import MeetDetail from "../components/MeetDetail";
+import MeetForm from "../components/MeetForm";
 
 const WEEKDAYS = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
 const MONTHS = ["Januar", "Februar", "Marts", "April", "Maj", "Juni", "Juli", "August", "September", "Oktober", "November", "December"];
@@ -19,15 +20,14 @@ export default function CalendarPage() {
   const [events, setEvents] = useState([]);
   const [cursor, setCursor] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
   const [open, setOpen] = useState(null);
+  const [creating, setCreating] = useState(null); // null | { date }
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const { data } = await supabase.from("events").select("*").order("starts_at", { ascending: true });
-      if (active) setEvents(data || []);
-    })();
-    return () => { active = false; };
-  }, []);
+  const loadEvents = async () => {
+    const { data } = await supabase.from("events").select("*").order("starts_at", { ascending: true });
+    setEvents(data || []);
+  };
+
+  useEffect(() => { loadEvents(); }, []);
 
   const byDay = useMemo(() => {
     const map = {};
@@ -76,8 +76,10 @@ export default function CalendarPage() {
             <button className="cal-arrow" onClick={() => move(-1)} aria-label="Forrige måned">‹</button>
             <button className="cal-today" onClick={goToday}>I dag</button>
             <button className="cal-arrow" onClick={() => move(1)} aria-label="Næste måned">›</button>
+            {session && <button className="btn-gold cal-new" onClick={() => setCreating({ date: "" })}>+ Nyt meet</button>}
           </div>
         </div>
+        {session && <p className="cal-hint">Tip: klik på en dag for at planlægge et meet den dato.</p>}
 
         <div className="cal-grid">
           {WEEKDAYS.map((w) => <div className="cal-wd" key={w}>{w}</div>)}
@@ -86,11 +88,18 @@ export default function CalendarPage() {
             const inMonth = d.getMonth() === cursor.getMonth();
             const dayEvents = byDay[key] || [];
             return (
-              <div className={`cal-cell ${inMonth ? "" : "out"} ${key === todayKey ? "today" : ""} ${dayEvents.length ? "has" : ""}`} key={key}>
+              <div
+                className={`cal-cell ${inMonth ? "" : "out"} ${key === todayKey ? "today" : ""} ${dayEvents.length ? "has" : ""} ${session ? "clickable" : ""}`}
+                key={key}
+                onClick={session ? () => setCreating({ date: key }) : undefined}
+                role={session ? "button" : undefined}
+                aria-label={session ? `Planlæg meet den ${d.getDate()}.` : undefined}
+              >
                 <span className="cal-daynum">{d.getDate()}</span>
+                {session && <span className="cal-add" aria-hidden="true">+</span>}
                 <div className="cal-events">
                   {dayEvents.map((e) => (
-                    <button key={e.id} className="cal-chip" onClick={() => setOpen(e)} title={e.title}>
+                    <button key={e.id} className="cal-chip" onClick={(ev) => { ev.stopPropagation(); setOpen(e); }} title={e.title}>
                       <span className="cal-chip-time">{hm(e.starts_at)}</span>
                       <span className="cal-chip-title">{e.title}</span>
                     </button>
@@ -102,11 +111,18 @@ export default function CalendarPage() {
         </div>
 
         {events.length === 0 && (
-          <p className="cal-note">Ingen meets i kalenderen endnu.{session ? <> Planlæg et på <Link href="/events" className="c-link">Meets-listen</Link>.</> : <> <Link href="/login" className="c-link">Log ind</Link> for at planlægge et.</>}</p>
+          <p className="cal-note">Ingen meets i kalenderen endnu.{session ? " Klik på en dag eller “+ Nyt meet” for at planlægge det første." : <> <Link href="/login" className="c-link">Log ind</Link> for at planlægge et.</>}</p>
         )}
       </div>
 
       {open && <MeetDetail event={open} onClose={() => setOpen(null)} />}
+      {creating && (
+        <MeetForm
+          presetDate={creating.date}
+          onClose={() => setCreating(null)}
+          onCreated={(ev) => { loadEvents(); setCursor(new Date(new Date(ev.starts_at).getFullYear(), new Date(ev.starts_at).getMonth(), 1)); }}
+        />
+      )}
     </main>
   );
 }
