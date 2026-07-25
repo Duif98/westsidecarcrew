@@ -11,6 +11,7 @@ import { asset } from "../lib/asset";
 import CarProfile from "../components/CarProfile";
 import PhotoLightbox from "../components/PhotoLightbox";
 import ProfileWall from "../components/ProfileWall";
+import AvatarCropper from "../components/AvatarCropper";
 
 const memberSince = (t) => new Date(t).toLocaleDateString("da-DK", { month: "long", year: "numeric" });
 const carsBySlug = Object.fromEntries(cars.map((c) => [c.slug, c]));
@@ -33,6 +34,7 @@ function ProfileInner() {
   const [editing, setEditing] = useState(false);
   const [edit, setEdit] = useState({ bio: "", location: "" });
   const [avatarFile, setAvatarFile] = useState(null);
+  const [cropSource, setCropSource] = useState(null);
   const [savingProfile, setSavingProfile] = useState(false);
   const avatarRef = useRef(null);
 
@@ -166,7 +168,7 @@ function ProfileInner() {
         <div className="profil-editor">
           <div className="pe-avatar-row">
             <div className="profil-avatar sm">{avatarFile ? <img src={URL.createObjectURL(avatarFile)} alt="" /> : (profile.avatar_path ? <img src={avatarUrl(profile.avatar_path)} alt="" /> : initials)}</div>
-            <input ref={avatarRef} type="file" accept="image/*" hidden onChange={(e) => setAvatarFile(e.target.files?.[0] || null)} />
+            <input ref={avatarRef} type="file" accept="image/*" hidden onChange={(e) => { const fl = e.target.files?.[0]; if (fl) setCropSource(fl); e.target.value = ""; }} />
             <button type="button" className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.45rem 0.9rem" }} onClick={() => avatarRef.current?.click()}>Skift profilbillede</button>
           </div>
           <label className="post-field"><span>Om mig</span>
@@ -233,6 +235,14 @@ function ProfileInner() {
 
       {albums.length === 0 && photos.length === 0 && (
         <p className="muted" style={{ marginTop: "2rem" }}>@{profile.username} har ikke delt biler eller billeder endnu.</p>
+      )}
+
+      {cropSource && (
+        <AvatarCropper
+          file={cropSource}
+          onCancel={() => setCropSource(null)}
+          onDone={(f) => { setAvatarFile(f); setCropSource(null); }}
+        />
       )}
 
       <ProfileWall ownerId={profile.id} ownerName={profile.username} />
