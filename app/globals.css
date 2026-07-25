@@ -1455,6 +1455,10 @@ a.btn-gold { text-decoration: none; }
 .md-wx-src { font-family: var(--font-mono), monospace; font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); align-self: flex-start; }
 .md-wx-soon { color: var(--muted); }
 @media (max-width: 460px) { .md-wx { flex-wrap: wrap; } .md-wx-meta { margin-left: 0; width: 100%; } .md-wx-src { position: absolute; opacity: 0; } }
+.md-yr { display: flex; align-items: center; gap: 0.55rem; margin-top: 0.6rem; padding: 0.65rem 0.9rem; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 12px; font-family: var(--font-mono), monospace; font-size: 0.68rem; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: all 0.2s; }
+.md-yr:hover { color: var(--gold-bright); border-color: var(--gold); background: rgba(201,168,119,0.1); }
+.md-yr-icon { font-size: 1.05rem; }
+.md-yr-arrow { margin-left: auto; font-size: 0.9rem; }
 .md-going { margin-top: 1.6rem; border-top: 1px solid var(--line); padding-top: 1.2rem; }
 .md-going-lists p { font-size: 0.92rem; color: var(--muted); margin-bottom: 0.35rem; }
 .md-going-lists b { color: var(--text); font-weight: 500; }

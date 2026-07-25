@@ -131,6 +131,19 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
         <MeetWeather lat={event.lat} lng={event.lng} startsAt={event.starts_at} />
 
         {typeof event.lat === "number" && typeof event.lng === "number" && (
+          <a
+            className="md-yr"
+            href={`https://www.yr.no/en/forecast/daily-table/${event.lat.toFixed(4)},${event.lng.toFixed(4)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="md-yr-icon">🌦</span>
+            <span>Se fuld vejrudsigt på yr.no</span>
+            <span className="md-yr-arrow">↗</span>
+          </a>
+        )}
+
+        {typeof event.lat === "number" && typeof event.lng === "number" && (
           <div className="md-map">
             <MeetMap events={[event]} onSelect={() => {}} />
           </div>
