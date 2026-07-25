@@ -6,18 +6,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../lib/AuthProvider";
 import { useUnread } from "../lib/useUnread";
+import { useT } from "../lib/i18n";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 
 const IG = "https://www.instagram.com/westsidecarcrew/";
 const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
 const LINKS = [
-  { href: "/#crewet", label: "The Crew" },
-  { href: "/#garagen", label: "The Garage" },
-  { href: "/medlemmer", label: "Members" },
-  { href: "/events", label: "Meets" },
-  { href: "/calendar", label: "Calendar" },
-  { href: "/kort", label: "Map" },
+  { href: "/#crewet", key: "crew" },
+  { href: "/#garagen", key: "garage" },
+  { href: "/medlemmer", key: "members" },
+  { href: "/events", key: "meets" },
+  { href: "/calendar", key: "calendar" },
+  { href: "/kort", key: "map" },
 ];
 
 // Global mobile menu — a fixed hamburger + slide-over drawer, rendered on every
@@ -26,6 +27,7 @@ export default function NavMenu() {
   const router = useRouter();
   const { session, user, profile, isAdmin, signOut } = useAuth();
   const { total } = useUnread(session, user?.id);
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -41,7 +43,7 @@ export default function NavMenu() {
 
   return (
     <>
-      <button className="menu-fab" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button className="menu-fab" aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <span /><span /><span />
         {session && total > 0 && !open && <span className="nav-badge menu-fab-badge">{total > 9 ? "9+" : total}</span>}
       </button>
@@ -56,31 +58,31 @@ export default function NavMenu() {
                   : (session && profile?.username ? profile.username.slice(0, 2).toUpperCase() : "?")}
               </span>
               <span>
-                <b>{session ? `@${profile?.username || "member"}` : "Log in"}</b>
-                <span className="nav-m-sub">{session ? "View your profile" : "Join the crew"}</span>
+                <b>{session ? `@${profile?.username || "member"}` : t("nav.login")}</b>
+                <span className="nav-m-sub">{session ? t("nav.viewProfile") : t("nav.joinCrew")}</span>
               </span>
               {session && total > 0 && <span className="nav-badge" style={{ position: "static" }}>{total > 9 ? "9+" : total}</span>}
             </Link>
 
             {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} className="nav-m-link" onClick={close}>{l.label}</Link>
+              <Link key={l.href} href={l.href} className="nav-m-link" onClick={close}>{t(`nav.${l.key}`)}</Link>
             ))}
 
             {session && (
               <>
                 <div className="nav-m-sep" />
-                <Link href="/chat" className="nav-m-link" onClick={close}>Crew chat</Link>
-                <Link href="/upload" className="nav-m-link" onClick={close}>Upload photos</Link>
-                <Link href="/leaderboard" className="nav-m-link" onClick={close}>Leaderboard</Link>
-                {isAdmin && <Link href="/admin" className="nav-m-link" onClick={close}>Admin</Link>}
+                <Link href="/chat" className="nav-m-link" onClick={close}>{t("nav.crewChat")}</Link>
+                <Link href="/upload" className="nav-m-link" onClick={close}>{t("nav.uploadPhotos")}</Link>
+                <Link href="/leaderboard" className="nav-m-link" onClick={close}>{t("nav.leaderboard")}</Link>
+                {isAdmin && <Link href="/admin" className="nav-m-link" onClick={close}>{t("nav.admin")}</Link>}
               </>
             )}
 
-            <a href={IG} target="_blank" rel="noopener noreferrer" className="nav-m-link" onClick={close}>Instagram ↗</a>
+            <a href={IG} target="_blank" rel="noopener noreferrer" className="nav-m-link" onClick={close}>{t("nav.instagram")} ↗</a>
 
             {session
-              ? <button className="nav-m-link nav-m-logout" onClick={logout}>Log out</button>
-              : <Link href="/login" className="nav-m-link" onClick={close}>Log in</Link>}
+              ? <button className="nav-m-link nav-m-logout" onClick={logout}>{t("nav.logout")}</button>
+              : <Link href="/login" className="nav-m-link" onClick={close}>{t("nav.login")}</Link>}
           </div>
         </div>,
         document.body

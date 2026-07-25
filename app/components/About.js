@@ -1,8 +1,12 @@
+"use client";
+
 import Reveal from "./Reveal";
 import { asset } from "../lib/asset";
 import { cars } from "../data/cars";
+import { useT } from "../lib/i18n";
 
 export default function About() {
+  const { t } = useT();
   const figure = cars.find((c) => c.slug === "mark-gtr");
   const figSrc = figure?.cover
     ? asset(`/cars/${figure.slug}/${figure.cover}`)
@@ -12,49 +16,40 @@ export default function About() {
     <section className="section about" id="crewet">
       <div className="wrap">
         <Reveal className="section-head" as="div">
-          <span className="overline">The Crew</span>
+          <span className="overline">{t("about.overline")}</span>
         </Reveal>
 
         <div className="about-grid" style={{ marginTop: "2.5rem" }}>
           <div>
             <Reveal as="p" className="about-lead">
-              We met over the cars — and stayed for{" "}
-              <span className="g">each other</span>.
+              {t("about.leadA")}
+              <span className="g">{t("about.leadEm")}</span>{t("about.leadB")}
             </Reveal>
 
             <Reveal as="div" className="about-body" delay={120} style={{ marginTop: "1.8rem" }}>
-              <p>
-                West Side Car Crew started in 2022 in Esbjerg: a group of friends
-                from the harbour town, each with their own taste in horsepower.
-                No club, no membership fees — just a community built on a shared
-                passion and late nights in the garage.
-              </p>
-              <p>
-                Today the crew stretches from the west coast to Fredericia, and
-                the garage runs wide: classic American iron, a Japanese icon,
-                German engineering and raw V8. Different cars, same crew.
-              </p>
+              <p>{t("about.p1")}</p>
+              <p>{t("about.p2")}</p>
 
               <div className="stat-row">
                 <div className="stat">
                   <b>2022</b>
-                  <span>Founded</span>
+                  <span>{t("about.founded")}</span>
                 </div>
                 <div className="stat">
                   <b>{cars.length}</b>
-                  <span>Cars</span>
+                  <span>{t("about.cars")}</span>
                 </div>
                 <div className="stat">
                   <b>ESB × FRE</b>
-                  <span>Esbjerg · Fredericia</span>
+                  <span>{t("about.esbFreSub")}</span>
                 </div>
               </div>
             </Reveal>
           </div>
 
           <Reveal as="figure" className="about-figure" delay={80}>
-            <img src={figSrc} alt="Nissan GT-R by the Little Belt Bridge" loading="lazy" />
-            <figcaption>Little Belt · Golden hour</figcaption>
+            <img src={figSrc} alt={t("about.figAlt")} loading="lazy" />
+            <figcaption>{t("about.figCaption")}</figcaption>
           </Reveal>
         </div>
       </div>

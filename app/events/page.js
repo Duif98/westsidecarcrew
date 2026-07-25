@@ -6,22 +6,22 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
 import { yrUrl } from "../lib/weather";
+import { useT } from "../lib/i18n";
 import MeetForm from "../components/MeetForm";
 import MeetWeather from "../components/MeetWeather";
 
-const fmt = (t) =>
-  new Date(t).toLocaleString("da-DK", { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
-const dayNum = (t) => new Date(t).toLocaleDateString("da-DK", { day: "numeric" });
-const monShort = (t) => new Date(t).toLocaleDateString("da-DK", { month: "short" }).replace(".", "");
-
 const STATUS = [
-  { key: "yes", label: "Kommer", emoji: "✅" },
-  { key: "maybe", label: "Måske", emoji: "🤔" },
-  { key: "no", label: "Kan ikke", emoji: "❌" },
+  { key: "yes", emoji: "✅" },
+  { key: "maybe", emoji: "🤔" },
+  { key: "no", emoji: "❌" },
 ];
 
 export default function EventsPage() {
   const { session, user, profile } = useAuth();
+  const { t, locale } = useT();
+  const fmt = (ts) => new Date(ts).toLocaleString(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
+  const dayNum = (ts) => new Date(ts).toLocaleDateString(locale, { day: "numeric" });
+  const monShort = (ts) => new Date(ts).toLocaleDateString(locale, { month: "short" }).replace(".", "");
   const [events, setEvents] = useState([]);
   const [rsvps, setRsvps] = useState({}); // { [eventId]: [{user_id, status, username}] }
   const [ready, setReady] = useState(false);
@@ -72,7 +72,7 @@ export default function EventsPage() {
   };
 
   const removeEvent = async (id) => {
-    if (!confirm("Slet dette meet?")) return;
+    if (!confirm(t("events.confirmDelete"))) return;
     setEvents((p) => p.filter((e) => e.id !== id));
     await supabase.from("events").delete().eq("id", id);
   };
@@ -85,9 +85,9 @@ export default function EventsPage() {
         <div className="wrap member-bar-inner">
           <Link href="/" className="wordmark"><span className="dot" /> West Side Car Crew</Link>
           <div className="member-actions">
-            <Link href="/calendar" className="mlink">📅 Kalender</Link>
-            <Link href="/kort" className="mlink">🗺️ Kort</Link>
-            {session ? <Link href="/medlem" className="mlink">‹ Medlem</Link> : <Link href="/login" className="mlink">Log ind</Link>}
+            <Link href="/calendar" className="mlink">📅 {t("nav.calendar")}</Link>
+            <Link href="/kort" className="mlink">🗺️ {t("nav.map")}</Link>
+            {session ? <Link href="/medlem" className="mlink">{t("common.back")}</Link> : <Link href="/login" className="mlink">{t("common.loginShort")}</Link>}
           </div>
         </div>
       </div>
@@ -95,19 +95,19 @@ export default function EventsPage() {
       <div className="wrap events-body">
         <div className="events-head">
           <div>
-            <span className="overline">Meets & events</span>
-            <h1 className="member-title">Kommende meets</h1>
+            <span className="overline">{t("events.overline")}</span>
+            <h1 className="member-title">{t("events.title")}</h1>
           </div>
           {session && (
-            <button className="btn-gold" onClick={() => setFormOpen({})}>+ Nyt meet</button>
+            <button className="btn-gold" onClick={() => setFormOpen({})}>{t("events.newMeet")}</button>
           )}
         </div>
 
         {ready && events.length === 0 && (
           <div className="events-empty">
-            <p>Ingen meets planlagt endnu.</p>
-            {session ? <p className="muted">Vær den første til at planlægge et — tryk “Nyt meet”.</p>
-              : <p className="muted"><Link href="/login" className="c-link">Log ind</Link> for at planlægge et meet.</p>}
+            <p>{t("events.emptyTitle")}</p>
+            {session ? <p className="muted">{t("events.emptyMember")}</p>
+              : <p className="muted"><Link href="/login" className="c-link">{t("events.emptyGuestLogin")}</Link>{t("events.emptyGuestB")}</p>}
           </div>
         )}
 
@@ -129,8 +129,8 @@ export default function EventsPage() {
                     <h2>{ev.title}</h2>
                     {canManage && (
                       <div className="event-actions">
-                        <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.3rem 0.7rem" }} onClick={() => setFormOpen({ event: ev })}>✎ Rediger</button>
-                        <button className="event-del" onClick={() => removeEvent(ev.id)} aria-label="Slet meet">✕</button>
+                        <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.3rem 0.7rem" }} onClick={() => setFormOpen({ event: ev })}>{t("events.edit")}</button>
+                        <button className="event-del" onClick={() => removeEvent(ev.id)} aria-label={t("events.deleteMeet")}>✕</button>
                       </div>
                     )}
                   </div>
@@ -146,26 +146,26 @@ export default function EventsPage() {
                   {typeof ev.lat === "number" && typeof ev.lng === "number" && (
                     <a className="md-yr" href={yrUrl(ev.lat, ev.lng, ev.starts_at)} target="_blank" rel="noopener noreferrer">
                       <span className="md-yr-icon">🌦</span>
-                      <span>Se timevejr for dagen på yr.no</span>
+                      <span>{t("events.yrLink")}</span>
                       <span className="md-yr-arrow">↗</span>
                     </a>
                   )}
 
                   <div className="event-going">
-                    <span className="eg-count">✅ {yes.length} kommer{maybe.length ? ` · 🤔 ${maybe.length} måske` : ""}</span>
-                    {yes.length > 0 && <span className="eg-names">{yes.map((r) => `@${r.username || "medlem"}`).join(", ")}</span>}
+                    <span className="eg-count">✅ {t("events.comingN", { n: yes.length })}{maybe.length ? ` · 🤔 ${t("events.maybeN", { n: maybe.length })}` : ""}</span>
+                    {yes.length > 0 && <span className="eg-names">{yes.map((r) => `@${r.username || t("photo.member")}`).join(", ")}</span>}
                   </div>
 
                   {session ? (
                     <div className="rsvp-row">
                       {STATUS.map((s) => (
                         <button key={s.key} className={`rsvp-btn ${mine === s.key ? "on " + s.key : ""}`} onClick={() => setRsvp(ev.id, s.key)}>
-                          {s.emoji} {s.label}
+                          {s.emoji} {t(`rsvp.${s.key}`)}
                         </button>
                       ))}
                     </div>
                   ) : (
-                    <p className="muted rsvp-login"><Link href="/login" className="c-link">Log ind</Link> for at svare.</p>
+                    <p className="muted rsvp-login"><Link href="/login" className="c-link">{t("events.loginToRsvpLogin")}</Link>{t("events.loginToRsvpB")}</p>
                   )}
                 </div>
               </article>

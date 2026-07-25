@@ -4,14 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
+import { useT } from "../lib/i18n";
 
-const fmtDate = (d) => new Date(d).toLocaleDateString("da-DK", { day: "numeric", month: "long", year: "numeric" });
 const imgUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
 // Car profile: specs + build thread (byggetråd) for one album. Shown over the
 // gallery lightbox. Owner/admin can edit specs and add build entries.
 export default function CarProfile({ album, curated, onClose }) {
   const { user, profile } = useAuth();
+  const { t, locale } = useT();
+  const fmtDate = (d) => new Date(d).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
   const [mounted, setMounted] = useState(false);
   const [entries, setEntries] = useState([]);
   const [spec, setSpec] = useState(album);
@@ -72,7 +74,7 @@ export default function CarProfile({ album, curated, onClose }) {
     };
     const { error } = await supabase.from("albums").update(patch).eq("id", album.id);
     setBusy(false);
-    if (error) { alert("Kunne ikke gemme: " + error.message); return; }
+    if (error) { alert(t("car.saveError") + error.message); return; }
     setSpec({ ...spec, ...patch });
     setEditSpecs(false);
   };
@@ -100,7 +102,7 @@ export default function CarProfile({ album, curated, onClose }) {
       setEntryFile(null);
       if (fileRef.current) fileRef.current.value = "";
     } catch (err) {
-      alert("Kunne ikke tilføje: " + (err.message || err));
+      alert(t("car.addError") + (err.message || err));
     } finally {
       setBusy(false);
     }
@@ -116,10 +118,10 @@ export default function CarProfile({ album, curated, onClose }) {
   if (!mounted) return null;
 
   const specRows = [
-    ["År", spec.model_year],
-    ["Motor", spec.engine],
-    ["Effekt", spec.power_hp ? `${spec.power_hp} hk` : null],
-    ["Drivlinje", spec.drivetrain],
+    [t("car.year"), spec.model_year],
+    [t("car.engine"), spec.engine],
+    [t("car.power"), spec.power_hp ? `${spec.power_hp} ${t("car.hp")}` : null],
+    [t("car.drivetrain"), spec.drivetrain],
   ].filter(([, v]) => v);
 
   const title = spec.make || album.title;
@@ -129,18 +131,18 @@ export default function CarProfile({ album, curated, onClose }) {
   return createPortal(
     <div className="cp" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="cp-panel">
-        <button className="cp-close" onClick={onClose} aria-label="Luk profil">✕</button>
+        <button className="cp-close" onClick={onClose} aria-label={t("car.close")}>✕</button>
 
         <header className="cp-head">
-          <span className="overline">Bil-profil</span>
+          <span className="overline">{t("car.overline")}</span>
           <h2>{title}</h2>
           {sub && <p className="cp-sub">{sub}</p>}
           {canClaim && (
             <button className="btn-gold cp-claim" onClick={claim} disabled={busy}>
-              {busy ? "…" : "🚗 Claim denne bil (den er min)"}
+              {busy ? "…" : t("car.claim")}
             </button>
           )}
-          {claimedBy && claimedBy === user?.id && <p className="cp-claimed">✓ Din bil</p>}
+          {claimedBy && claimedBy === user?.id && <p className="cp-claimed">{t("car.claimed")}</p>}
         </header>
 
         {specRows.length > 0 ? (
@@ -155,7 +157,7 @@ export default function CarProfile({ album, curated, onClose }) {
 
         {(spec.mods || curatedTags.length > 0) && (
           <div className="cp-mods">
-            <span className="cp-label">Modifikationer</span>
+            <span className="cp-label">{t("car.mods")}</span>
             {spec.mods
               ? <p className="cp-modtext">{spec.mods}</p>
               : <div className="cp-tags">{curatedTags.map((t) => <span key={t} className="cp-tag">{t}</span>)}</div>}
@@ -166,44 +168,44 @@ export default function CarProfile({ album, curated, onClose }) {
 
         {canEdit && (
           <div className="cp-editspecs">
-            <button className="ph-btn" onClick={() => setEditSpecs((s) => !s)}>{editSpecs ? "Luk" : "✎ Rediger specs"}</button>
+            <button className="ph-btn" onClick={() => setEditSpecs((s) => !s)}>{editSpecs ? t("car.closeEdit") : t("car.editSpecs")}</button>
             {editSpecs && (
               <div className="cp-specform">
                 <div className="ef-grid">
-                  <label className="post-field"><span>Mærke</span><input value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} placeholder="fx BMW M4" /></label>
-                  <label className="post-field"><span>Model</span><input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="fx F82" /></label>
-                  <label className="post-field"><span>Årgang</span><input type="number" value={form.model_year} onChange={(e) => setForm({ ...form, model_year: e.target.value })} placeholder="2016" /></label>
-                  <label className="post-field"><span>Effekt (hk)</span><input type="number" value={form.power_hp} onChange={(e) => setForm({ ...form, power_hp: e.target.value })} placeholder="510" /></label>
-                  <label className="post-field"><span>Motor</span><input value={form.engine} onChange={(e) => setForm({ ...form, engine: e.target.value })} placeholder="3.0 R6 Twin-Turbo" /></label>
-                  <label className="post-field"><span>Drivlinje</span><input value={form.drivetrain} onChange={(e) => setForm({ ...form, drivetrain: e.target.value })} placeholder="RWD" /></label>
-                  <label className="post-field ef-full"><span>Modifikationer</span><textarea rows={2} value={form.mods} onChange={(e) => setForm({ ...form, mods: e.target.value })} placeholder="Downpipe, coilovers, stage 2…" /></label>
+                  <label className="post-field"><span>{t("car.fMake")}</span><input value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} placeholder="fx BMW M4" /></label>
+                  <label className="post-field"><span>{t("car.fModel")}</span><input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="fx F82" /></label>
+                  <label className="post-field"><span>{t("car.fYear")}</span><input type="number" value={form.model_year} onChange={(e) => setForm({ ...form, model_year: e.target.value })} placeholder="2016" /></label>
+                  <label className="post-field"><span>{t("car.fPower")}</span><input type="number" value={form.power_hp} onChange={(e) => setForm({ ...form, power_hp: e.target.value })} placeholder="510" /></label>
+                  <label className="post-field"><span>{t("car.fEngine")}</span><input value={form.engine} onChange={(e) => setForm({ ...form, engine: e.target.value })} placeholder="3.0 R6 Twin-Turbo" /></label>
+                  <label className="post-field"><span>{t("car.fDrivetrain")}</span><input value={form.drivetrain} onChange={(e) => setForm({ ...form, drivetrain: e.target.value })} placeholder="RWD" /></label>
+                  <label className="post-field ef-full"><span>{t("car.fMods")}</span><textarea rows={2} value={form.mods} onChange={(e) => setForm({ ...form, mods: e.target.value })} placeholder={t("car.fModsPh")} /></label>
                 </div>
-                <button className="btn-gold" onClick={saveSpecs} disabled={busy}>{busy ? "Gemmer…" : "Gem specs"}</button>
+                <button className="btn-gold" onClick={saveSpecs} disabled={busy}>{busy ? t("car.saving") : t("car.saveSpecs")}</button>
               </div>
             )}
           </div>
         )}
 
         <div className="cp-thread">
-          <span className="cp-label">Byggetråd</span>
+          <span className="cp-label">{t("car.thread")}</span>
 
           {canEdit && (
             <form className="cp-entryform" onSubmit={addEntry}>
               <div className="ef-grid">
-                <label className="post-field"><span>Overskrift</span><input value={entry.title} onChange={(e) => setEntry({ ...entry, title: e.target.value })} placeholder="fx Nye fælge" maxLength={120} /></label>
-                <label className="post-field"><span>Dato</span><input type="date" value={entry.date} onChange={(e) => setEntry({ ...entry, date: e.target.value })} /></label>
-                <label className="post-field ef-full"><span>Tekst</span><textarea rows={2} value={entry.body} onChange={(e) => setEntry({ ...entry, body: e.target.value })} placeholder="Hvad blev der lavet?" /></label>
+                <label className="post-field"><span>{t("car.fHeadline")}</span><input value={entry.title} onChange={(e) => setEntry({ ...entry, title: e.target.value })} placeholder={t("car.fHeadlinePh")} maxLength={120} /></label>
+                <label className="post-field"><span>{t("car.fDate")}</span><input type="date" value={entry.date} onChange={(e) => setEntry({ ...entry, date: e.target.value })} /></label>
+                <label className="post-field ef-full"><span>{t("car.fText")}</span><textarea rows={2} value={entry.body} onChange={(e) => setEntry({ ...entry, body: e.target.value })} placeholder={t("car.fTextPh")} /></label>
               </div>
               <div className="cp-entryactions">
                 <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => setEntryFile(e.target.files?.[0] || null)} />
-                <button type="button" className="ph-btn" onClick={() => fileRef.current?.click()}>{entryFile ? "✓ Billede valgt" : "+ Billede"}</button>
-                <button className="btn-gold" type="submit" disabled={busy || !entry.title.trim()}>{busy ? "…" : "Tilføj"}</button>
+                <button type="button" className="ph-btn" onClick={() => fileRef.current?.click()}>{entryFile ? t("car.imgChosen") : t("car.addImg")}</button>
+                <button className="btn-gold" type="submit" disabled={busy || !entry.title.trim()}>{busy ? "…" : t("car.add")}</button>
               </div>
             </form>
           )}
 
           {entries.length === 0 ? (
-            <p className="cp-empty">Ingen byggetråd endnu{canEdit ? " — tilføj den første milepæl ✎" : "."}</p>
+            <p className="cp-empty">{t("car.emptyThread")}{canEdit ? t("car.emptyThreadEdit") : t("meet.period")}</p>
           ) : (
             <div className="cp-timeline">
               {entries.map((en) => (
@@ -213,7 +215,7 @@ export default function CarProfile({ album, curated, onClose }) {
                     <div className="cp-item-head">
                       <b>{en.title}</b>
                       <span className="cp-item-date">{fmtDate(en.entry_date)}</span>
-                      {canEdit && <button className="cp-item-del" onClick={() => removeEntry(en.id)} aria-label="Slet">✕</button>}
+                      {canEdit && <button className="cp-item-del" onClick={() => removeEntry(en.id)} aria-label={t("car.deleteEntry")}>✕</button>}
                     </div>
                     {en.body && <p className="cp-item-text">{en.body}</p>}
                     {en.image_path && <img className="cp-item-img" src={imgUrl(en.image_path)} alt={en.title} loading="lazy" />}

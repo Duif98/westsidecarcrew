@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { toggleLike } from "../lib/photos";
+import { useT } from "../lib/i18n";
 
 export default function LikeButton({ photo, userId, canLike, onNeedLogin }) {
+  const { t } = useT();
   const [liked, setLiked] = useState(!!photo.likedByMe);
   const [count, setCount] = useState(photo.likeCount || 0);
   const [busy, setBusy] = useState(false);
@@ -30,8 +32,8 @@ export default function LikeButton({ photo, userId, canLike, onNeedLogin }) {
       className={`like-btn${liked ? " liked" : ""}`}
       onClick={click}
       aria-pressed={liked}
-      aria-label={liked ? "Fjern like" : "Synes godt om"}
-      title={canLike ? "" : "Log ind for at like"}
+      aria-label={liked ? t("like.remove") : t("like.add")}
+      title={canLike ? "" : t("like.loginTitle")}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 20s-7-4.6-9.5-9C1 8.5 2.2 5.5 5.2 5.1 7 4.9 8.6 5.9 12 9c3.4-3.1 5-4.1 6.8-3.9 3 .4 4.2 3.4 2.7 5.9C19 15.4 12 20 12 20z" />

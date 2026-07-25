@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabaseClient";
 import { enrichPhotos } from "../lib/photos";
 import { useAuth } from "../lib/AuthProvider";
+import { useT } from "../lib/i18n";
 import Reveal from "./Reveal";
 import LikeButton from "./LikeButton";
 import PhotoLightbox from "./PhotoLightbox";
@@ -13,6 +14,7 @@ import PhotoLightbox from "./PhotoLightbox";
 export default function CommunityGallery() {
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useT();
   const [photos, setPhotos] = useState([]);
   const [ready, setReady] = useState(false);
   const [lb, setLb] = useState(null);
@@ -42,24 +44,24 @@ export default function CommunityGallery() {
   return (
     <div className="community" id="crew-billeder">
       <Reveal className="section-head" as="div">
-        <span className="overline">From the crew</span>
-        <h2>Members&rsquo; photos</h2>
-        <p>Uploaded by the crew. <Link href="/login" className="c-link">Log in</Link> to see every photo and share your own.</p>
+        <span className="overline">{t("community.overline")}</span>
+        <h2>{t("community.title")}</h2>
+        <p>{t("community.subA")}<Link href="/login" className="c-link">{t("community.subLogin")}</Link>{t("community.subB")}</p>
       </Reveal>
       <div className="community-grid">
         {photos.map((p, idx) => (
           <figure className="c-card" key={p.id}>
-            <button className="c-imgbtn" onClick={() => setLb({ index: idx })} aria-label={`Åbn ${p.car || "billede"}`}>
-              <img src={p.url} alt={p.car || "Bil"} loading="lazy" />
+            <button className="c-imgbtn" onClick={() => setLb({ index: idx })} aria-label={t("community.openAria", { name: p.car || t("community.car").toLowerCase() })}>
+              <img src={p.url} alt={p.car || t("community.car")} loading="lazy" />
             </button>
             <figcaption>
               <div className="c-textcol">
-                <span className="c-car">{p.car || "Uden titel"}</span>
-                <span className="c-owner">@{p.profiles?.username || "medlem"}</span>
+                <span className="c-car">{p.car || t("community.untitled")}</span>
+                <span className="c-owner">@{p.profiles?.username || t("community.member")}</span>
               </div>
               <div className="c-meta">
                 {p.commentCount > 0 && (
-                  <span className="c-cmt" title={`${p.commentCount} kommentarer`}>
+                  <span className="c-cmt" title={t("community.commentsTitle", { n: p.commentCount })}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8 8 0 0 1-11.3 7.3L4 21l1.7-5.7A8 8 0 1 1 21 12z" /></svg>
                     {p.commentCount}
                   </span>

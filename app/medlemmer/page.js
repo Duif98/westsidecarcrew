@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
+import { useT } from "../lib/i18n";
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
@@ -11,6 +12,7 @@ const scoreOf = (r) => r.likes_received * 3 + r.photos * 2 + r.comments;
 
 export default function MembersPage() {
   const { session } = useAuth();
+  const { t } = useT();
   const [members, setMembers] = useState([]);
   const [ready, setReady] = useState(false);
 
@@ -62,18 +64,18 @@ export default function MembersPage() {
         <div className="wrap member-bar-inner">
           <Link href="/" className="wordmark"><span className="dot" /> West Side Car Crew</Link>
           <div className="member-actions">
-            <Link href="/leaderboard" className="mlink">🏆 Leaderboard</Link>
-            {session ? <Link href="/medlem" className="mlink">Medlem</Link> : <Link href="/login" className="mlink">Log ind</Link>}
+            <Link href="/leaderboard" className="mlink">🏆 {t("nav.leaderboard")}</Link>
+            {session ? <Link href="/medlem" className="mlink">{t("common.member")}</Link> : <Link href="/login" className="mlink">{t("common.loginShort")}</Link>}
           </div>
         </div>
       </div>
 
       <div className="wrap members-body">
-        <span className="overline">Crewet</span>
-        <h1 className="member-title">Medlemmer</h1>
-        <p className="members-intro">{members.length} medlemmer. Klik ind på en profil for at se biler, byggetråde og badges.</p>
+        <span className="overline">{t("members.overline")}</span>
+        <h1 className="member-title">{t("members.title")}</h1>
+        <p className="members-intro">{t("members.intro", { n: members.length })}</p>
 
-        {ready && members.length === 0 && <p className="muted">Ingen medlemmer endnu.</p>}
+        {ready && members.length === 0 && <p className="muted">{t("members.empty")}</p>}
 
         <div className="members-grid">
           {members.map((m) => (
@@ -82,9 +84,9 @@ export default function MembersPage() {
               <div className="mcard-info">
                 <span className="mcard-name">@{m.username}{typeof m.rank === "number" && m.rank < 3 ? ` ${MEDALS[m.rank]}` : ""}</span>
                 <span className="mcard-meta">
-                  {m.cars > 0 ? `${m.cars} bil${m.cars > 1 ? "er" : ""}` : "Ingen biler endnu"}
+                  {m.cars > 0 ? t(m.cars > 1 ? "members.carsMany" : "members.carsOne", { n: m.cars }) : t("members.noCars")}
                   {m.likes > 0 ? ` · ❤️ ${m.likes}` : ""}
-                  {m.is_admin ? " · 🛠 admin" : ""}
+                  {m.is_admin ? ` · 🛠 ${t("members.admin")}` : ""}
                 </span>
               </div>
               <span className="mcard-go">→</span>

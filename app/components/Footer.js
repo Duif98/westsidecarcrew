@@ -1,8 +1,12 @@
+"use client";
+
 import Reveal from "./Reveal";
+import { useT } from "../lib/i18n";
 
 const IG = "https://www.instagram.com/westsidecarcrew/";
 
 export default function Footer() {
+  const { t } = useT();
   return (
     <footer className="footer" id="kontakt">
       <div className="wrap">
@@ -11,7 +15,7 @@ export default function Footer() {
             West Side <em>Car Crew</em>
           </div>
           <div className="footer-cta">
-            <span className="overline">Follow along</span>
+            <span className="overline">{t("footer.followAlong")}</span>
             <a className="ig-btn" href={IG} target="_blank" rel="noopener noreferrer">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
                 <rect x="3" y="3" width="18" height="18" rx="5" />
@@ -25,7 +29,7 @@ export default function Footer() {
 
         <div className="footer-fine">
           <span>Esbjerg × Fredericia · Est. 2022</span>
-          <span>Built for the crew</span>
+          <span>{t("footer.builtForCrew")}</span>
         </div>
       </div>
     </footer>

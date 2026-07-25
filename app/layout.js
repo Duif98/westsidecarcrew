@@ -2,6 +2,8 @@ import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { asset } from "./lib/asset";
 import AuthProvider from "./lib/AuthProvider";
 import NavMenu from "./components/NavMenu";
+import LangSwitcher from "./components/LangSwitcher";
+import { I18nProvider } from "./lib/i18n";
 import "./globals.css";
 
 const display = Fraunces({
@@ -51,12 +53,15 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="da" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
-        <AuthProvider>
-          {children}
-          <NavMenu />
-        </AuthProvider>
+        <I18nProvider>
+          <AuthProvider>
+            {children}
+            <NavMenu />
+            <LangSwitcher />
+          </AuthProvider>
+        </I18nProvider>
       </body>
     </html>
   );

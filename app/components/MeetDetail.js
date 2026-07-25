@@ -11,20 +11,20 @@ import MeetMap from "./MeetMap";
 import MeetForm from "./MeetForm";
 import MeetWeather from "./MeetWeather";
 import { yrUrl } from "../lib/weather";
-
-const fmt = (t) =>
-  new Date(t).toLocaleString("da-DK", { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+import { useT } from "../lib/i18n";
 
 const STATUS = [
-  { key: "yes", label: "Kommer", emoji: "✅" },
-  { key: "maybe", label: "Måske", emoji: "🤔" },
-  { key: "no", label: "Kan ikke", emoji: "❌" },
+  { key: "yes", emoji: "✅" },
+  { key: "maybe", emoji: "🤔" },
+  { key: "no", emoji: "❌" },
 ];
 
 // Full details + RSVP for a single meet. Rendered as a portal dialog so it can
 // be opened from the calendar (or anywhere).
 export default function MeetDetail({ event: initialEvent, onClose, onUpdated, onDeleted }) {
   const { session, user, profile } = useAuth();
+  const { t, locale } = useT();
+  const fmt = (ts) => new Date(ts).toLocaleString(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
   const [event, setEvent] = useState(initialEvent);
   const [mounted, setMounted] = useState(false);
   const [rsvps, setRsvps] = useState([]);
@@ -37,7 +37,7 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
   const canManage = !!user && (event.created_by === user.id || isAdmin);
 
   const removeMeet = async () => {
-    if (!confirm("Slet dette meet?")) return;
+    if (!confirm(t("meet.confirmDelete"))) return;
     await supabase.from("events").delete().eq("id", event.id);
     onDeleted?.(event.id);
     onClose();
@@ -84,7 +84,7 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
       }
       await loadPhotos();
     } catch (err) {
-      alert("Kunne ikke uploade: " + (err.message || err));
+      alert(t("meet.uploadError") + (err.message || err));
     } finally {
       setUploading(false);
     }
@@ -111,14 +111,14 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
   return createPortal(
     <div className="md" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="md-panel">
-        <button className="md-close" onClick={onClose} aria-label="Luk">✕</button>
+        <button className="md-close" onClick={onClose} aria-label={t("meet.close")}>✕</button>
 
-        <span className="overline">Meet</span>
+        <span className="overline">{t("meet.tag")}</span>
         <h2 className="md-title">{event.title}</h2>
         {canManage && (
           <div className="md-manage">
-            <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.35rem 0.8rem" }} onClick={() => setEditing(true)}>✎ Rediger</button>
-            <button className="ph-btn del" style={{ flex: "none", width: "auto", padding: "0.35rem 0.8rem" }} onClick={removeMeet}>Slet</button>
+            <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.35rem 0.8rem" }} onClick={() => setEditing(true)}>{t("meet.edit")}</button>
+            <button className="ph-btn del" style={{ flex: "none", width: "auto", padding: "0.35rem 0.8rem" }} onClick={removeMeet}>{t("meet.delete")}</button>
           </div>
         )}
         <p className="md-when">🗓 {fmt(event.starts_at)}</p>
@@ -139,7 +139,7 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
             rel="noopener noreferrer"
           >
             <span className="md-yr-icon">🌦</span>
-            <span>Se timevejr for dagen på yr.no</span>
+            <span>{t("meet.yrLink")}</span>
             <span className="md-yr-arrow">↗</span>
           </a>
         )}
@@ -151,13 +151,13 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
         )}
 
         <div className="md-going">
-          <span className="cp-label">Hvem kommer</span>
+          <span className="cp-label">{t("meet.whoComing")}</span>
           {yes.length === 0 && maybe.length === 0
-            ? <p className="md-empty">Ingen tilmeldte endnu.</p>
+            ? <p className="md-empty">{t("meet.noneComing")}</p>
             : (
               <div className="md-going-lists">
-                {yes.length > 0 && <p><b>✅ Kommer:</b> {yes.map((r) => `@${r.username || "medlem"}`).join(", ")}</p>}
-                {maybe.length > 0 && <p><b>🤔 Måske:</b> {maybe.map((r) => `@${r.username || "medlem"}`).join(", ")}</p>}
+                {yes.length > 0 && <p><b>{t("meet.comingLabel")}</b> {yes.map((r) => `@${r.username || t("photo.member")}`).join(", ")}</p>}
+                {maybe.length > 0 && <p><b>{t("meet.maybeLabel")}</b> {maybe.map((r) => `@${r.username || t("photo.member")}`).join(", ")}</p>}
               </div>
             )}
         </div>
@@ -166,34 +166,34 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
           <div className="rsvp-row md-rsvp">
             {STATUS.map((s) => (
               <button key={s.key} className={`rsvp-btn ${mine === s.key ? "on " + s.key : ""}`} onClick={() => setRsvp(s.key)}>
-                {s.emoji} {s.label}
+                {s.emoji} {t(`rsvp.${s.key}`)}
               </button>
             ))}
           </div>
         ) : (
-          <p className="muted rsvp-login"><Link href="/login" className="c-link">Log ind</Link> for at tilmelde dig.</p>
+          <p className="muted rsvp-login"><Link href="/login" className="c-link">{t("meet.loginToRsvpLogin")}</Link>{t("meet.loginToRsvpB")}</p>
         )}
 
         <div className="md-photos">
           <div className="md-photos-head">
-            <span className="cp-label" style={{ margin: 0 }}>Billeder fra meet{photos.length ? ` (${photos.length})` : ""}</span>
+            <span className="cp-label" style={{ margin: 0 }}>{t("meet.photosLabel")}{photos.length ? ` (${photos.length})` : ""}</span>
             {session && (
               <>
                 <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={onFiles} />
                 <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.4rem 0.8rem" }} onClick={() => fileRef.current?.click()} disabled={uploading}>
-                  {uploading ? "Uploader…" : "+ Tilføj billeder"}
+                  {uploading ? t("meet.uploading") : t("meet.addPhotos")}
                 </button>
               </>
             )}
           </div>
           {photos.length === 0 ? (
-            <p className="md-empty">Ingen billeder endnu{session ? " — del dine fra dagen 📸" : "."}</p>
+            <p className="md-empty">{t("meet.noPhotos")}{session ? t("meet.noPhotosMember") : t("meet.period")}</p>
           ) : (
             <div className="md-photo-grid">
               {photos.map((p, i) => (
-                <button className="md-photo" key={p.id} onClick={() => setLb({ index: i })} aria-label="Åbn billede">
-                  <img src={p.url} alt={p.car || "Meet-billede"} loading="lazy" />
-                  {!p.approved && <span className="md-photo-pending" title="Afventer godkendelse til offentlig visning">Afventer</span>}
+                <button className="md-photo" key={p.id} onClick={() => setLb({ index: i })} aria-label={t("meet.openPhoto")}>
+                  <img src={p.url} alt={p.car || t("meet.photoAlt")} loading="lazy" />
+                  {!p.approved && <span className="md-photo-pending" title={t("meet.pendingTitle")}>{t("meet.pending")}</span>}
                 </button>
               ))}
             </div>

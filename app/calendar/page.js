@@ -4,21 +4,35 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
+import { useT } from "../lib/i18n";
 import MeetDetail from "../components/MeetDetail";
 import MeetForm from "../components/MeetForm";
 import WeatherIcon from "../components/WeatherIcon";
 import { fetchMeetWeather } from "../lib/weather";
 
-const WEEKDAYS = ["Man", "Tir", "Ons", "Tor", "Fre", "Lør", "Søn"];
-const MONTHS = ["Januar", "Februar", "Marts", "April", "Maj", "Juni", "Juli", "August", "September", "Oktober", "November", "December"];
-
 const pad = (n) => String(n).padStart(2, "0");
 const dateKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 const eventKey = (iso) => dateKey(new Date(iso));
-const hm = (iso) => new Date(iso).toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
+
+// Short weekday names (Mon-first) and full month names for the active locale.
+const weekdayNames = (locale) => {
+  const fmt = new Intl.DateTimeFormat(locale, { weekday: "short" });
+  // 2024-01-01 is a Monday.
+  return Array.from({ length: 7 }, (_, i) => {
+    const s = fmt.format(new Date(2024, 0, 1 + i));
+    return s.charAt(0).toUpperCase() + s.slice(1).replace(".", "");
+  });
+};
+const monthName = (locale, month) => {
+  const s = new Date(2024, month, 1).toLocaleDateString(locale, { month: "long" });
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
 
 export default function CalendarPage() {
   const { session } = useAuth();
+  const { t, locale } = useT();
+  const WEEKDAYS = weekdayNames(locale);
+  const hm = (iso) => new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
   const [events, setEvents] = useState([]);
   const [cursor, setCursor] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); });
   const [open, setOpen] = useState(null);
@@ -85,24 +99,24 @@ export default function CalendarPage() {
         <div className="wrap member-bar-inner">
           <Link href="/" className="wordmark"><span className="dot" /> West Side Car Crew</Link>
           <div className="member-actions">
-            <Link href="/events" className="mlink">Meets-liste</Link>
-            {session ? <Link href="/medlem" className="mlink">Medlem</Link> : <Link href="/login" className="mlink">Log ind</Link>}
+            <Link href="/events" className="mlink">{t("common.meetsList")}</Link>
+            {session ? <Link href="/medlem" className="mlink">{t("common.member")}</Link> : <Link href="/login" className="mlink">{t("common.loginShort")}</Link>}
           </div>
         </div>
       </div>
 
       <div className="wrap cal-body">
-        <span className="overline">Kalender</span>
+        <span className="overline">{t("calendar.overline")}</span>
         <div className="cal-head">
-          <h1 className="member-title">{MONTHS[cursor.getMonth()]} {cursor.getFullYear()}</h1>
+          <h1 className="member-title">{monthName(locale, cursor.getMonth())} {cursor.getFullYear()}</h1>
           <div className="cal-nav">
-            <button className="cal-arrow" onClick={() => move(-1)} aria-label="Forrige måned">‹</button>
-            <button className="cal-today" onClick={goToday}>I dag</button>
-            <button className="cal-arrow" onClick={() => move(1)} aria-label="Næste måned">›</button>
-            {session && <button className="btn-gold cal-new" onClick={() => setCreating({ date: "" })}>+ Nyt meet</button>}
+            <button className="cal-arrow" onClick={() => move(-1)} aria-label={t("calendar.prevMonth")}>‹</button>
+            <button className="cal-today" onClick={goToday}>{t("calendar.today")}</button>
+            <button className="cal-arrow" onClick={() => move(1)} aria-label={t("calendar.nextMonth")}>›</button>
+            {session && <button className="btn-gold cal-new" onClick={() => setCreating({ date: "" })}>{t("calendar.newMeet")}</button>}
           </div>
         </div>
-        {session && <p className="cal-hint">Tip: klik på en dag for at planlægge et meet den dato.</p>}
+        {session && <p className="cal-hint">{t("calendar.hint")}</p>}
 
         <div className="cal-grid">
           {WEEKDAYS.map((w) => <div className="cal-wd" key={w}>{w}</div>)}
@@ -117,12 +131,12 @@ export default function CalendarPage() {
                 key={key}
                 onClick={session ? () => setCreating({ date: key }) : undefined}
                 role={session ? "button" : undefined}
-                aria-label={session ? `Planlæg meet den ${d.getDate()}.` : undefined}
+                aria-label={session ? t("calendar.planAria", { day: d.getDate() }) : undefined}
               >
                 <span className="cal-daynum">{d.getDate()}</span>
                 {session && <span className="cal-add" aria-hidden="true">+</span>}
                 {wx && (
-                  <div className="cal-wx" title={`${wx.label}${wx.temp != null ? ` · ${wx.temp}°` : ""}`}>
+                  <div className="cal-wx" title={`${t("weather." + (wx.labelKey || "unknown"))}${wx.temp != null ? ` · ${wx.temp}°` : ""}`}>
                     <div className="cal-wx-top">
                       <WeatherIcon category={wx.category} size={26} />
                       {wx.temp != null && <span className="cal-wx-temp">{wx.temp}°</span>}
@@ -148,7 +162,7 @@ export default function CalendarPage() {
         </div>
 
         {events.length === 0 && (
-          <p className="cal-note">Ingen meets i kalenderen endnu.{session ? " Klik på en dag eller “+ Nyt meet” for at planlægge det første." : <> <Link href="/login" className="c-link">Log ind</Link> for at planlægge et.</>}</p>
+          <p className="cal-note">{t("calendar.emptyA")}{session ? t("calendar.emptyMember") : <> <Link href="/login" className="c-link">{t("calendar.emptyGuestLogin")}</Link>{t("calendar.emptyGuestB")}</>}</p>
         )}
       </div>
 

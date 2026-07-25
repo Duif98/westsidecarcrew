@@ -9,6 +9,7 @@ import { cars } from "../data/cars";
 import { supabase } from "../lib/supabaseClient";
 import { getAlbums } from "../lib/albums";
 import { withUrls } from "../lib/photos";
+import { useT } from "../lib/i18n";
 
 // Deterministic shuffle so the order is stable within a visit but rotates
 // between visits (which car sits in the wide/top tiles changes over time).
@@ -29,6 +30,7 @@ function shuffle(arr, seed) {
 }
 
 export default function Garage() {
+  const { t } = useT();
   const [open, setOpen] = useState(null); // { items, title, subtitle }
   const [extra, setExtra] = useState({ bySlug: {}, covers: {}, newAlbums: [], albumBySlug: {} });
   const [seed, setSeed] = useState(null);
@@ -99,7 +101,7 @@ export default function Garage() {
       const items = coverFirst(raw, coverUrl);
       return {
         key: a.slug, coverUrl,
-        tag: "Crew album", title: a.title, model: "", owner: a.owner_name,
+        tag: t("garage.crewAlbum"), title: a.title, model: "", owner: a.owner_name,
         count: items.length, items,
         lbTitle: a.title, lbSubtitle: a.owner_name || "",
         album: extra.albumBySlug[a.slug], curated: null,
@@ -107,15 +109,15 @@ export default function Garage() {
     });
     const orderedCurated = seed == null ? curated : shuffle(curated, seed);
     return [...orderedCurated, ...news];
-  }, [extra, seed]);
+  }, [extra, seed, t]);
 
   return (
     <section className="section garage" id="garagen">
       <div className="wrap">
         <Reveal className="section-head" as="div">
-          <span className="overline">The Garage</span>
-          <h2>One crew, every car.</h2>
-          <p>From classic American muscle to a Japanese icon. Tap a car to open its gallery.</p>
+          <span className="overline">{t("garage.overline")}</span>
+          <h2>{t("garage.title")}</h2>
+          <p>{t("garage.sub")}</p>
         </Reveal>
 
         <div className="grid">
@@ -126,7 +128,7 @@ export default function Garage() {
               className={`card ${idx === 0 || idx === 5 ? "feature" : ""}`}
               delay={(idx % 3) * 90}
               onClick={() => setOpen({ items: s.items, title: s.lbTitle, subtitle: s.lbSubtitle, album: s.album, curated: s.curated })}
-              aria-label={`Open gallery: ${s.title}${s.owner ? " — " + s.owner : ""}`}
+              aria-label={t("garage.openAria", { title: `${s.title}${s.owner ? " — " + s.owner : ""}` })}
             >
               {s.coverUrl && <img src={s.coverUrl} alt={`${s.title}${s.owner ? " — " + s.owner : ""}`} loading="lazy" />}
               <span className="card-count">

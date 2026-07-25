@@ -3,14 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
-
-const time = (t) =>
-  new Date(t).toLocaleString("da-DK", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
+import { useT } from "../lib/i18n";
 
 // Comment thread for a single photo. Reads for everyone, posting for members.
 // Fail-safe: if the comments table isn't set up yet it just shows nothing broken.
 export default function Comments({ photoId, onCountChange, onNeedLogin }) {
   const { user, profile, isAdmin } = useAuth();
+  const { t, locale } = useT();
+  const time = (ts) => new Date(ts).toLocaleString(locale, { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
   const [items, setItems] = useState([]);
   const [text, setText] = useState("");
   const [ready, setReady] = useState(false);
@@ -104,16 +104,16 @@ export default function Comments({ photoId, onCountChange, onNeedLogin }) {
   return (
     <div className="cmts">
       <div className="cmts-list">
-        {ready && items.length === 0 && <p className="cmts-empty">Ingen kommentarer endnu — vær den første 💬</p>}
+        {ready && items.length === 0 && <p className="cmts-empty">{t("comments.empty")}</p>}
         {items.map((c) => {
           const mine = c.user_id === user?.id;
           return (
             <div className="cmt" key={c.id}>
               <div className="cmt-head">
-                <span className="cmt-name">@{c.profiles?.username || "medlem"}</span>
+                <span className="cmt-name">@{c.profiles?.username || t("comments.member")}</span>
                 <span className="cmt-time">{time(c.created_at)}</span>
                 {(mine || isAdmin) && !String(c.id).startsWith("tmp-") && (
-                  <button className="cmt-del" onClick={() => remove(c)} aria-label="Slet kommentar">✕</button>
+                  <button className="cmt-del" onClick={() => remove(c)} aria-label={t("comments.delete")}>✕</button>
                 )}
               </div>
               <p className="cmt-body">{c.body}</p>
@@ -125,12 +125,12 @@ export default function Comments({ photoId, onCountChange, onNeedLogin }) {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder={user ? "Skriv en kommentar…" : "Log ind for at kommentere"}
+          placeholder={user ? t("comments.placeholder") : t("comments.loginPlaceholder")}
           maxLength={500}
-          aria-label="Kommentar"
+          aria-label={t("comments.aria")}
           onFocus={() => { if (!user) onNeedLogin?.(); }}
         />
-        <button className="btn-gold" type="submit" disabled={!text.trim() || busy}>Send</button>
+        <button className="btn-gold" type="submit" disabled={!text.trim() || busy}>{t("comments.send")}</button>
       </form>
     </div>
   );

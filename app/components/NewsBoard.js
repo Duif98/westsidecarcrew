@@ -4,12 +4,13 @@ import { useEffect, useState } from "react";
 import { getPosts } from "../lib/posts";
 import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
+import { useT } from "../lib/i18n";
 import Reveal from "./Reveal";
-
-const fmtDate = (t) => new Date(t).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
 
 export default function NewsBoard() {
   const { session } = useAuth();
+  const { t, locale } = useT();
+  const fmtDate = (ts) => new Date(ts).toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric" });
   const [posts, setPosts] = useState([]);
   const [ready, setReady] = useState(false);
 
@@ -28,8 +29,8 @@ export default function NewsBoard() {
     <section className="section newsboard" id="nyheder">
       <div className="wrap">
         <Reveal className="section-head" as="div">
-          <span className="overline">Notice board</span>
-          <h2>News from the crew</h2>
+          <span className="overline">{t("news.overline")}</span>
+          <h2>{t("news.title")}</h2>
         </Reveal>
 
         <div className="news-grid">
@@ -46,7 +47,7 @@ export default function NewsBoard() {
                 </div>
               )}
               <div className="news-body">
-                {p.pinned && <span className="news-pin">Pinned</span>}
+                {p.pinned && <span className="news-pin">{t("news.pinned")}</span>}
                 <h3 className="news-title">{p.title}</h3>
                 {p.body && <p className="news-text">{p.body}</p>}
                 <div className="news-meta">

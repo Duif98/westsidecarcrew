@@ -3,9 +3,11 @@
 import { useEffect, useRef } from "react";
 import { asset } from "../lib/asset";
 import { totalPhotos, cars } from "../data/cars";
+import { useT } from "../lib/i18n";
 
 export default function Hero() {
   const mediaRef = useRef(null);
+  const { t } = useT();
 
   useEffect(() => {
     const el = mediaRef.current;
@@ -33,7 +35,7 @@ export default function Hero() {
       <div className="hero-media" ref={mediaRef}>
         <img
           src={asset("/hero.webp")}
-          alt="Mineral grey BMW M4 on gold wheels in front of the Little Belt Bridge at sunset"
+          alt={t("hero.imgAlt")}
           fetchPriority="high"
         />
       </div>
@@ -42,7 +44,7 @@ export default function Hero() {
       <div className="hero-inner">
         <div className="hero-overline">
           <p className="overline rise" style={{ animationDelay: "0.1s" }}>
-            Est. 2022 — Esbjerg × Fredericia
+            {t("hero.overline")}
           </p>
         </div>
         <h1>
@@ -54,28 +56,27 @@ export default function Hero() {
           </span>
         </h1>
         <p className="hero-sub rise" style={{ animationDelay: "0.42s" }}>
-          A group of friends from the west coast. Nine cars, one garage — united
-          by fuel, salt air and respect for each other&rsquo;s builds.
+          {t("hero.sub")}
         </p>
 
         <div className="hero-meta rise" style={{ animationDelay: "0.54s" }}>
           <div className="stat">
             <b>{cars.length}</b>
-            <span>Cars in the garage</span>
+            <span>{t("hero.cars")}</span>
           </div>
           <div className="stat">
             <b>2022</b>
-            <span>Founded</span>
+            <span>{t("hero.founded")}</span>
           </div>
           <div className="stat">
             <b>{totalPhotos}</b>
-            <span>Photos</span>
+            <span>{t("hero.photos")}</span>
           </div>
         </div>
       </div>
 
-      <a className="hero-scroll" href="#crewet" aria-label="Scroll to the crew">
-        <span>Scroll</span>
+      <a className="hero-scroll" href="#crewet" aria-label={t("hero.scrollAria")}>
+        <span>{t("hero.scroll")}</span>
         <span className="line" />
       </a>
     </section>

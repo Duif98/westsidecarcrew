@@ -24,42 +24,44 @@ export function yrUrl(lat, lng, startsAt) {
 }
 
 // Map a MET symbol_code (minus its _day/_night/_polartwilight suffix) to an
-// emoji + Danish label. Falls back to substring matching for the many
-// light/heavy variants so we never show a blank.
+// emoji + translation key (looked up under the `weather.*` namespace by the UI).
+// Falls back to substring matching for the many light/heavy variants so we never
+// show a blank.
 const SYMBOLS = {
-  clearsky: ["☀️", "Klart"],
-  fair: ["🌤", "Let skyet"],
-  partlycloudy: ["⛅", "Delvist skyet"],
-  cloudy: ["☁️", "Skyet"],
-  fog: ["🌫", "Tåge"],
-  lightrain: ["🌦", "Let regn"],
-  rain: ["🌧", "Regn"],
-  heavyrain: ["🌧", "Kraftig regn"],
-  lightrainshowers: ["🌦", "Lette regnbyger"],
-  rainshowers: ["🌦", "Regnbyger"],
-  heavyrainshowers: ["🌧", "Kraftige regnbyger"],
-  sleet: ["🌨", "Slud"],
-  sleetshowers: ["🌨", "Sludbyger"],
-  snow: ["❄️", "Sne"],
-  snowshowers: ["🌨", "Snebyger"],
-  heavysnow: ["❄️", "Kraftig sne"],
+  clearsky: ["☀️", "clear"],
+  fair: ["🌤", "fair"],
+  partlycloudy: ["⛅", "partly"],
+  cloudy: ["☁️", "cloudy"],
+  fog: ["🌫", "fog"],
+  lightrain: ["🌦", "lightrain"],
+  rain: ["🌧", "rain"],
+  heavyrain: ["🌧", "heavyrain"],
+  lightrainshowers: ["🌦", "lightrainshowers"],
+  rainshowers: ["🌦", "rainshowers"],
+  heavyrainshowers: ["🌧", "heavyrainshowers"],
+  sleet: ["🌨", "sleet"],
+  sleetshowers: ["🌨", "sleetshowers"],
+  snow: ["❄️", "snow"],
+  snowshowers: ["🌨", "snowshowers"],
+  heavysnow: ["❄️", "heavysnow"],
 };
 
 const base = (code) => (code || "").replace(/_(day|night|polartwilight)$/, "");
 
+// Returns [emoji, labelKey]; labelKey resolves via t(`weather.${labelKey}`).
 export function symbolMeta(code) {
-  if (!code) return ["🌡", "—"];
+  if (!code) return ["🌡", "unknown"];
   const b = base(code);
   if (SYMBOLS[b]) return SYMBOLS[b];
-  if (b.includes("thunder")) return ["⛈", "Torden"];
-  if (b.includes("snow")) return ["❄️", "Sne"];
-  if (b.includes("sleet")) return ["🌨", "Slud"];
-  if (b.includes("rain")) return ["🌧", "Regn"];
-  if (b.includes("cloud")) return ["☁️", "Skyet"];
-  if (b.includes("fair")) return ["🌤", "Let skyet"];
-  if (b.includes("clear")) return ["☀️", "Klart"];
-  if (b.includes("fog")) return ["🌫", "Tåge"];
-  return ["🌡", "—"];
+  if (b.includes("thunder")) return ["⛈", "thunder"];
+  if (b.includes("snow")) return ["❄️", "snow"];
+  if (b.includes("sleet")) return ["🌨", "sleet"];
+  if (b.includes("rain")) return ["🌧", "rain"];
+  if (b.includes("cloud")) return ["☁️", "cloudy"];
+  if (b.includes("fair")) return ["🌤", "fair"];
+  if (b.includes("clear")) return ["☀️", "clear"];
+  if (b.includes("fog")) return ["🌫", "fog"];
+  return ["🌡", "unknown"];
 }
 
 // A coarse category used to pick a drawn (SVG) weather icon.
@@ -101,7 +103,7 @@ async function getForecast(lat, lng) {
 
 // Returns weather for the meet's start time, or a { past } / { tooFar } flag
 // when there's no forecast to show. On success:
-// { temp, wind, precip, precipProb, emoji, label, category }.
+// { temp, wind, precip, precipProb, emoji, labelKey, category }.
 export async function fetchMeetWeather(lat, lng, startsAt) {
   if (typeof lat !== "number" || typeof lng !== "number") return null;
   const target = new Date(startsAt).getTime();
@@ -125,7 +127,7 @@ export async function fetchMeetWeather(lat, lng, startsAt) {
   const inst = best.data?.instant?.details || {};
   const period = best.data?.next_1_hours || best.data?.next_6_hours || best.data?.next_12_hours || {};
   const code = period.summary?.symbol_code;
-  const [emoji, label] = symbolMeta(code);
+  const [emoji, labelKey] = symbolMeta(code);
 
   return {
     temp: typeof inst.air_temperature === "number" ? Math.round(inst.air_temperature) : null,
@@ -134,7 +136,7 @@ export async function fetchMeetWeather(lat, lng, startsAt) {
     precipProb: typeof period.details?.probability_of_precipitation === "number"
       ? Math.round(period.details.probability_of_precipitation) : null,
     emoji,
-    label,
+    labelKey,
     category: symbolCategory(code),
   };
 }
