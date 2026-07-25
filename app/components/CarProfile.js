@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
+import { catalogsFor } from "../lib/catalog";
 
 const imgUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
@@ -21,6 +22,7 @@ export default function CarProfile({ album, curated, onClose }) {
   const [form, setForm] = useState({
     make: album.make || "", model: album.model || "", model_year: album.model_year || "",
     power_hp: album.power_hp || "", drivetrain: album.drivetrain || "", engine: album.engine || "", mods: album.mods || "",
+    vin: album.vin || "",
   });
   const [entry, setEntry] = useState({ title: "", date: new Date().toISOString().slice(0, 10), body: "" });
   const [entryFile, setEntryFile] = useState(null);
@@ -71,6 +73,7 @@ export default function CarProfile({ album, curated, onClose }) {
       drivetrain: form.drivetrain.trim() || null,
       engine: form.engine.trim() || null,
       mods: form.mods.trim() || null,
+      vin: form.vin.trim().toUpperCase() || null,
     };
     const { error } = await supabase.from("albums").update(patch).eq("id", album.id);
     setBusy(false);
@@ -166,6 +169,24 @@ export default function CarProfile({ album, curated, onClose }) {
 
         {curated?.blurb && !spec.mods && <p className="cp-blurb">{curated.blurb}</p>}
 
+        {user && (
+          <div className="cp-catalog">
+            <span className="cp-label">{t("car.catalog")}</span>
+            {spec.vin ? (
+              <>
+                <div className="cp-catlinks">
+                  {catalogsFor(spec.make || curated?.make, spec.vin).map((c) => (
+                    <a key={c.id} className="cp-catbtn" href={c.url} target="_blank" rel="noopener noreferrer">{c.label} ↗</a>
+                  ))}
+                </div>
+                <p className="cp-cathint">{t("car.catalogHint")}</p>
+              </>
+            ) : (
+              <p className="cp-catempty">{canEdit ? t("car.catalogAddVin") : t("car.catalogNoVin")}</p>
+            )}
+          </div>
+        )}
+
         {canEdit && (
           <div className="cp-editspecs">
             <button className="ph-btn" onClick={() => setEditSpecs((s) => !s)}>{editSpecs ? t("car.closeEdit") : t("car.editSpecs")}</button>
@@ -178,6 +199,7 @@ export default function CarProfile({ album, curated, onClose }) {
                   <label className="post-field"><span>{t("car.fPower")}</span><input type="number" value={form.power_hp} onChange={(e) => setForm({ ...form, power_hp: e.target.value })} placeholder="510" /></label>
                   <label className="post-field"><span>{t("car.fEngine")}</span><input value={form.engine} onChange={(e) => setForm({ ...form, engine: e.target.value })} placeholder="3.0 R6 Twin-Turbo" /></label>
                   <label className="post-field"><span>{t("car.fDrivetrain")}</span><input value={form.drivetrain} onChange={(e) => setForm({ ...form, drivetrain: e.target.value })} placeholder="RWD" /></label>
+                  <label className="post-field ef-full"><span>{t("car.fVin")}</span><input value={form.vin} onChange={(e) => setForm({ ...form, vin: e.target.value.toUpperCase() })} placeholder="WBS3R9C50FK330000" maxLength={17} spellCheck={false} autoCapitalize="characters" style={{ fontFamily: "var(--font-mono), monospace", letterSpacing: "0.06em" }} /></label>
                   <label className="post-field ef-full"><span>{t("car.fMods")}</span><textarea rows={2} value={form.mods} onChange={(e) => setForm({ ...form, mods: e.target.value })} placeholder={t("car.fModsPh")} /></label>
                 </div>
                 <button className="btn-gold" onClick={saveSpecs} disabled={busy}>{busy ? t("car.saving") : t("car.saveSpecs")}</button>

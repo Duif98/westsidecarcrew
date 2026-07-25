@@ -1289,6 +1289,12 @@ a.btn-gold { text-decoration: none; }
 .cp-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 .cp-tag { font-size: 0.78rem; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 100px; padding: 0.3rem 0.7rem; color: var(--muted); }
 .cp-blurb { color: var(--muted); font-size: 0.95rem; margin-top: 1.2rem; font-style: italic; }
+.cp-catalog { margin-top: 1.4rem; }
+.cp-catlinks { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.cp-catbtn { display: inline-flex; align-items: center; gap: 0.3rem; font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.06em; padding: 0.5rem 0.95rem; border-radius: 100px; border: 1px solid var(--gold); color: var(--gold); background: rgba(201,168,119,0.10); text-decoration: none; transition: all 0.2s; }
+.cp-catbtn:hover { background: rgba(201,168,119,0.2); color: var(--gold-bright); }
+.cp-cathint { color: var(--faint); font-size: 0.74rem; margin-top: 0.55rem; max-width: 46ch; }
+.cp-catempty { color: var(--muted); font-size: 0.9rem; }
 .cp-editspecs { margin-top: 1.4rem; }
 .cp-editspecs .ph-btn { flex: none; width: auto; padding: 0.5rem 0.9rem; }
 .cp-specform { margin-top: 0.9rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 1rem; }
