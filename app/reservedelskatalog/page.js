@@ -110,8 +110,9 @@ export default function PartsCatalog() {
               </div>
 
               <p className="pk-hint">
-                PartSouq søger på VIN og dækker de fleste mærker. For BMW åbner RealOEM de officielle
-                eksplosionstegninger — indsæt VIN i feltet “Enter your VIN”.
+                Vi sender dig direkte til det rigtige katalog. De fleste biler slås op på VIN;
+                nogle — fx EU-modeller PartSouq ikke kan dekode — har vi linket direkte til den
+                rette model. Har din bil flere knapper, viser de samme katalog fra hver sin kilde.
               </p>
 
               <p className="pk-hint">
