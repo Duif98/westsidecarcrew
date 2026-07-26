@@ -3,8 +3,10 @@
 //
 //  - PartSouq is the universal, VIN-aware catalog (BMW, Mercedes, Nissan, Audi,
 //    SEAT, VW, Skoda …). Its search accepts a VIN directly in the URL.
-//  - RealOEM is added for BMW as the nicer official-diagram source; it has no
-//    stable VIN URL param, so it opens on the VIN-lookup select page.
+//  - RealOEM is the nicer official-diagram source for the whole BMW group (BMW,
+//    Mini, Rolls-Royce). Its "Serial Number" lookup is a plain GET on /select
+//    with the VIN's last 7 chars, so we deep-link straight into that search
+//    instead of dumping the member on the empty select page.
 //
 // Returns [{ id, label, url }]. Empty array when there's no VIN yet.
 
@@ -25,6 +27,18 @@ const vinKey = (s = "") => s.toUpperCase().replace(/[^A-Z0-9]/g, "");
 const PARTSOUQ_VIN_OVERRIDES = {
   WP1ZZZ9PZ8LA81990:
     "https://partsouq.com/en/catalog/genuine/vehicle?c=Porsche&ssd=%24%2AKwGTp7aI08_L4sXa4-mBlcvf__jml5iVlIapmtLU5_Pv6-nqr7iU_tDU0OH37v-5pK6TmuTH2MXJy53WvJmA89PTwsiFj5-eyYDTz9HU1cqWn4mBx8LH08LI3YaAj8ng3ITDgoef2NS67oKLhoPTyofYzMqD8uPxg4yHh5vUypuAlpaSkYuF2pvIgZqHhJjw5pTa2sqD08SEgZqHh8Gmq-DploSNgIXAm9TKm4CFkpmVlofU1sjVw4WGm4CF5MzO35OC2gAAAABuMqrN%24&vid=857&q=",
+};
+
+// Per-VIN RealOEM overrides — an exact catalog URL we resolved by hand for a
+// specific car. RealOEM's URLs are stable and carry no session token, so these
+// don't expire like the PartSouq deep links do. Keyed by normalised VIN.
+//
+//  - WMWXM9100GT898496: a crew member's Mini JCW (F56, EU 2015). PartSouq can't
+//    decode it, and RealOEM's live serial search can be flaky, so we pin the
+//    resolved part-groups page directly.
+const REALOEM_VIN_OVERRIDES = {
+  WMWXM9100GT898496:
+    "https://www.realoem.com/bmw/enUS/partgrp?id=XM91-EUR-09-2015-F56-Mini-JCW",
 };
 
 export function catalogsFor(make = "", vin = "") {
@@ -50,9 +64,18 @@ export function catalogsFor(make = "", vin = "") {
     links.push({ id: "partsouq-vin", label: "PartSouq — søg på VIN", url: vinSearch });
   }
 
-  // BMW: add RealOEM (paste VIN into the Serial Number box there).
-  if (m.includes("bmw")) {
-    links.push({ id: "realoem", label: "RealOEM", url: "https://www.realoem.com/bmw/enUS/select" });
+  // BMW group (BMW, Mini, Rolls-Royce) → RealOEM. Deep-link the serial search
+  // (last 7 VIN chars) so it runs the lookup instead of opening a blank form,
+  // unless we've pinned an exact resolved catalog URL for this VIN.
+  if (m.includes("bmw") || m.includes("mini") || m.includes("rolls")) {
+    const serial = v.slice(-7);
+    links.push({
+      id: "realoem",
+      label: "RealOEM",
+      url:
+        REALOEM_VIN_OVERRIDES[vinKey(vin)] ||
+        `https://www.realoem.com/bmw/enUS/select?vin=${encodeURIComponent(serial)}`,
+    });
   }
 
   return links;
