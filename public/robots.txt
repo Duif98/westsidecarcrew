@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://duif98.github.io/westsidecarcrew/sitemap.xml
+Sitemap: https://westsidecarcrew.dk/sitemap.xml

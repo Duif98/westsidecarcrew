@@ -32,7 +32,7 @@ export const metadata = {
   title: "West Side Car Crew — Car enthusiasts from the west coast",
   description:
     "West Side Car Crew is a group of friends and car enthusiasts from Esbjerg and Fredericia, founded in 2022. See the garage: BMW M4, Nissan GT-R, AMG C63 S, Corvette Z06 and more.",
-  metadataBase: new URL("https://duif98.github.io/westsidecarcrew"),
+  metadataBase: new URL("https://westsidecarcrew.dk"),
   openGraph: {
     title: "West Side Car Crew",
     description:
@@ -54,7 +54,7 @@ export const viewport = {
 // Brand structured data so Google can recognise "West Side Car Crew" as an
 // organisation (name, logo, socials, area) — helps the site show for the brand
 // name. Update SITE_URL if the site moves to a custom domain.
-const SITE_URL = "https://duif98.github.io/westsidecarcrew";
+const SITE_URL = "https://westsidecarcrew.dk";
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
