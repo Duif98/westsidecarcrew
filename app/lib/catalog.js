@@ -10,14 +10,18 @@
 
 const clean = (s = "") => s.trim();
 
+// Normalise a VIN for matching: uppercase, strip anything that isn't a letter or
+// digit (spaces, hyphens). So "wp1zzz 9pz8la81990" still matches the key below.
+const vinKey = (s = "") => s.toUpperCase().replace(/[^A-Z0-9]/g, "");
+
 // Per-VIN PartSouq overrides. Some cars can't be resolved by PartSouq's VIN
 // search — typically EU-spec models whose VIN carries the "ZZZ" filler that the
-// decoder rejects. For those we hard-link the already-decoded catalog URL that
-// we resolved by hand. Keyed by full uppercase VIN.
+// decoder rejects. For those we hard-link the exact catalog URL we want the
+// member's PartSouq button to open. Keyed by normalised VIN (see vinKey).
 //
-//  - WP1ZZZ9PZ8LA81990: Nicolai's Porsche Cayenne Turbo (957, EU 2008). PartSouq's
-//    VIN search can't decode the EU VIN, so this points at the resolved Cayenne
-//    Turbo catalog instead.
+//  - WP1ZZZ9PZ8LA81990: Nicolai's Porsche Cayenne Turbo (957, EU 2008). PartSouq
+//    can't decode the EU VIN, so the button opens this resolved Cayenne catalog
+//    URL directly instead of the (failing) VIN search.
 const PARTSOUQ_VIN_OVERRIDES = {
   WP1ZZZ9PZ8LA81990:
     "https://partsouq.com/en/catalog/genuine/vehicle?c=Porsche&ssd=%24%2AKwGTp7aI08_L4sXa4-mBlcvf__jml5iVlIapmtLU5_Pv6-nqr7iU_tDU0OH37v-5pK6TmuTH2MXJy53WvJmA89PTwsiFj5-eyYDTz9HU1cqWn4mBx8LH08LI3YaAj8ng3ITDgoef2NS67oKLhoPTyofYzMqD8uPxg4yHh5vUypuAlpaSkYuF2pvIgZqHhJjw5pTa2sqD08SEgZqHh8Gmq-DploSNgIXAm9TKm4CFkpmVlofU1sjVw4WGm4CF5MzO35OC2gAAAABuMqrN%24&vid=857&q=",
@@ -33,7 +37,7 @@ export function catalogsFor(make = "", vin = "") {
       id: "partsouq",
       label: "PartSouq",
       url:
-        PARTSOUQ_VIN_OVERRIDES[v] ||
+        PARTSOUQ_VIN_OVERRIDES[vinKey(vin)] ||
         `https://partsouq.com/en/search/all?q=${encodeURIComponent(v)}`,
     },
   ];
