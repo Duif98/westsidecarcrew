@@ -12,6 +12,7 @@ import PhotoLightbox from "../components/PhotoLightbox";
 import PostManager from "../components/PostManager";
 import EventManager from "../components/EventManager";
 import CarManager from "../components/CarManager";
+import AdminAddCar from "../components/AdminAddCar";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function AdminPage() {
   const [photos, setPhotos] = useState([]);
   const [albums, setAlbums] = useState([]);
   const [lb, setLb] = useState(null);
+  const [carMgrKey, setCarMgrKey] = useState(0);
 
   useEffect(() => {
     if (loading) return;
@@ -73,7 +75,9 @@ export default function AdminPage() {
 
         <EventManager userId={user.id} />
 
-        <CarManager />
+        <AdminAddCar onCreated={() => { load(); setCarMgrKey((k) => k + 1); }} />
+
+        <CarManager key={carMgrKey} />
 
         <p className="member-note" style={{ marginTop: "1.5rem" }}>Godkend billeder til forsiden, og vælg hvilket billede der skal være bilens cover (thumbnail).</p>
 

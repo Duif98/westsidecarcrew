@@ -13,7 +13,7 @@ export async function uploadPhoto({ file, isPublic, car, caption, userId, albumI
   });
   if (up.error) throw new Error("Upload fejlede: " + up.error.message);
 
-  const { error } = await supabase.from("photos").insert({
+  const { data, error } = await supabase.from("photos").insert({
     user_id: userId,
     bucket,
     path,
@@ -23,12 +23,13 @@ export async function uploadPhoto({ file, isPublic, car, caption, userId, albumI
     caption: caption?.trim() || null,
     album_id: albumId || null,
     event_id: eventId || null,
-  });
+  }).select("id, path").single();
   if (error) {
     // roll back the orphaned file
     await supabase.storage.from(bucket).remove([path]);
     throw new Error("Kunne ikke gemme billedet: " + error.message);
   }
+  return data;
 }
 
 // Attach a displayable URL to each photo row (signed for private files).
