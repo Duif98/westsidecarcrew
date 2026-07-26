@@ -5,6 +5,9 @@
 //    SEAT, VW, Skoda …). Its search accepts a VIN directly in the URL.
 //  - RealOEM is added for BMW as the nicer official-diagram source; it has no
 //    stable VIN URL param, so it opens on the VIN-lookup select page.
+//  - 7zap is added for Porsche: European Porsche VINs use "ZZZ" filler + a
+//    non-numeric check digit, so NHTSA/check-digit-based decoders reject them.
+//    7zap queries the OEM (PET) database and accepts these EU VINs — paste it in.
 //
 // Returns [{ id, label, url }]. Empty array when there's no VIN yet.
 
@@ -26,6 +29,12 @@ export function catalogsFor(make = "", vin = "") {
   // BMW: add RealOEM (paste VIN into the Serial Number box there).
   if (m.includes("bmw")) {
     links.push({ id: "realoem", label: "RealOEM", url: "https://www.realoem.com/bmw/enUS/select" });
+  }
+
+  // Porsche: add 7zap's Porsche VIN decoder — it reads the OEM PET database,
+  // so it accepts European VINs (ZZZ filler) that other decoders reject.
+  if (m.includes("porsche")) {
+    links.push({ id: "7zap", label: "7zap (Porsche PET)", url: "https://7zap.com/en/catalog/cars/porsche/vin-decoder/" });
   }
 
   return links;
