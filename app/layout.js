@@ -51,10 +51,30 @@ export const viewport = {
   initialScale: 1,
 };
 
+// Brand structured data so Google can recognise "West Side Car Crew" as an
+// organisation (name, logo, socials, area) — helps the site show for the brand
+// name. Update SITE_URL if the site moves to a custom domain.
+const SITE_URL = "https://duif98.github.io/westsidecarcrew";
+const orgJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "West Side Car Crew",
+  alternateName: "WestSideCarCrew",
+  url: SITE_URL,
+  logo: `${SITE_URL}/og.jpg`,
+  foundingDate: "2022",
+  areaServed: "Esbjerg, Fredericia, Denmark",
+  sameAs: ["https://www.instagram.com/westsidecarcrew/"],
+};
+
 export default function RootLayout({ children }) {
   return (
     <html lang="da" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
+        />
         <I18nProvider>
           <AuthProvider>
             {children}
