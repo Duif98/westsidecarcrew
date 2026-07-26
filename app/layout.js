@@ -32,7 +32,7 @@ export const metadata = {
   title: "West Side Car Crew — Car enthusiasts from the west coast",
   description:
     "West Side Car Crew is a group of friends and car enthusiasts from Esbjerg and Fredericia, founded in 2022. See the garage: BMW M4, Nissan GT-R, AMG C63 S, Corvette Z06 and more.",
-  metadataBase: new URL("https://westsidecarcrew.github.io"),
+  metadataBase: new URL("https://duif98.github.io/westsidecarcrew"),
   openGraph: {
     title: "West Side Car Crew",
     description:
