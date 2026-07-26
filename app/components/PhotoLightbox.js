@@ -13,6 +13,7 @@ export default function PhotoLightbox({ photos, index, onClose, userId, canLike,
   const [showComments, setShowComments] = useState(false);
   const [counts, setCounts] = useState({});
   const touchX = useRef(null);
+  const closeRef = useRef(null);
   const n = photos.length;
   const p = photos[i];
   const commentCount = counts[p?.id] ?? p?.commentCount ?? 0;
@@ -30,6 +31,7 @@ export default function PhotoLightbox({ photos, index, onClose, userId, canLike,
     window.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    closeRef.current?.focus();
     return () => { window.removeEventListener("keydown", onKey); document.body.style.overflow = prev; };
   }, [go, onClose]);
 
@@ -46,8 +48,8 @@ export default function PhotoLightbox({ photos, index, onClose, userId, canLike,
   // Rendered on <body> via a portal so it escapes any section stacking context
   // and always sits above the sticky nav.
   return createPortal(
-    <div className="plb" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <button className="plb-close" onClick={onClose} aria-label={t("photo.close")}>
+    <div className="plb" role="dialog" aria-modal="true" aria-label={t("photo.gallery")} onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <button ref={closeRef} className="plb-close" onClick={onClose} aria-label={t("photo.close")}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
       </button>
 

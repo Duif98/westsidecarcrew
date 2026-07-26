@@ -162,7 +162,7 @@ const M = {
     },
     photo: {
       close: "Luk", prev: "Forrige", next: "Næste", untitled: "Uden titel",
-      member: "medlem", car: "Bil", comments: "Kommentarer",
+      member: "medlem", car: "Bil", comments: "Kommentarer", gallery: "Foto-galleri",
     },
     comments: {
       empty: "Ingen kommentarer endnu — vær den første 💬",
@@ -318,7 +318,7 @@ const M = {
     },
     photo: {
       close: "Close", prev: "Previous", next: "Next", untitled: "Untitled",
-      member: "member", car: "Car", comments: "Comments",
+      member: "member", car: "Car", comments: "Comments", gallery: "Photo gallery",
     },
     comments: {
       empty: "No comments yet — be the first 💬",
@@ -474,7 +474,7 @@ const M = {
     },
     photo: {
       close: "Schließen", prev: "Zurück", next: "Weiter", untitled: "Ohne Titel",
-      member: "Mitglied", car: "Auto", comments: "Kommentare",
+      member: "Mitglied", car: "Auto", comments: "Kommentare", gallery: "Fotogalerie",
     },
     comments: {
       empty: "Noch keine Kommentare — sei der Erste 💬",
