@@ -32,15 +32,23 @@ export function catalogsFor(make = "", vin = "") {
   if (!v) return [];
 
   const m = clean(make).toLowerCase();
+  const override = PARTSOUQ_VIN_OVERRIDES[vinKey(vin)];
+  const vinSearch = `https://partsouq.com/en/search/all?q=${encodeURIComponent(v)}`;
+
   const links = [
     {
       id: "partsouq",
-      label: "PartSouq",
-      url:
-        PARTSOUQ_VIN_OVERRIDES[vinKey(vin)] ||
-        `https://partsouq.com/en/search/all?q=${encodeURIComponent(v)}`,
+      label: override ? "PartSouq — katalog" : "PartSouq",
+      url: override || vinSearch,
     },
   ];
+
+  // When we hard-link a resolved catalog URL (which can carry an expiring
+  // session token), keep a plain VIN-search button as a fallback so the member
+  // always has a working path if that deep link ever stops resolving.
+  if (override) {
+    links.push({ id: "partsouq-vin", label: "PartSouq — søg på VIN", url: vinSearch });
+  }
 
   // BMW: add RealOEM (paste VIN into the Serial Number box there).
   if (m.includes("bmw")) {
