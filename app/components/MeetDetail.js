@@ -32,6 +32,8 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
   const [lb, setLb] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [noteDraft, setNoteDraft] = useState("");
+  const [noteSaving, setNoteSaving] = useState(false);
   const fileRef = useRef(null);
   const isAdmin = !!profile?.is_admin;
   const canManage = !!user && (event.created_by === user.id || isAdmin);
@@ -57,10 +59,25 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
         .from("event_rsvps")
         .select("user_id, status, profiles!event_rsvps_user_id_fkey(username)")
         .eq("event_id", event.id);
-      if (active) setRsvps((data || []).map((r) => ({ user_id: r.user_id, status: r.status, username: r.profiles?.username })));
+      // Reasons are members-only (RLS blocks anon), so only fetch them when logged in.
+      const notes = {};
+      if (session) {
+        const { data: nd } = await supabase
+          .from("event_rsvp_notes")
+          .select("user_id, note")
+          .eq("event_id", event.id);
+        (nd || []).forEach((n) => { if (n.note) notes[n.user_id] = n.note; });
+      }
+      if (active) setRsvps((data || []).map((r) => ({ user_id: r.user_id, status: r.status, username: r.profiles?.username, note: notes[r.user_id] || null })));
     })();
     return () => { active = false; };
-  }, [event.id]);
+  }, [event.id, session]);
+
+  // Keep the reason editor in sync with the member's own saved note.
+  useEffect(() => {
+    const my = rsvps.find((r) => r.user_id === user?.id);
+    setNoteDraft(my?.note || "");
+  }, [rsvps, user?.id]);
 
   const loadPhotos = async () => {
     const { data } = await supabase
@@ -96,16 +113,35 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
     if (mine && mine.status === status) {
       setRsvps((p) => p.filter((r) => r.user_id !== user.id));
       await supabase.from("event_rsvps").delete().eq("event_id", event.id).eq("user_id", user.id);
+      await supabase.from("event_rsvp_notes").delete().eq("event_id", event.id).eq("user_id", user.id);
       return;
     }
-    setRsvps((p) => [...p.filter((r) => r.user_id !== user.id), { user_id: user.id, status, username: profile?.username }]);
+    setRsvps((p) => {
+      const keptNote = p.find((r) => r.user_id === user.id)?.note || null;
+      return [...p.filter((r) => r.user_id !== user.id), { user_id: user.id, status, username: profile?.username, note: keptNote }];
+    });
     await supabase.from("event_rsvps").upsert({ event_id: event.id, user_id: user.id, status }, { onConflict: "event_id,user_id" });
+  };
+
+  // Save (or clear) the member's private reason for their RSVP.
+  const saveNote = async () => {
+    if (!user) return;
+    setNoteSaving(true);
+    const note = noteDraft.trim().slice(0, 300) || null;
+    if (note) {
+      await supabase.from("event_rsvp_notes").upsert({ event_id: event.id, user_id: user.id, note, updated_at: new Date().toISOString() }, { onConflict: "event_id,user_id" });
+    } else {
+      await supabase.from("event_rsvp_notes").delete().eq("event_id", event.id).eq("user_id", user.id);
+    }
+    setRsvps((p) => p.map((r) => (r.user_id === user.id ? { ...r, note } : r)));
+    setNoteSaving(false);
   };
 
   if (!mounted) return null;
 
   const yes = rsvps.filter((r) => r.status === "yes");
   const maybe = rsvps.filter((r) => r.status === "maybe");
+  const no = rsvps.filter((r) => r.status === "no");
   const mine = rsvps.find((r) => r.user_id === user?.id)?.status;
 
   return createPortal(
@@ -160,16 +196,47 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
                 {maybe.length > 0 && <p><b>{t("meet.maybeLabel")}</b> {maybe.map((r) => `@${r.username || t("photo.member")}`).join(", ")}</p>}
               </div>
             )}
+          {/* "Kommer ikke" + private reasons — members only (RLS also hides the notes from anon). */}
+          {session && no.length > 0 && (
+            <div className="md-not-coming">
+              <p className="md-nc-head"><b>{t("meet.notComingLabel")}</b></p>
+              <ul className="md-nc-list">
+                {no.map((r) => (
+                  <li key={r.user_id}>
+                    <span className="md-nc-name">@{r.username || t("photo.member")}</span>
+                    {r.note
+                      ? <span className="md-nc-reason">„{r.note}"</span>
+                      : <span className="md-nc-noreason">{t("meet.noReason")}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         {session ? (
-          <div className="rsvp-row md-rsvp">
-            {STATUS.map((s) => (
-              <button key={s.key} className={`rsvp-btn ${mine === s.key ? "on " + s.key : ""}`} onClick={() => setRsvp(s.key)}>
-                {s.emoji} {t(`rsvp.${s.key}`)}
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="rsvp-row md-rsvp">
+              {STATUS.map((s) => (
+                <button key={s.key} className={`rsvp-btn ${mine === s.key ? "on " + s.key : ""}`} onClick={() => setRsvp(s.key)}>
+                  {s.emoji} {t(`rsvp.${s.key}`)}
+                </button>
+              ))}
+            </div>
+            {mine === "no" && (
+              <div className="md-reason">
+                <label className="cp-label md-reason-label" htmlFor="rsvp-reason">{t("meet.reasonLabel")}</label>
+                <textarea id="rsvp-reason" rows={2} maxLength={300} value={noteDraft}
+                  onChange={(e) => setNoteDraft(e.target.value)} placeholder={t("meet.reasonPh")} />
+                <div className="md-reason-actions">
+                  <span className="md-reason-hint">{t("meet.reasonHint")}</span>
+                  <button className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.35rem 0.9rem" }} onClick={saveNote} disabled={noteSaving}>
+                    {noteSaving ? t("meet.saving") : t("meet.saveReason")}
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <p className="muted rsvp-login"><Link href="/login" className="c-link">{t("meet.loginToRsvpLogin")}</Link>{t("meet.loginToRsvpB")}</p>
         )}

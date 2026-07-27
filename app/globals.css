@@ -1526,6 +1526,33 @@ a.btn-gold { text-decoration: none; }
 .md-empty { color: var(--faint); font-size: 0.9rem; }
 .md-rsvp { margin-top: 1.4rem; }
 
+/* "Kommer ikke" list with private reasons (members only) */
+.md-not-coming { margin-top: 0.9rem; }
+.md-nc-head { font-size: 0.92rem; color: var(--muted); margin-bottom: 0.35rem; }
+.md-nc-head b { color: var(--text); font-weight: 500; }
+.md-nc-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }
+.md-nc-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.5rem; font-size: 0.9rem; }
+.md-nc-name { color: var(--text); font-weight: 500; }
+.md-nc-reason { color: var(--muted); font-style: italic; }
+.md-nc-noreason { color: var(--faint); font-size: 0.82rem; }
+
+/* Private reason editor shown when the member picks "kommer ikke" */
+.md-reason { margin-top: 0.9rem; padding: 0.85rem 0.9rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; }
+.md-reason-label { display: block; margin-bottom: 0.5rem; }
+.md-reason textarea { width: 100%; font-family: var(--font-body), sans-serif; font-size: 0.95rem; color: var(--text); background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; padding: 0.7rem 0.8rem; resize: vertical; }
+.md-reason textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,119,0.16); }
+.md-reason-actions { display: flex; align-items: center; justify-content: space-between; gap: 0.7rem; margin-top: 0.6rem; }
+.md-reason-hint { font-size: 0.72rem; color: var(--faint); }
+
+/* Address → map lookup in the meet form */
+.mf-addr { display: flex; gap: 0.5rem; align-items: stretch; }
+.mf-addr input { flex: 1; min-width: 0; }
+.mf-addr-btn { flex: none; width: auto; white-space: nowrap; padding: 0 0.9rem; }
+.mf-addr-msg { display: block; margin-top: 0.4rem; font-size: 0.78rem; }
+.mf-addr-msg.ok { color: var(--gold-bright); }
+.mf-addr-msg.no { color: #d98a8a; }
+@media (max-width: 460px) { .mf-addr { flex-direction: column; } .mf-addr-btn { width: 100%; padding: 0.6rem; } }
+
 /* ---------- Member profiles ---------- */
 .profil-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }
 .profil-head { display: flex; align-items: center; gap: clamp(1rem, 3vw, 1.8rem); }

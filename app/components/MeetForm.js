@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
+import { geocode } from "../lib/geo";
 import MapPicker from "./MapPicker";
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -24,8 +25,24 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
   const [pin, setPin] = useState(editing && typeof event.lat === "number" && typeof event.lng === "number" ? { lat: event.lat, lng: event.lng } : null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
+  const [geo, setGeo] = useState("idle"); // idle | searching | found | notfound
+  const lastGeo = useRef("");
 
   useEffect(() => setMounted(true), []);
+
+  // Look the Sted address up on the map: drops the pin (which turns the weather
+  // on, both here and in the calendar). Runs automatically when the field loses
+  // focus and from the "Find adresse" button; skips repeat lookups of the same text.
+  const findAddress = async (force = false) => {
+    const q = f.location.trim();
+    if (q.length < 3) return;
+    if (!force && q === lastGeo.current) return;
+    lastGeo.current = q;
+    setGeo("searching");
+    const hit = await geocode(q);
+    if (hit) { setPin({ lat: hit.lat, lng: hit.lng }); setGeo("found"); }
+    else setGeo("notfound");
+  };
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
@@ -75,7 +92,18 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
             <label className="post-field"><span>{t("meet.fTime")}</span>
               <input type="time" value={f.time} onChange={(e) => setF({ ...f, time: e.target.value })} /></label>
             <label className="post-field ef-full"><span>{t("meet.fLocation")}</span>
-              <input value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} placeholder={t("meet.fLocationPh")} /></label>
+              <div className="mf-addr">
+                <input value={f.location}
+                  onChange={(e) => { setF({ ...f, location: e.target.value }); if (geo !== "idle") setGeo("idle"); }}
+                  onBlur={() => findAddress()}
+                  placeholder={t("meet.fLocationPh")} />
+                <button type="button" className="ph-btn mf-addr-btn" onClick={() => findAddress(true)} disabled={geo === "searching" || f.location.trim().length < 3}>
+                  {geo === "searching" ? t("meet.geoSearching") : t("meet.geoFind")}
+                </button>
+              </div>
+              {geo === "found" && <span className="mf-addr-msg ok">{t("meet.geoFound")}</span>}
+              {geo === "notfound" && <span className="mf-addr-msg no">{t("meet.geoNotFound")}</span>}
+            </label>
             <label className="post-field ef-full"><span>{t("meet.fMapLink")}</span>
               <input value={f.location_url} onChange={(e) => setF({ ...f, location_url: e.target.value })} placeholder="https://maps.google.com/…" /></label>
             <label className="post-field ef-full"><span>{t("meet.fDesc")}</span>
