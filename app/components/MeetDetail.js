@@ -12,6 +12,7 @@ import MeetForm from "./MeetForm";
 import MeetWeather from "./MeetWeather";
 import { yrUrl } from "../lib/weather";
 import { directionsUrl } from "../lib/geo";
+import Linkify from "./Linkify";
 import { useT } from "../lib/i18n";
 
 const STATUS = [
@@ -169,7 +170,12 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
             🧭 {t("meet.directions")}
           </a>
         )}
-        {event.description && <p className="md-desc">{event.description}</p>}
+        {event.link_url && (
+          <a className="md-dir md-link" href={event.link_url} target="_blank" rel="noopener noreferrer">
+            🔗 {t("meet.openLink")}
+          </a>
+        )}
+        {event.description && <p className="md-desc"><Linkify text={event.description} /></p>}
 
         <MeetWeather lat={event.lat} lng={event.lng} startsAt={event.starts_at} />
 

@@ -7,6 +7,7 @@ import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
 import { yrUrl } from "../lib/weather";
 import { directionsUrl } from "../lib/geo";
+import Linkify from "../components/Linkify";
 import { useT } from "../lib/i18n";
 import MeetForm from "../components/MeetForm";
 import MeetWeather from "../components/MeetWeather";
@@ -175,7 +176,12 @@ export default function EventsPage() {
                       🧭 {t("meet.directions")}
                     </a>
                   )}
-                  {ev.description && <p className="event-desc">{ev.description}</p>}
+                  {ev.link_url && (
+                    <a className="md-dir md-link" href={ev.link_url} target="_blank" rel="noopener noreferrer">
+                      🔗 {t("meet.openLink")}
+                    </a>
+                  )}
+                  {ev.description && <p className="event-desc"><Linkify text={ev.description} /></p>}
 
                   <MeetWeather lat={ev.lat} lng={ev.lng} startsAt={ev.starts_at} />
                   {typeof ev.lat === "number" && typeof ev.lng === "number" && (

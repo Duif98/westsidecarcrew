@@ -21,8 +21,8 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
   const editing = !!event;
   const [mounted, setMounted] = useState(false);
   const [f, setF] = useState(editing
-    ? { title: event.title || "", date: toDate(event.starts_at), time: toTime(event.starts_at), location: event.location || "", location_url: event.location_url || "", description: event.description || "" }
-    : { title: "", date: presetDate, time: "", location: "", location_url: "", description: "" });
+    ? { title: event.title || "", date: toDate(event.starts_at), time: toTime(event.starts_at), location: event.location || "", location_url: event.location_url || "", link_url: event.link_url || "", description: event.description || "" }
+    : { title: "", date: presetDate, time: "", location: "", location_url: "", link_url: "", description: "" });
   const [pin, setPin] = useState(editing && typeof event.lat === "number" && typeof event.lng === "number" ? { lat: event.lat, lng: event.lng } : null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
@@ -143,14 +143,21 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
       description: f.description.trim() || null,
       location: f.location.trim() || null,
       location_url: f.location_url.trim() || null,
+      link_url: f.link_url.trim() || null,
       lat: pin?.lat ?? null,
       lng: pin?.lng ?? null,
       starts_at,
     };
-    const q = editing
-      ? supabase.from("events").update(payload).eq("id", event.id).select().single()
-      : supabase.from("events").insert({ ...payload, created_by: user.id }).select().single();
-    const { data, error } = await q;
+    const run = (p) => editing
+      ? supabase.from("events").update(p).eq("id", event.id).select().single()
+      : supabase.from("events").insert({ ...p, created_by: user.id }).select().single();
+    let { data, error } = await run(payload);
+    // Fail-safe: if the link_url column isn't there yet (migration 018 not run),
+    // save the meet without it rather than blocking the whole save.
+    if (error && (error.code === "PGRST204" || /link_url/i.test(error.message || ""))) {
+      const { link_url, ...rest } = payload;
+      ({ data, error } = await run(rest));
+    }
     setBusy(false);
     if (error) { setErr(error.message); return; }
     if (editing) onSaved?.(data); else onCreated?.(data);
@@ -219,6 +226,8 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
               <input value={f.location_url} onChange={(e) => { setF({ ...f, location_url: e.target.value }); setLinkAuto(false); }} placeholder="https://maps.google.com/…" /></label>
             <label className="post-field ef-full"><span>{t("meet.fDesc")}</span>
               <textarea rows={3} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} placeholder={t("meet.fDescPh")} /></label>
+            <label className="post-field ef-full"><span>{t("meet.fLink")}</span>
+              <input type="url" value={f.link_url} onChange={(e) => setF({ ...f, link_url: e.target.value })} placeholder="https://facebook.com/events/…" /></label>
           </div>
 
           <div className="mf-map">
