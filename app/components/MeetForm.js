@@ -28,6 +28,7 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
   const [geo, setGeo] = useState("idle"); // idle | searching | found | notfound | ambiguous | linkset
   const [suggests, setSuggests] = useState([]);
   const [nearTown, setNearTown] = useState(null); // town name when suggestions are "nearest to <town>"
+  const [nearCenter, setNearCenter] = useState(null); // {lat,lng} of that town, for the "pin the town" option
   // Whether the map-link field is ours to fill. True until the member types
   // their own link — then we never overwrite it.
   const [linkAuto, setLinkAuto] = useState(!(editing && (event.location_url || "").trim()));
@@ -54,6 +55,22 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
     lastGeo.current = hit.label.trim();
   };
 
+  // Anchor to the town: the exact place isn't in OSM (e.g. no ILVA in Vejle), so
+  // drop the pin in the town for the map + weather, and open the exact query on
+  // Google Maps via the link.
+  const applyTown = () => {
+    if (!nearCenter) return;
+    const q = rawQuery.current || f.location.trim();
+    setPin({ lat: nearCenter.lat, lng: nearCenter.lng });
+    setF((prev) => ({ ...prev, location: q, location_url: mapsSearchUrl(q) }));
+    setLinkAuto(true);
+    setSuggests([]);
+    setNearTown(null);
+    setNearCenter(null);
+    setGeo("found");
+    lastGeo.current = q;
+  };
+
   // Fallback: no matching pin (or none is right) — just point the map link at a
   // Google Maps search of exactly what the member typed, so it still opens the place.
   const useGoogleSearch = () => {
@@ -76,13 +93,15 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
     rawQuery.current = q;
     setSuggests([]);
     setNearTown(null);
+    setNearCenter(null);
     setGeo("searching");
-    const { hits, near } = await geocode(q);
-    if (!hits.length) { fillLink(q); setLinkAuto(true); setGeo("notfound"); return; }
-    // "Brand near town" always lets the member pick the right store, even if one.
+    const { hits, near, center } = await geocode(q);
+    if (!hits.length && !center) { fillLink(q); setLinkAuto(true); setGeo("notfound"); return; }
+    // "Brand near town" always lets the member pick the town or the right store.
     if (hits.length === 1 && !near) { apply(hits[0]); return; }
     setSuggests(hits);
     setNearTown(near);
+    setNearCenter(center || null);
     setGeo("ambiguous");
   };
   useEffect(() => {
@@ -136,7 +155,7 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
             <label className="post-field ef-full"><span>{t("meet.fLocation")}</span>
               <div className="mf-addr">
                 <input value={f.location}
-                  onChange={(e) => { setF({ ...f, location: e.target.value }); setSuggests([]); setNearTown(null); if (geo !== "idle") setGeo("idle"); }}
+                  onChange={(e) => { setF({ ...f, location: e.target.value }); setSuggests([]); setNearTown(null); setNearCenter(null); if (geo !== "idle") setGeo("idle"); }}
                   onBlur={() => findAddress()}
                   placeholder={t("meet.fLocationPh")} />
                 <button type="button" className="ph-btn mf-addr-btn" onClick={() => findAddress(true)} disabled={geo === "searching" || f.location.trim().length < 3}>
@@ -146,9 +165,19 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
               {geo === "found" && <span className="mf-addr-msg ok">{t("meet.geoFound")}</span>}
               {geo === "linkset" && <span className="mf-addr-msg ok">{t("meet.geoLinkSet")}</span>}
               {geo === "notfound" && <span className="mf-addr-msg no">{t("meet.geoNotFound")}</span>}
-              {geo === "ambiguous" && suggests.length > 0 && (
+              {geo === "ambiguous" && (suggests.length > 0 || nearCenter) && (
                 <div className="mf-suggests">
-                  <span className="mf-suggests-head">{nearTown ? t("meet.geoNear", { town: nearTown }) : t("meet.geoPick")}</span>
+                  {nearCenter ? (
+                    <>
+                      <span className="mf-suggests-head">{t("meet.geoTownHead", { q: rawQuery.current })}</span>
+                      <button type="button" className="mf-suggest mf-suggest-town" onClick={applyTown}>
+                        📍 {t("meet.geoUseTown", { town: nearTown })}
+                      </button>
+                      {suggests.length > 0 && <span className="mf-suggests-sub">{t("meet.geoOrNearest")}</span>}
+                    </>
+                  ) : (
+                    <span className="mf-suggests-head">{t("meet.geoPick")}</span>
+                  )}
                   {suggests.map((s, i) => (
                     <button type="button" key={i} className="mf-suggest" onClick={() => apply(s)}>
                       📍 {s.label}{s.dist != null && <span className="mf-suggest-dist"> · ~{s.dist} km</span>}

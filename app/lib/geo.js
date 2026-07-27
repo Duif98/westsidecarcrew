@@ -21,13 +21,15 @@ const BIAS = { lat: 55.7, lon: 9.3 }; // Jutland / crew home turf
 
 export async function geocode(query) {
   const q = (query || "").trim();
-  if (q.length < 3) return { hits: [], near: null };
+  if (q.length < 3) return { hits: [], near: null, center: null };
   const key = q.toLowerCase();
   if (cache.has(key)) return cache.get(key);
-  let result = { hits: [], near: null };
+  let result = { hits: [], near: null, center: null };
   try {
     const tokens = q.split(/\s+/);
-    // Pass 1: "<brand> <town>" → nearest brand stores to that town.
+    // Pass 1: "<brand> <town>" → nearest brand stores to that town. We also keep
+    // the town centre so the caller can offer "pin the town + Google link" when
+    // the exact place isn't in OSM (e.g. "Ilva Vejle" — no ILVA is mapped in Vejle).
     if (tokens.length >= 2) {
       const brand = tokens.slice(0, -1).join(" ");
       const center = await townCenter(tokens[tokens.length - 1]);
@@ -36,15 +38,15 @@ export async function geocode(query) {
           .map((h) => ({ ...h, dist: Math.round(havKm(center.lat, center.lon, h.lat, h.lng)) }))
           .sort((a, b) => a.dist - b.dist)
           .slice(0, 5);
-        if (near.length) result = { hits: near, near: center.name };
+        result = { hits: near, near: center.name, center: { lat: center.lat, lng: center.lon } };
       }
     }
-    // Pass 2: plain search of the whole query.
-    if (!result.hits.length) {
-      result = { hits: await photonRaw(q, BIAS.lat, BIAS.lon, 6), near: null };
+    // Pass 2: plain search of the whole query (only if the town path found nothing to anchor on).
+    if (!result.hits.length && !result.center) {
+      result = { hits: await photonRaw(q, BIAS.lat, BIAS.lon, 6), near: null, center: null };
     }
   } catch {
-    result = { hits: [], near: null };
+    result = { hits: [], near: null, center: null };
   }
   cache.set(key, result);
   return result;
