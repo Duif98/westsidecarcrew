@@ -27,6 +27,7 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
   const [err, setErr] = useState("");
   const [geo, setGeo] = useState("idle"); // idle | searching | found | notfound | ambiguous | linkset
   const [suggests, setSuggests] = useState([]);
+  const [nearTown, setNearTown] = useState(null); // town name when suggestions are "nearest to <town>"
   // Whether the map-link field is ours to fill. True until the member types
   // their own link — then we never overwrite it.
   const [linkAuto, setLinkAuto] = useState(!(editing && (event.location_url || "").trim()));
@@ -74,11 +75,14 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
     lastGeo.current = q;
     rawQuery.current = q;
     setSuggests([]);
+    setNearTown(null);
     setGeo("searching");
-    const hits = await geocode(q, 6);
+    const { hits, near } = await geocode(q);
     if (!hits.length) { fillLink(q); setLinkAuto(true); setGeo("notfound"); return; }
-    if (hits.length === 1) { apply(hits[0]); return; }
+    // "Brand near town" always lets the member pick the right store, even if one.
+    if (hits.length === 1 && !near) { apply(hits[0]); return; }
     setSuggests(hits);
+    setNearTown(near);
     setGeo("ambiguous");
   };
   useEffect(() => {
@@ -132,7 +136,7 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
             <label className="post-field ef-full"><span>{t("meet.fLocation")}</span>
               <div className="mf-addr">
                 <input value={f.location}
-                  onChange={(e) => { setF({ ...f, location: e.target.value }); setSuggests([]); if (geo !== "idle") setGeo("idle"); }}
+                  onChange={(e) => { setF({ ...f, location: e.target.value }); setSuggests([]); setNearTown(null); if (geo !== "idle") setGeo("idle"); }}
                   onBlur={() => findAddress()}
                   placeholder={t("meet.fLocationPh")} />
                 <button type="button" className="ph-btn mf-addr-btn" onClick={() => findAddress(true)} disabled={geo === "searching" || f.location.trim().length < 3}>
@@ -144,9 +148,11 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
               {geo === "notfound" && <span className="mf-addr-msg no">{t("meet.geoNotFound")}</span>}
               {geo === "ambiguous" && suggests.length > 0 && (
                 <div className="mf-suggests">
-                  <span className="mf-suggests-head">{t("meet.geoPick")}</span>
+                  <span className="mf-suggests-head">{nearTown ? t("meet.geoNear", { town: nearTown }) : t("meet.geoPick")}</span>
                   {suggests.map((s, i) => (
-                    <button type="button" key={i} className="mf-suggest" onClick={() => apply(s)}>📍 {s.label}</button>
+                    <button type="button" key={i} className="mf-suggest" onClick={() => apply(s)}>
+                      📍 {s.label}{s.dist != null && <span className="mf-suggest-dist"> · ~{s.dist} km</span>}
+                    </button>
                   ))}
                 </div>
               )}
