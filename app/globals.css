@@ -1552,6 +1552,10 @@ a.btn-gold { text-decoration: none; }
 .mf-addr-msg.ok { color: var(--gold-bright); }
 .mf-addr-msg.no { color: #d98a8a; }
 @media (max-width: 460px) { .mf-addr { flex-direction: column; } .mf-addr-btn { width: 100%; padding: 0.6rem; } }
+.mf-suggests { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.5rem; }
+.mf-suggests-head { font-size: 0.72rem; color: var(--muted); text-transform: none; letter-spacing: 0; }
+.mf-suggest { text-align: left; font-family: var(--font-body), sans-serif; font-size: 0.9rem; text-transform: none; letter-spacing: 0; color: var(--text); background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; padding: 0.55rem 0.75rem; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+.mf-suggest:hover { border-color: var(--gold); background: var(--bg-2); }
 
 /* ---------- Member profiles ---------- */
 .profil-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }

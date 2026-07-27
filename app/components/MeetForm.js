@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
-import { geocode } from "../lib/geo";
+import { geocode, mapsUrl } from "../lib/geo";
 import MapPicker from "./MapPicker";
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -25,23 +25,48 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
   const [pin, setPin] = useState(editing && typeof event.lat === "number" && typeof event.lng === "number" ? { lat: event.lat, lng: event.lng } : null);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  const [geo, setGeo] = useState("idle"); // idle | searching | found | notfound
+  const [geo, setGeo] = useState("idle"); // idle | searching | found | notfound | ambiguous
+  const [suggests, setSuggests] = useState([]);
+  // Whether the map-link field is ours to fill. True until the member types
+  // their own link — then we never overwrite it.
+  const [linkAuto, setLinkAuto] = useState(!(editing && (event.location_url || "").trim()));
   const lastGeo = useRef("");
 
   useEffect(() => setMounted(true), []);
 
-  // Look the Sted address up on the map: drops the pin (which turns the weather
-  // on, both here and in the calendar). Runs automatically when the field loses
-  // focus and from the "Find adresse" button; skips repeat lookups of the same text.
+  // Apply a chosen location: drop the pin (which turns the weather on, here and
+  // in the calendar) and auto-fill the Google Maps link unless the member set
+  // their own. `useLabel` also snaps the Sted text to the tidy "road, postcode
+  // city" form (used when picking a suggestion).
+  const apply = (hit, useLabel) => {
+    setPin({ lat: hit.lat, lng: hit.lng });
+    setF((prev) => {
+      const next = { ...prev };
+      if (useLabel && hit.label) next.location = hit.label;
+      if (linkAuto || !prev.location_url.trim()) next.location_url = mapsUrl(hit.lat, hit.lng);
+      return next;
+    });
+    setLinkAuto(true);
+    setSuggests([]);
+    setGeo("found");
+    lastGeo.current = useLabel && hit.label ? hit.label.trim() : f.location.trim();
+  };
+
+  // Look the Sted address up: one hit → apply it; several → offer them as
+  // suggestions (ambiguous input like a street with no town/postcode). Runs on
+  // blur and from the "Find adresse" button; skips repeat lookups of the same text.
   const findAddress = async (force = false) => {
     const q = f.location.trim();
     if (q.length < 3) return;
     if (!force && q === lastGeo.current) return;
     lastGeo.current = q;
+    setSuggests([]);
     setGeo("searching");
-    const hit = await geocode(q);
-    if (hit) { setPin({ lat: hit.lat, lng: hit.lng }); setGeo("found"); }
-    else setGeo("notfound");
+    const hits = await geocode(q, 5);
+    if (!hits.length) { setGeo("notfound"); return; }
+    if (hits.length === 1) { apply(hits[0], false); return; }
+    setSuggests(hits);
+    setGeo("ambiguous");
   };
   useEffect(() => {
     const onKey = (e) => e.key === "Escape" && onClose();
@@ -94,7 +119,7 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
             <label className="post-field ef-full"><span>{t("meet.fLocation")}</span>
               <div className="mf-addr">
                 <input value={f.location}
-                  onChange={(e) => { setF({ ...f, location: e.target.value }); if (geo !== "idle") setGeo("idle"); }}
+                  onChange={(e) => { setF({ ...f, location: e.target.value }); setSuggests([]); if (geo !== "idle") setGeo("idle"); }}
                   onBlur={() => findAddress()}
                   placeholder={t("meet.fLocationPh")} />
                 <button type="button" className="ph-btn mf-addr-btn" onClick={() => findAddress(true)} disabled={geo === "searching" || f.location.trim().length < 3}>
@@ -103,9 +128,17 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
               </div>
               {geo === "found" && <span className="mf-addr-msg ok">{t("meet.geoFound")}</span>}
               {geo === "notfound" && <span className="mf-addr-msg no">{t("meet.geoNotFound")}</span>}
+              {geo === "ambiguous" && suggests.length > 0 && (
+                <div className="mf-suggests">
+                  <span className="mf-suggests-head">{t("meet.geoPick")}</span>
+                  {suggests.map((s, i) => (
+                    <button type="button" key={i} className="mf-suggest" onClick={() => apply(s, true)}>📍 {s.label}</button>
+                  ))}
+                </div>
+              )}
             </label>
             <label className="post-field ef-full"><span>{t("meet.fMapLink")}</span>
-              <input value={f.location_url} onChange={(e) => setF({ ...f, location_url: e.target.value })} placeholder="https://maps.google.com/…" /></label>
+              <input value={f.location_url} onChange={(e) => { setF({ ...f, location_url: e.target.value }); setLinkAuto(false); }} placeholder="https://maps.google.com/…" /></label>
             <label className="post-field ef-full"><span>{t("meet.fDesc")}</span>
               <textarea rows={3} value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} placeholder={t("meet.fDescPh")} /></label>
           </div>
