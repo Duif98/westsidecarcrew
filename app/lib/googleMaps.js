@@ -8,6 +8,37 @@ import { supabase } from "./supabaseClient";
 
 let mapsPromise = null;
 
+// Site-side hard cap: once this many billable Google events (autocomplete +
+// place details) happen in a month across all members, the site stops calling
+// Google and falls back to OSM. Set far above realistic use (~hundreds/month)
+// but safely under Google's 10k/month free tier, so it can never cost money.
+const MONTHLY_LIMIT = 5000;
+const usage = { count: null }; // cached running total for the current month
+
+// Current month's total, cached after first read (kept fresh by bump()).
+async function currentCount() {
+  if (usage.count !== null) return usage.count;
+  try {
+    const { data } = await supabase.rpc("google_usage_count");
+    usage.count = typeof data === "number" ? data : 0;
+  } catch {
+    usage.count = 0; // fail open on read error — the domain-lock + free tier still protect us
+  }
+  return usage.count;
+}
+
+// Record n billable events; the RPC returns the authoritative new total so the
+// cap stays correct even across members. Best-effort (never blocks the UI).
+async function bump(n) {
+  try {
+    const { data } = await supabase.rpc("bump_google_usage", { n });
+    if (typeof data === "number") usage.count = data;
+    else if (usage.count !== null) usage.count += n;
+  } catch {
+    if (usage.count !== null) usage.count += n;
+  }
+}
+
 async function fetchKey() {
   try {
     const { data } = await supabase.from("app_secrets").select("value").eq("key", "google_maps_key").maybeSingle();
@@ -70,16 +101,20 @@ export async function newSessionToken() {
   }
 }
 
-// Denmark-biased autocomplete predictions for `input`, or null if Google isn't
-// available (→ caller uses the OSM fallback). Each item: { label, prediction }.
-export async function googleAutocomplete(input, sessionToken) {
+// Denmark-biased autocomplete. Returns { status, hits }:
+//   'ok'          → hits: [{ label, prediction }]
+//   'blocked'     → monthly site cap reached (caller falls back to OSM + warns)
+//   'unavailable' → no key / not a member / load error (caller falls back to OSM)
+export async function googleSearch(input, sessionToken) {
   const places = await loadPlaces();
-  if (!places) return null;
+  if (!places) return { status: "unavailable", hits: [] };
+  if ((await currentCount()) >= MONTHLY_LIMIT) return { status: "blocked", hits: [] };
   try {
     const req = { input, includedRegionCodes: ["dk"], language: "da" };
     if (sessionToken) req.sessionToken = sessionToken;
     const { suggestions } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions(req);
-    return (suggestions || [])
+    bump(1); // one billable autocomplete event
+    const hits = (suggestions || [])
       .map((s) => s.placePrediction)
       .filter(Boolean)
       .map((p) => ({
@@ -87,8 +122,9 @@ export async function googleAutocomplete(input, sessionToken) {
         prediction: p,
       }))
       .filter((x) => x.label);
+    return { status: "ok", hits };
   } catch {
-    return null;
+    return { status: "unavailable", hits: [] };
   }
 }
 
@@ -98,6 +134,7 @@ export async function resolvePlace(prediction) {
   try {
     const place = prediction.toPlace();
     await place.fetchFields({ fields: ["location", "formattedAddress", "displayName", "googleMapsURI"] });
+    bump(1); // one billable place-details event
     const loc = place.location;
     if (!loc) return null;
     const lat = typeof loc.lat === "function" ? loc.lat() : loc.lat;

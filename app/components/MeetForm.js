@@ -6,7 +6,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
 import { geocode, mapsSearchUrl } from "../lib/geo";
-import { googleAutocomplete, resolvePlace, newSessionToken } from "../lib/googleMaps";
+import { googleSearch, resolvePlace, newSessionToken } from "../lib/googleMaps";
 import MapPicker from "./MapPicker";
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -30,6 +30,7 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
   const [suggests, setSuggests] = useState([]);
   const [nearTown, setNearTown] = useState(null); // town name when suggestions are "nearest to <town>"
   const [nearCenter, setNearCenter] = useState(null); // {lat,lng} of that town, for the "pin the town" option
+  const [googleBlocked, setGoogleBlocked] = useState(false); // monthly site cap reached → OSM only
   // Whether the map-link field is ours to fill. True until the member types
   // their own link — then we never overwrite it.
   const [linkAuto, setLinkAuto] = useState(!(editing && (event.location_url || "").trim()));
@@ -111,9 +112,11 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
     setNearTown(null);
     setNearCenter(null);
     setGeo("searching");
-    // Google Places first (has businesses like "Ilva Vejle"); null → OSM fallback.
-    const g = await googleAutocomplete(q, sessionToken.current);
-    if (g && g.length) { setSuggests(g); setGeo("ambiguous"); return; }
+    // Google Places first (has businesses like "Ilva Vejle"); OSM is the fallback
+    // when Google is unavailable or the monthly site cap has been reached.
+    const g = await googleSearch(q, sessionToken.current);
+    if (g.status === "blocked") setGoogleBlocked(true);
+    if (g.status === "ok" && g.hits.length) { setSuggests(g.hits); setGeo("ambiguous"); return; }
     const { hits, near, center } = await geocode(q);
     if (!hits.length && !center) { fillLink(q); setLinkAuto(true); setGeo("notfound"); return; }
     // "Brand near town" always lets the member pick the town or the right store.
@@ -181,6 +184,7 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
                   {geo === "searching" ? t("meet.geoSearching") : t("meet.geoFind")}
                 </button>
               </div>
+              {googleBlocked && <span className="mf-addr-tip">{t("meet.geoCapReached")}</span>}
               {geo === "found" && <span className="mf-addr-msg ok">{t("meet.geoFound")}</span>}
               {geo === "linkset" && <span className="mf-addr-msg ok">{t("meet.geoLinkSet")}</span>}
               {geo === "notfound" && <span className="mf-addr-msg no">{t("meet.geoNotFound")}</span>}
