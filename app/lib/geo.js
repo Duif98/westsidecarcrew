@@ -30,7 +30,9 @@ export async function geocode(query) {
     // Pass 1: "<brand> <town>" → nearest brand stores to that town. We also keep
     // the town centre so the caller can offer "pin the town + Google link" when
     // the exact place isn't in OSM (e.g. "Ilva Vejle" — no ILVA is mapped in Vejle).
-    if (tokens.length >= 2) {
+    // Skip this for anything with a digit — that's a street address (house number
+    // / postcode), which OSM has precisely, so a plain lookup pins it exactly.
+    if (!/\d/.test(q) && tokens.length >= 2) {
       const brand = tokens.slice(0, -1).join(" ");
       const center = await townCenter(tokens[tokens.length - 1]);
       if (center && brand.length >= 2) {

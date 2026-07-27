@@ -188,6 +188,9 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
               {(geo === "found" || geo === "ambiguous" || geo === "notfound") && (
                 <button type="button" className="mf-gmaps" onClick={useGoogleSearch}>{t("meet.geoGoogle")}</button>
               )}
+              {(geo === "notfound" || (geo === "ambiguous" && nearCenter)) && (
+                <p className="mf-addr-tip">{t("meet.geoAddrTip")}</p>
+              )}
             </label>
             <label className="post-field ef-full"><span>{t("meet.fMapLink")}</span>
               <input value={f.location_url} onChange={(e) => { setF({ ...f, location_url: e.target.value }); setLinkAuto(false); }} placeholder="https://maps.google.com/…" /></label>
