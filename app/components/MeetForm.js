@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
 import { geocode, mapsSearchUrl } from "../lib/geo";
+import { googleAutocomplete, resolvePlace, newSessionToken } from "../lib/googleMaps";
 import MapPicker from "./MapPicker";
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -34,25 +35,40 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
   const [linkAuto, setLinkAuto] = useState(!(editing && (event.location_url || "").trim()));
   const lastGeo = useRef("");
   const rawQuery = useRef(""); // exactly what the member typed (for the Google fallback)
+  const sessionToken = useRef(null); // Google Places session token (billing), renewed after each pick
 
   useEffect(() => setMounted(true), []);
+  useEffect(() => { newSessionToken().then((tk) => { sessionToken.current = tk; }); }, []);
 
   const fillLink = (text) => setF((prev) => (linkAuto || !prev.location_url.trim()) ? { ...prev, location_url: mapsSearchUrl(text) } : prev);
 
   // Apply a chosen place: drop the pin (which turns the weather on, here and in
   // the calendar), snap the Sted text to the tidy label, and auto-fill the
-  // Google Maps link (unless the member set their own).
+  // Google Maps link (unless the member set their own). `url` overrides the link
+  // with the exact Google Maps place link (Google results provide one).
   const apply = (hit) => {
     setPin({ lat: hit.lat, lng: hit.lng });
     setF((prev) => {
       const next = { ...prev, location: hit.label };
-      if (linkAuto || !prev.location_url.trim()) next.location_url = mapsSearchUrl(hit.label);
+      if (linkAuto || !prev.location_url.trim()) next.location_url = hit.url || mapsSearchUrl(hit.label);
       return next;
     });
     setLinkAuto(true);
     setSuggests([]);
     setGeo("found");
     lastGeo.current = hit.label.trim();
+  };
+
+  // Pick a suggestion. Google predictions need one Place Details call to resolve
+  // coords/address/link; OSM hits already carry them. Any Google failure falls
+  // back to a plain Google Maps search link so the member is never stuck.
+  const pick = async (s) => {
+    if (!s.prediction) { apply(s); return; }
+    setGeo("searching");
+    const place = await resolvePlace(s.prediction);
+    newSessionToken().then((tk) => { sessionToken.current = tk; }); // the pick closed the session
+    if (place) apply(place);
+    else useGoogleSearch();
   };
 
   // Anchor to the town: the exact place isn't in OSM (e.g. no ILVA in Vejle), so
@@ -95,6 +111,9 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
     setNearTown(null);
     setNearCenter(null);
     setGeo("searching");
+    // Google Places first (has businesses like "Ilva Vejle"); null → OSM fallback.
+    const g = await googleAutocomplete(q, sessionToken.current);
+    if (g && g.length) { setSuggests(g); setGeo("ambiguous"); return; }
     const { hits, near, center } = await geocode(q);
     if (!hits.length && !center) { fillLink(q); setLinkAuto(true); setGeo("notfound"); return; }
     // "Brand near town" always lets the member pick the town or the right store.
@@ -179,7 +198,7 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
                     <span className="mf-suggests-head">{t("meet.geoPick")}</span>
                   )}
                   {suggests.map((s, i) => (
-                    <button type="button" key={i} className="mf-suggest" onClick={() => apply(s)}>
+                    <button type="button" key={i} className="mf-suggest" onClick={() => pick(s)}>
                       📍 {s.label}{s.dist != null && <span className="mf-suggest-dist"> · ~{s.dist} km</span>}
                     </button>
                   ))}
