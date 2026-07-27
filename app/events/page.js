@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
 import { yrUrl } from "../lib/weather";
+import { directionsUrl } from "../lib/geo";
 import { useT } from "../lib/i18n";
 import MeetForm from "../components/MeetForm";
 import MeetWeather from "../components/MeetWeather";
@@ -168,6 +169,11 @@ export default function EventsPage() {
                     <p className="event-where">📍 {ev.location_url
                       ? <a href={ev.location_url} target="_blank" rel="noopener noreferrer" className="c-link">{ev.location}</a>
                       : ev.location}</p>
+                  )}
+                  {directionsUrl(ev.lat, ev.lng, ev.location) && (
+                    <a className="md-dir" href={directionsUrl(ev.lat, ev.lng, ev.location)} target="_blank" rel="noopener noreferrer">
+                      🧭 {t("meet.directions")}
+                    </a>
                   )}
                   {ev.description && <p className="event-desc">{ev.description}</p>}
 

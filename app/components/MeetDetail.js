@@ -11,6 +11,7 @@ import MeetMap from "./MeetMap";
 import MeetForm from "./MeetForm";
 import MeetWeather from "./MeetWeather";
 import { yrUrl } from "../lib/weather";
+import { directionsUrl } from "../lib/geo";
 import { useT } from "../lib/i18n";
 
 const STATUS = [
@@ -162,6 +163,11 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
           <p className="md-where">📍 {event.location_url
             ? <a href={event.location_url} target="_blank" rel="noopener noreferrer" className="c-link">{event.location}</a>
             : event.location}</p>
+        )}
+        {directionsUrl(event.lat, event.lng, event.location) && (
+          <a className="md-dir" href={directionsUrl(event.lat, event.lng, event.location)} target="_blank" rel="noopener noreferrer">
+            🧭 {t("meet.directions")}
+          </a>
         )}
         {event.description && <p className="md-desc">{event.description}</p>}
 

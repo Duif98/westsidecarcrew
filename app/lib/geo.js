@@ -90,6 +90,15 @@ export function mapsSearchUrl(text) {
   return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent((text || "").trim());
 }
 
+// Google Maps *directions* link (free Maps URL — no API key/quota). Opens the
+// Maps app/site with a route from the user's current location to the meet.
+// Uses coords when we have them, else the location text.
+export function directionsUrl(lat, lng, fallbackText) {
+  const dest = typeof lat === "number" && typeof lng === "number" ? `${lat},${lng}` : (fallbackText || "").trim();
+  if (!dest) return null;
+  return "https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=" + encodeURIComponent(dest);
+}
+
 // Distance in km between two lat/lng points (haversine).
 function havKm(a, b, c, d) {
   const R = 6371, r = Math.PI / 180;
