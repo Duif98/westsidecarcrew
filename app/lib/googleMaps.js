@@ -17,24 +17,44 @@ async function fetchKey() {
   }
 }
 
-// Load the Maps JS API + Places library once. Returns the places library, or
-// null if there's no key (anon / not stored) or loading fails.
+// Install Google's dynamic-library bootstrap: defines google.maps.importLibrary,
+// which lazily loads the JS API with a callback (a plain <script loading=async>
+// injection does NOT expose importLibrary — verified). Clean rewrite of Google's
+// official inline loader snippet.
+function installBootstrap(key) {
+  const g = window.google || (window.google = {});
+  const maps = g.maps || (g.maps = {});
+  if (maps.importLibrary) return;
+  let scriptPromise = null;
+  const libs = new Set();
+  const startLoad = () => {
+    if (scriptPromise) return scriptPromise;
+    scriptPromise = new Promise((resolve, reject) => {
+      const params = new URLSearchParams();
+      params.set("key", key);
+      params.set("v", "weekly");
+      params.set("libraries", [...libs].join(","));
+      params.set("callback", "google.maps.__ib__");
+      maps.__ib__ = resolve;
+      const s = document.createElement("script");
+      s.src = "https://maps.googleapis.com/maps/api/js?" + params.toString();
+      s.onerror = () => reject(new Error("google maps failed to load"));
+      document.head.appendChild(s);
+    });
+    return scriptPromise;
+  };
+  maps.importLibrary = (name) => { libs.add(name); return startLoad().then(() => maps.importLibrary(name)); };
+}
+
+// Load the Places library once. Returns it, or null if there's no key (anon /
+// not stored) or loading fails.
 export function loadPlaces() {
   if (mapsPromise) return mapsPromise;
   mapsPromise = (async () => {
     if (typeof window === "undefined") return null;
     const key = await fetchKey();
     if (!key) return null;
-    if (!window.google?.maps) {
-      await new Promise((resolve, reject) => {
-        const s = document.createElement("script");
-        s.src = "https://maps.googleapis.com/maps/api/js?key=" + encodeURIComponent(key) + "&v=weekly&libraries=places&loading=async";
-        s.async = true;
-        s.onload = resolve;
-        s.onerror = () => reject(new Error("google maps failed to load"));
-        document.head.appendChild(s);
-      });
-    }
+    if (!window.google?.maps?.importLibrary) installBootstrap(key);
     return await window.google.maps.importLibrary("places");
   })().catch(() => null);
   return mapsPromise;
