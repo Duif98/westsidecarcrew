@@ -50,10 +50,11 @@ begin
 end;
 $$;
 
--- Lock down: only logged-in members may read/bump the counter. Functions default
--- to PUBLIC execute, which would let anon inflate the count and disable Google
--- search for the month. Revoke that, then grant only to members.
-revoke execute on function public.google_usage_count() from public;
-revoke execute on function public.bump_google_usage(int) from public;
+-- Lock down: only logged-in members may read/bump the counter. Supabase grants
+-- execute to the `anon` role by default (not just PUBLIC), which would let anon
+-- inflate the count and disable Google search for the month. Revoke from both
+-- anon and public, then grant only to members.
+revoke execute on function public.google_usage_count() from public, anon;
+revoke execute on function public.bump_google_usage(int) from public, anon;
 grant execute on function public.google_usage_count() to authenticated;
 grant execute on function public.bump_google_usage(int) to authenticated;
