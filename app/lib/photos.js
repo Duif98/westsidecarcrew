@@ -1,7 +1,11 @@
 import { supabase, PUBLIC_BUCKET, PRIVATE_BUCKET } from "./supabaseClient";
 
 // Upload a file to the right bucket and record it in the photos table.
-export async function uploadPhoto({ file, isPublic, car, caption, userId, albumId, eventId }) {
+// `userId` is always the actual uploader (used for the storage folder, which RLS
+// ties to auth.uid()). `ownerId` lets an admin attribute the row to another
+// member (their car showcase); it defaults to the uploader. `approved` lets an
+// admin publish straight away.
+export async function uploadPhoto({ file, isPublic, car, caption, userId, albumId, eventId, ownerId, approved = false }) {
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
   const bucket = isPublic ? PUBLIC_BUCKET : PRIVATE_BUCKET;
   const path = `${userId}/${crypto.randomUUID()}.${ext}`;
@@ -14,11 +18,11 @@ export async function uploadPhoto({ file, isPublic, car, caption, userId, albumI
   if (up.error) throw new Error("Upload fejlede: " + up.error.message);
 
   const { data, error } = await supabase.from("photos").insert({
-    user_id: userId,
+    user_id: ownerId || userId,
     bucket,
     path,
     visibility: isPublic ? "public" : "private",
-    approved: false,
+    approved: !!approved,
     car: car?.trim() || null,
     caption: caption?.trim() || null,
     album_id: albumId || null,

@@ -1301,7 +1301,7 @@ a.btn-gold { text-decoration: none; }
 
 /* ---------- Admin: car manager (assign + VIN) ---------- */
 .cm-list { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1rem; }
-.cm-row { display: grid; grid-template-columns: 1.3fr 1fr 1.2fr; gap: 0.9rem; align-items: end; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 0.9rem 1rem; }
+.cm-row { display: grid; grid-template-columns: 1.3fr 1fr 1.1fr 1.1fr; gap: 0.9rem; align-items: end; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 0.9rem 1rem; }
 .cm-car { display: flex; flex-direction: column; gap: 0.2rem; }
 .cm-car b { font-size: 1rem; font-weight: 500; }
 .cm-sub { color: var(--faint); font-family: var(--font-mono), monospace; font-size: 0.68rem; }
@@ -1312,6 +1312,9 @@ a.btn-gold { text-decoration: none; }
 .cm-vin { display: flex; gap: 0.4rem; }
 .cm-vin input { font-family: var(--font-mono), monospace; letter-spacing: 0.05em; }
 .cm-vin .ph-btn { flex: none; width: auto; padding: 0.5rem 0.8rem; }
+.cm-upload { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.cm-upload .ph-btn { flex: none; width: auto; padding: 0.5rem 0.8rem; white-space: nowrap; }
+.cm-upmsg { font-family: var(--font-mono), monospace; font-size: 0.72rem; color: var(--gold); }
 @media (max-width: 640px) { .cm-row { grid-template-columns: 1fr; gap: 0.6rem; } }
 
 /* ---------- Profile: own-car info editor ---------- */
