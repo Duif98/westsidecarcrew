@@ -95,6 +95,8 @@ export default function PhotoLightbox({ photos, index, onClose, userId, canLike,
           <Comments
             key={p.id}
             photoId={p.id}
+            photoOwnerId={p.user_id}
+            photoLabel={p.car}
             onNeedLogin={onNeedLogin}
             onCountChange={(c) => setCounts((prev) => ({ ...prev, [p.id]: c }))}
           />

@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { toggleLike } from "../lib/photos";
+import { notifyUser } from "../lib/pwa";
+import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
 
 export default function LikeButton({ photo, userId, canLike, onNeedLogin }) {
   const { t } = useT();
+  const { profile } = useAuth();
   const [liked, setLiked] = useState(!!photo.likedByMe);
   const [count, setCount] = useState(photo.likeCount || 0);
   const [busy, setBusy] = useState(false);
@@ -19,6 +22,15 @@ export default function LikeButton({ photo, userId, canLike, onNeedLogin }) {
     setLiked(next); setCount((c) => c + (next ? 1 : -1)); // optimistic
     try {
       await toggleLike(photo.id, userId, liked);
+      // Tell the owner when someone else likes their photo (not on unlike / own photo).
+      if (next && photo.user_id && photo.user_id !== userId) {
+        notifyUser(photo.user_id, {
+          title: "❤️ Ny like",
+          body: `@${profile?.username || "Et medlem"} kan lide dit billede${photo.car ? " · " + photo.car : ""}`,
+          url: "/",
+          tag: "like-" + photo.id,
+        });
+      }
     } catch {
       setLiked(!next); setCount((c) => c + (next ? -1 : 1)); // revert
     } finally {

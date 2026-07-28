@@ -3,11 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
+import { notifyUser } from "../lib/pwa";
 import { useT } from "../lib/i18n";
 
 // Comment thread for a single photo. Reads for everyone, posting for members.
 // Fail-safe: if the comments table isn't set up yet it just shows nothing broken.
-export default function Comments({ photoId, onCountChange, onNeedLogin }) {
+export default function Comments({ photoId, photoOwnerId, photoLabel, onCountChange, onNeedLogin }) {
   const { user, profile, isAdmin } = useAuth();
   const { t, locale } = useT();
   const time = (ts) => new Date(ts).toLocaleString(locale, { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
@@ -94,6 +95,15 @@ export default function Comments({ photoId, onCountChange, onNeedLogin }) {
     }
     mapRef.current[user.id] = data.profiles?.username;
     setItems((prev) => prev.map((x) => (x.id === optimistic.id ? data : x)));
+    // Notify the photo owner about the comment (not on your own photo).
+    if (photoOwnerId && photoOwnerId !== user.id) {
+      notifyUser(photoOwnerId, {
+        title: "💬 Ny kommentar",
+        body: `@${profile?.username || "Et medlem"} kommenterede dit billede${photoLabel ? " · " + photoLabel : ""}`,
+        url: "/",
+        tag: "comment-" + photoId,
+      });
+    }
   };
 
   const remove = async (c) => {

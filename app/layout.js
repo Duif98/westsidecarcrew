@@ -4,6 +4,7 @@ import AuthProvider from "./lib/AuthProvider";
 import NavMenu from "./components/NavMenu";
 import LangSwitcher from "./components/LangSwitcher";
 import { PwaProvider } from "./components/PwaProvider";
+import { PresenceProvider } from "./components/PresenceProvider";
 import PushPrompt from "./components/PushPrompt";
 import AppleSplash from "./components/AppleSplash";
 import { I18nProvider } from "./lib/i18n";
@@ -95,12 +96,14 @@ export default function RootLayout({ children }) {
         />
         <I18nProvider>
           <AuthProvider>
-            <PwaProvider>
-              {children}
-              <NavMenu />
-              <LangSwitcher />
-              <PushPrompt />
-            </PwaProvider>
+            <PresenceProvider>
+              <PwaProvider>
+                {children}
+                <NavMenu />
+                <LangSwitcher />
+                <PushPrompt />
+              </PwaProvider>
+            </PresenceProvider>
           </AuthProvider>
         </I18nProvider>
       </body>

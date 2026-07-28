@@ -24,11 +24,15 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   try {
-    const { title, body, url, tag } = await req.json();
+    const { title, body, url, tag, userIds } = await req.json();
     if (!title) return json({ error: "title required" }, 400);
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
-    const { data: subs } = await admin.from("push_subscriptions").select("endpoint, p256dh, auth");
+    // Optional: target specific members (e.g. "someone liked your photo").
+    // Omit userIds to broadcast to the whole crew (new meet / news).
+    let q = admin.from("push_subscriptions").select("endpoint, p256dh, auth");
+    if (Array.isArray(userIds) && userIds.length) q = q.in("user_id", userIds);
+    const { data: subs } = await q;
     const payload = JSON.stringify({ title, body: body || "", url: url || "/", tag: tag || "wscc" });
 
     const results = await Promise.allSettled(

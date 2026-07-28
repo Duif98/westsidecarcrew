@@ -13,6 +13,7 @@ import MeetWeather from "./MeetWeather";
 import { yrUrl } from "../lib/weather";
 import { directionsUrl } from "../lib/geo";
 import { downloadICS } from "../lib/ics";
+import MeetComments from "./MeetComments";
 import Linkify from "./Linkify";
 import { useT } from "../lib/i18n";
 
@@ -283,6 +284,8 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
             </div>
           )}
         </div>
+
+        <MeetComments eventId={event.id} onNeedLogin={() => { window.location.href = "/login"; }} />
       </div>
 
       {lb && <PhotoLightbox photos={photos} index={lb.index} onClose={() => setLb(null)} userId={user?.id} canLike={!!session} onNeedLogin={() => { window.location.href = "/login"; }} />}

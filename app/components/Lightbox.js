@@ -10,6 +10,7 @@ export default function Lightbox({ items, title, subtitle, startIndex = 0, onClo
   const { t } = useT();
   const [i, setI] = useState(startIndex);
   const [mounted, setMounted] = useState(false);
+  const [playing, setPlaying] = useState(false);
   const closeRef = useRef(null);
   const thumbsRef = useRef(null);
   const touchX = useRef(null);
@@ -37,6 +38,13 @@ export default function Lightbox({ items, title, subtitle, startIndex = 0, onClo
     active?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
   }, [i]);
 
+  // Slideshow: auto-advance every 4s while playing (needs at least 2 photos).
+  useEffect(() => {
+    if (!playing || n < 2) return;
+    const id = setInterval(() => setI((p) => (p + 1) % n), 4000);
+    return () => clearInterval(id);
+  }, [playing, n]);
+
   const neighbours = useMemo(() => {
     if (n < 2) return [];
     return [items[(i + 1) % n], items[(i - 1 + n) % n]];
@@ -61,6 +69,13 @@ export default function Lightbox({ items, title, subtitle, startIndex = 0, onClo
           {subtitle && <div className="meta">{subtitle}</div>}
         </div>
         <div className="lb-top-actions">
+          {n > 1 && (
+            <button className={`lb-play${playing ? " on" : ""}`} onClick={() => setPlaying((p) => !p)} aria-pressed={playing} aria-label={playing ? t("lightbox.pause") : t("lightbox.play")} title={playing ? t("lightbox.pause") : t("lightbox.play")}>
+              {playing
+                ? <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+                : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5l12 7-12 7z" /></svg>}
+            </button>
+          )}
           <button ref={closeRef} className="lb-close" onClick={onClose} aria-label={t("lightbox.close")}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
               <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />

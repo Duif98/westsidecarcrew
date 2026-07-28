@@ -94,6 +94,16 @@ export async function notifyCrew({ title, body, url, tag }) {
   }
 }
 
+// Notify a single member (e.g. someone liked/commented their photo). Fail-soft.
+export async function notifyUser(userId, { title, body, url, tag }) {
+  if (!userId) return;
+  try {
+    await supabase.functions.invoke(PUSH_FN, { body: { title, body, url, tag, userIds: [userId] } });
+  } catch {
+    /* ignore */
+  }
+}
+
 export async function unsubscribePush() {
   if (!pushSupported()) return false;
   const reg = await navigator.serviceWorker.ready.catch(() => null);

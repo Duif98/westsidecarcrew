@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../lib/AuthProvider";
 import { useUnread } from "../lib/useUnread";
+import { usePresence } from "../components/PresenceProvider";
 
 export default function MedlemHub() {
   const router = useRouter();
   const { session, user, profile, loading, isAdmin, signOut } = useAuth();
   const unread = useUnread(session, user?.id);
+  const { online } = usePresence();
 
   useEffect(() => { if (!loading && !session) router.replace("/login"); }, [loading, session, router]);
 
@@ -31,6 +33,16 @@ export default function MedlemHub() {
       <div className="wrap hub-body">
         <span className="overline">Medlem</span>
         <h1 className="hub-title">Hej @{profile?.username} 👋<br />Hvad vil du?</h1>
+
+        {online.length > 0 && (
+          <div className="hub-online">
+            <span className="online-dot" />
+            <span className="hub-online-count">{online.length} online nu</span>
+            <span className="hub-online-names">
+              {online.map((m) => `@${m.username}${m.id === user?.id ? " (dig)" : ""}`).join(" · ")}
+            </span>
+          </div>
+        )}
 
         <div className="hub-grid">
           <Link href="/chat" className="hub-card chat">
@@ -87,6 +99,15 @@ export default function MedlemHub() {
             <span className="hub-card-title">Dashboard</span>
             <span className="hub-card-sub">Crewet i tal — biler, hestekræfter, mærker og meets</span>
             <span className="hub-go">Se tallene →</span>
+          </Link>
+
+          <Link href="/mine-meets" className="hub-card events">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3" /><path d="m9 14 2 2 4-4" /></svg>
+            </span>
+            <span className="hub-card-title">Mine meets</span>
+            <span className="hub-card-sub">De meets du har sagt ja til, samlet ét sted</span>
+            <span className="hub-go">Se dine meets →</span>
           </Link>
         </div>
       </div>

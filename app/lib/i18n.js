@@ -29,7 +29,7 @@ const M = {
       crew: "Crewet", garage: "Garagen", members: "Medlemmer", meets: "Meets",
       calendar: "Kalender", map: "Kort", instagram: "Instagram",
       myProfile: "Min profil", login: "Log ind", crewChat: "Crew chat",
-      uploadPhotos: "Upload billeder", leaderboard: "Leaderboard", parts: "Reservedelskatalog", dashboard: "Dashboard", admin: "Admin",
+      uploadPhotos: "Upload billeder", leaderboard: "Leaderboard", parts: "Reservedelskatalog", dashboard: "Dashboard", myMeets: "Mine meets", admin: "Admin",
       logout: "Log ud", viewProfile: "Se din profil", joinCrew: "Bliv en del af crewet",
       openMenu: "Åbn menu", closeMenu: "Luk menu", toTop: "West Side Car Crew — til toppen",
       settings: "Indstillinger", themeLight: "Lyst tema", themeDark: "Mørkt tema",
@@ -129,6 +129,7 @@ const M = {
     meet: {
       tag: "Meet", close: "Luk", edit: "✎ Rediger", delete: "Slet", confirmDelete: "Slet dette meet?",
       createdBy: "Oprettet af {name}",
+      discussion: "Diskussion",
       whoComing: "Hvem kommer", noneComing: "Ingen tilmeldte endnu.",
       comingLabel: "✅ Kommer:", maybeLabel: "🤔 Måske:",
       yrLink: "Se timevejr for dagen på yr.no",
@@ -189,6 +190,7 @@ const M = {
     lightbox: {
       gallery: "{title} galleri", profile: "Profil", profileAria: "Bil-profil & byggetråd",
       close: "Luk galleri", prev: "Forrige", next: "Næste", goTo: "Gå til billede {n}",
+      play: "Start diasshow", pause: "Stop diasshow",
     },
     photo: {
       close: "Luk", prev: "Forrige", next: "Næste", untitled: "Uden titel",
@@ -208,6 +210,18 @@ const M = {
       heavysnow: "Kraftig sne", thunder: "Torden", unknown: "—",
     },
     common: { member: "Medlem", loginShort: "Log ind", back: "‹ Medlem", meetsList: "Meets-liste" },
+    mine: {
+      overline: "Mine meets", title: "Meets jeg kommer til",
+      intro: "De kommende meets du har sagt ja eller måske til.",
+      loading: "Indlæser…", empty: "Du har ikke tilmeldt dig nogen kommende meets endnu.",
+      emptyLink: "Se alle meets →",
+    },
+    settings: {
+      overline: "Konto", theme: "Tema", dark: "Mørkt", light: "Lyst",
+      notifications: "Notifikationer",
+      notifHint: "Få push når der er et nyt meet, en nyhed eller en påmindelse.",
+      language: "Sprog", app: "App", account: "Konto", myProfile: "Min profil",
+    },
     pushPrompt: {
       title: "Få besked om nye meets 🔔",
       body: "Slå notifikationer til, så ved du det med det samme, når der er et nyt meet eller opslag.",
@@ -221,7 +235,7 @@ const M = {
       crew: "The Crew", garage: "The Garage", members: "Members", meets: "Meets",
       calendar: "Calendar", map: "Map", instagram: "Instagram",
       myProfile: "My profile", login: "Log in", crewChat: "Crew chat",
-      uploadPhotos: "Upload photos", leaderboard: "Leaderboard", parts: "Parts catalog", dashboard: "Dashboard", admin: "Admin",
+      uploadPhotos: "Upload photos", leaderboard: "Leaderboard", parts: "Parts catalog", dashboard: "Dashboard", myMeets: "My meets", admin: "Admin",
       logout: "Log out", viewProfile: "View your profile", joinCrew: "Join the crew",
       openMenu: "Open menu", closeMenu: "Close menu", toTop: "West Side Car Crew — to top",
       settings: "Settings", themeLight: "Light theme", themeDark: "Dark theme",
@@ -321,6 +335,7 @@ const M = {
     meet: {
       tag: "Meet", close: "Close", edit: "✎ Edit", delete: "Delete", confirmDelete: "Delete this meet?",
       createdBy: "Created by {name}",
+      discussion: "Discussion",
       whoComing: "Who’s coming", noneComing: "No RSVPs yet.",
       comingLabel: "✅ Coming:", maybeLabel: "🤔 Maybe:",
       yrLink: "See the hourly forecast on yr.no",
@@ -380,6 +395,7 @@ const M = {
     lightbox: {
       gallery: "{title} gallery", profile: "Profile", profileAria: "Car profile & build thread",
       close: "Close gallery", prev: "Previous", next: "Next", goTo: "Go to image {n}",
+      play: "Start slideshow", pause: "Stop slideshow",
     },
     photo: {
       close: "Close", prev: "Previous", next: "Next", untitled: "Untitled",
@@ -399,6 +415,18 @@ const M = {
       heavysnow: "Heavy snow", thunder: "Thunder", unknown: "—",
     },
     common: { member: "Member", loginShort: "Log in", back: "‹ Member", meetsList: "Meets list" },
+    mine: {
+      overline: "My meets", title: "Meets I'm attending",
+      intro: "The upcoming meets you've said yes or maybe to.",
+      loading: "Loading…", empty: "You haven't RSVP'd to any upcoming meets yet.",
+      emptyLink: "See all meets →",
+    },
+    settings: {
+      overline: "Account", theme: "Theme", dark: "Dark", light: "Light",
+      notifications: "Notifications",
+      notifHint: "Get a push when there's a new meet, post or reminder.",
+      language: "Language", app: "App", account: "Account", myProfile: "My profile",
+    },
     pushPrompt: {
       title: "Get notified about new meets 🔔",
       body: "Turn on notifications so you know the moment there's a new meet or post.",
@@ -412,7 +440,7 @@ const M = {
       crew: "Die Crew", garage: "Die Garage", members: "Mitglieder", meets: "Meets",
       calendar: "Kalender", map: "Karte", instagram: "Instagram",
       myProfile: "Mein Profil", login: "Anmelden", crewChat: "Crew-Chat",
-      uploadPhotos: "Fotos hochladen", leaderboard: "Bestenliste", parts: "Ersatzteilkatalog", dashboard: "Dashboard", admin: "Admin",
+      uploadPhotos: "Fotos hochladen", leaderboard: "Bestenliste", parts: "Ersatzteilkatalog", dashboard: "Dashboard", myMeets: "Meine Meets", admin: "Admin",
       logout: "Abmelden", viewProfile: "Dein Profil ansehen", joinCrew: "Teil der Crew werden",
       openMenu: "Menü öffnen", closeMenu: "Menü schließen", toTop: "West Side Car Crew — nach oben",
       settings: "Einstellungen", themeLight: "Helles Design", themeDark: "Dunkles Design",
@@ -512,6 +540,7 @@ const M = {
     meet: {
       tag: "Meet", close: "Schließen", edit: "✎ Bearbeiten", delete: "Löschen", confirmDelete: "Dieses Meet löschen?",
       createdBy: "Erstellt von {name}",
+      discussion: "Diskussion",
       whoComing: "Wer kommt", noneComing: "Noch keine Zusagen.",
       comingLabel: "✅ Kommt:", maybeLabel: "🤔 Vielleicht:",
       yrLink: "Stündliche Vorhersage auf yr.no ansehen",
@@ -571,6 +600,7 @@ const M = {
     lightbox: {
       gallery: "{title} Galerie", profile: "Profil", profileAria: "Auto-Profil & Build-Thread",
       close: "Galerie schließen", prev: "Zurück", next: "Weiter", goTo: "Zu Bild {n} gehen",
+      play: "Diashow starten", pause: "Diashow stoppen",
     },
     photo: {
       close: "Schließen", prev: "Zurück", next: "Weiter", untitled: "Ohne Titel",
@@ -590,6 +620,18 @@ const M = {
       heavysnow: "Starker Schneefall", thunder: "Gewitter", unknown: "—",
     },
     common: { member: "Mitglied", loginShort: "Anmelden", back: "‹ Mitglied", meetsList: "Meets-Liste" },
+    mine: {
+      overline: "Meine Meets", title: "Meets, zu denen ich komme",
+      intro: "Die kommenden Meets, zu denen du ja oder vielleicht gesagt hast.",
+      loading: "Wird geladen…", empty: "Du hast noch für kein kommendes Meet zugesagt.",
+      emptyLink: "Alle Meets ansehen →",
+    },
+    settings: {
+      overline: "Konto", theme: "Design", dark: "Dunkel", light: "Hell",
+      notifications: "Benachrichtigungen",
+      notifHint: "Erhalte eine Push bei einem neuen Meet, Beitrag oder einer Erinnerung.",
+      language: "Sprache", app: "App", account: "Konto", myProfile: "Mein Profil",
+    },
     pushPrompt: {
       title: "Erfahre von neuen Meets 🔔",
       body: "Aktiviere Benachrichtigungen, dann weißt du sofort Bescheid bei einem neuen Meet oder Beitrag.",
