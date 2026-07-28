@@ -37,8 +37,8 @@ export default function Manualer() {
   if (loading || !session) return <main className="member"><div className="wrap" style={{ paddingTop: 120 }}>Indlæser…</div></main>;
 
   const countFor = (albumId) => docs.filter((d) => d.album_id === albumId).length;
-  // Members see cars that have docs; admins see every car (to upload).
-  const cars = albums.filter((a) => isAdmin || countFor(a.id) > 0);
+  // Every member can add docs, so show every car.
+  const cars = albums;
   const selDocs = selected ? docs.filter((d) => d.album_id === selected.id) : [];
 
   const open = async (doc) => {
@@ -99,9 +99,9 @@ export default function Manualer() {
         {!selected ? (
           <>
             <h1 className="pk-title">Bil-manualer</h1>
-            <p className="pk-intro">Service- og ejermanualer m.m. pr. bil. Vælg en bil for at hente dokumenterne.{isAdmin ? " Som admin kan du uploade nye." : ""}</p>
+            <p className="pk-intro">Service- og ejermanualer m.m. pr. bil. Vælg en bil for at hente dokumenterne — eller for at lægge en fil eller et link op til enhver bil.</p>
             {cars.length === 0 ? (
-              <p className="pk-empty">Der er ingen manualer endnu.{isAdmin ? " Vælg en bil og upload den første." : " Bed en admin om at lægge nogle op."}</p>
+              <p className="pk-empty">Der er ingen biler endnu.</p>
             ) : (
               <div className="pk-grid">
                 {cars.map((c) => {
@@ -114,7 +114,7 @@ export default function Manualer() {
                         {c.owner_name && n ? <span className="pk-sep" /> : null}
                         <span>{n ? `${n} dokument${n === 1 ? "" : "er"}` : "Ingen endnu"}</span>
                       </span>
-                      <span className="pk-go">{n ? "Åbn →" : (isAdmin ? "Upload →" : "—")}</span>
+                      <span className="pk-go">{n ? "Åbn →" : "Tilføj →"}</span>
                     </button>
                   );
                 })}
@@ -137,12 +137,12 @@ export default function Manualer() {
                     <span className="doc-title">{d.title}</span>
                     <span className="doc-sub">{[d.doc_type, d.link_url ? "Link" : d.file_name].filter(Boolean).join(" · ")}</span>
                   </button>
-                  {isAdmin && <button className="ph-btn del" style={{ flex: "none", width: "auto", padding: "0.35rem 0.7rem" }} onClick={() => remove(d)}>Slet</button>}
+                  {(isAdmin || d.uploaded_by === user.id) && <button className="ph-btn del" style={{ flex: "none", width: "auto", padding: "0.35rem 0.7rem" }} onClick={() => remove(d)}>Slet</button>}
                 </div>
               ))}
             </div>
 
-            {isAdmin && (
+            {session && (
               <div className="doc-upload">
                 <span className="cp-label">Tilføj dokument</span>
                 <div className="set-seg" style={{ marginTop: "0.6rem" }}>
