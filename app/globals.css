@@ -1484,6 +1484,10 @@ a.btn-gold { text-decoration: none; }
 
 /* ---------- Calendar ---------- */
 .cal-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }
+.cal-subscribe-row { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin: 0.6rem 0 0.2rem; }
+.cal-subscribe { display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-mono), monospace; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold-bright); background: rgba(201,168,119,0.12); border: 1px solid var(--gold-deep); border-radius: 999px; padding: 0.5rem 0.9rem; transition: background 0.2s, border-color 0.2s; }
+.cal-subscribe:hover { background: rgba(201,168,119,0.2); border-color: var(--gold); }
+.cal-subscribe-hint { color: var(--muted); font-size: 0.82rem; }
 .cal-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin: 0.4rem 0 1.4rem; flex-wrap: wrap; }
 .cal-nav { display: flex; align-items: center; gap: 0.5rem; }
 .cal-arrow { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--text); font-size: 1.4rem; line-height: 1; cursor: pointer; transition: background 0.2s, border-color 0.2s; }

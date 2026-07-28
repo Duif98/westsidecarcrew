@@ -89,6 +89,8 @@ const M = {
     calendar: {
       overline: "Kalender", today: "I dag", prevMonth: "Forrige måned", nextMonth: "Næste måned",
       newMeet: "+ Nyt meet", hint: "Tip: klik på en dag for at planlægge et meet den dato.",
+      subscribe: "Abonnér på kalender",
+      subscribeHint: "Tilføj alle meets til din kalender — nye kommer automatisk.",
       planAria: "Planlæg meet den {day}.",
       emptyA: "Ingen meets i kalenderen endnu.",
       emptyMember: " Klik på en dag eller “+ Nyt meet” for at planlægge det første.",
@@ -278,6 +280,8 @@ const M = {
     calendar: {
       overline: "Calendar", today: "Today", prevMonth: "Previous month", nextMonth: "Next month",
       newMeet: "+ New meet", hint: "Tip: click a day to plan a meet on that date.",
+      subscribe: "Subscribe to calendar",
+      subscribeHint: "Add every meet to your calendar — new ones sync automatically.",
       planAria: "Plan a meet on the {day}.",
       emptyA: "No meets in the calendar yet.",
       emptyMember: " Click a day or “+ New meet” to plan the first one.",
@@ -466,6 +470,8 @@ const M = {
     calendar: {
       overline: "Kalender", today: "Heute", prevMonth: "Voriger Monat", nextMonth: "Nächster Monat",
       newMeet: "+ Neues Meet", hint: "Tipp: Klick auf einen Tag, um an dem Datum ein Meet zu planen.",
+      subscribe: "Kalender abonnieren",
+      subscribeHint: "Alle Meets in deinen Kalender — neue kommen automatisch dazu.",
       planAria: "Meet am {day}. planen.",
       emptyA: "Noch keine Meets im Kalender.",
       emptyMember: " Klick auf einen Tag oder „+ Neues Meet“, um das erste zu planen.",

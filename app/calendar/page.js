@@ -9,6 +9,7 @@ import MeetDetail from "../components/MeetDetail";
 import MeetForm from "../components/MeetForm";
 import WeatherIcon from "../components/WeatherIcon";
 import { fetchMeetWeather } from "../lib/weather";
+import { CALENDAR_FEED_WEBCAL } from "../lib/calfeed";
 
 const pad = (n) => String(n).padStart(2, "0");
 const dateKey = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
@@ -115,6 +116,10 @@ export default function CalendarPage() {
             <button className="cal-arrow" onClick={() => move(1)} aria-label={t("calendar.nextMonth")}>›</button>
             {session && <button className="btn-gold cal-new" onClick={() => setCreating({ date: "" })}>{t("calendar.newMeet")}</button>}
           </div>
+        </div>
+        <div className="cal-subscribe-row">
+          <a href={CALENDAR_FEED_WEBCAL} className="cal-subscribe">📅 {t("calendar.subscribe")}</a>
+          <span className="cal-subscribe-hint">{t("calendar.subscribeHint")}</span>
         </div>
         {session && <p className="cal-hint">{t("calendar.hint")}</p>}
 
