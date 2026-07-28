@@ -79,6 +79,15 @@ export default function MedlemHub() {
             <span className="hub-card-sub">Slå originale reservedele op til din bil via VIN</span>
             <span className="hub-go">Åbn katalog →</span>
           </Link>
+
+          <Link href="/dashboard" className="hub-card dash">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></svg>
+            </span>
+            <span className="hub-card-title">Dashboard</span>
+            <span className="hub-card-sub">Crewet i tal — biler, hestekræfter, mærker og meets</span>
+            <span className="hub-go">Se tallene →</span>
+          </Link>
         </div>
       </div>
     </main>

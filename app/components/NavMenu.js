@@ -74,6 +74,7 @@ export default function NavMenu() {
                 <Link href="/chat" className="nav-m-link" onClick={close}>{t("nav.crewChat")}</Link>
                 <Link href="/upload" className="nav-m-link" onClick={close}>{t("nav.uploadPhotos")}</Link>
                 <Link href="/reservedelskatalog" className="nav-m-link" onClick={close}>{t("nav.parts")}</Link>
+                <Link href="/dashboard" className="nav-m-link" onClick={close}>{t("nav.dashboard")}</Link>
                 <Link href="/leaderboard" className="nav-m-link" onClick={close}>{t("nav.leaderboard")}</Link>
                 {isAdmin && <Link href="/admin" className="nav-m-link" onClick={close}>{t("nav.admin")}</Link>}
               </>

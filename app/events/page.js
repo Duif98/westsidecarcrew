@@ -7,6 +7,7 @@ import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
 import { yrUrl } from "../lib/weather";
 import { directionsUrl } from "../lib/geo";
+import { downloadICS } from "../lib/ics";
 import Linkify from "../components/Linkify";
 import { useT } from "../lib/i18n";
 import MeetForm from "../components/MeetForm";
@@ -181,6 +182,9 @@ export default function EventsPage() {
                       🔗 {t("meet.openLink")}
                     </a>
                   )}
+                  <button type="button" className="md-dir md-cal" onClick={() => downloadICS(ev)}>
+                    📆 {t("meet.addToCal")}
+                  </button>
                   {ev.description && <p className="event-desc"><Linkify text={ev.description} /></p>}
 
                   <MeetWeather lat={ev.lat} lng={ev.lng} startsAt={ev.starts_at} />
