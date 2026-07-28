@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { useT } from "../lib/i18n";
 
 // Generic gallery lightbox. `items` is [{ full, thumb, alt }] with URLs already
@@ -69,6 +70,11 @@ export default function Lightbox({ items, title, subtitle, startIndex = 0, onClo
           {subtitle && <div className="meta">{subtitle}</div>}
         </div>
         <div className="lb-top-actions">
+          {album?.slug && (
+            <Link className="lb-share" href={`/bil/${album.slug}/`} aria-label={t("lightbox.openPage")} title={t("lightbox.openPage")}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /></svg>
+            </Link>
+          )}
           {n > 1 && (
             <button className={`lb-play${playing ? " on" : ""}`} onClick={() => setPlaying((p) => !p)} aria-pressed={playing} aria-label={playing ? t("lightbox.pause") : t("lightbox.play")} title={playing ? t("lightbox.pause") : t("lightbox.play")}>
               {playing

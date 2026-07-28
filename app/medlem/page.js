@@ -45,6 +45,15 @@ export default function MedlemHub() {
         )}
 
         <div className="hub-grid">
+          <Link href="/notifikationer" className="hub-card board">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
+            </span>
+            <span className="hub-card-title">Notifikationer</span>
+            <span className="hub-card-sub">Likes, kommentarer, nye meets og opslag — samlet</span>
+            <span className="hub-go">Åbn inbox →</span>
+          </Link>
+
           <Link href="/chat" className="hub-card chat">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a8 8 0 0 1-11.3 7.3L4 21l1.7-5.7A8 8 0 1 1 21 12z" /><path d="M8.5 12h.01M12 12h.01M15.5 12h.01" /></svg>
@@ -90,6 +99,15 @@ export default function MedlemHub() {
             <span className="hub-card-title">Reservedelskatalog</span>
             <span className="hub-card-sub">Slå originale reservedele op til din bil via VIN</span>
             <span className="hub-go">Åbn katalog →</span>
+          </Link>
+
+          <Link href="/manualer" className="hub-card parts">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h10l6 6v10a0 0 0 0 1 0 0H4z" /><path d="M14 4v6h6" /><path d="M8 14h8M8 17h5" /></svg>
+            </span>
+            <span className="hub-card-title">Manualer</span>
+            <span className="hub-card-sub">Service- og ejermanualer pr. bil til download</span>
+            <span className="hub-go">Åbn manualer →</span>
           </Link>
 
           <Link href="/dashboard" className="hub-card dash">

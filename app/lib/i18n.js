@@ -28,8 +28,8 @@ const M = {
     nav: {
       crew: "Crewet", garage: "Garagen", members: "Medlemmer", meets: "Meets",
       calendar: "Kalender", map: "Kort", instagram: "Instagram",
-      myProfile: "Min profil", login: "Log ind", crewChat: "Crew chat",
-      uploadPhotos: "Upload billeder", leaderboard: "Leaderboard", parts: "Reservedelskatalog", dashboard: "Dashboard", myMeets: "Mine meets", admin: "Admin",
+      myProfile: "Min profil", login: "Log ind", inbox: "Notifikationer", crewChat: "Crew chat",
+      uploadPhotos: "Upload billeder", leaderboard: "Leaderboard", parts: "Reservedelskatalog", manuals: "Manualer", dashboard: "Dashboard", myMeets: "Mine meets", admin: "Admin",
       logout: "Log ud", viewProfile: "Se din profil", joinCrew: "Bliv en del af crewet",
       openMenu: "Åbn menu", closeMenu: "Luk menu", toTop: "West Side Car Crew — til toppen",
       settings: "Indstillinger", themeLight: "Lyst tema", themeDark: "Mørkt tema",
@@ -190,7 +190,7 @@ const M = {
     lightbox: {
       gallery: "{title} galleri", profile: "Profil", profileAria: "Bil-profil & byggetråd",
       close: "Luk galleri", prev: "Forrige", next: "Næste", goTo: "Gå til billede {n}",
-      play: "Start diasshow", pause: "Stop diasshow",
+      play: "Start diasshow", pause: "Stop diasshow", openPage: "Åbn bilens side",
     },
     photo: {
       close: "Luk", prev: "Forrige", next: "Næste", untitled: "Uden titel",
@@ -234,8 +234,8 @@ const M = {
     nav: {
       crew: "The Crew", garage: "The Garage", members: "Members", meets: "Meets",
       calendar: "Calendar", map: "Map", instagram: "Instagram",
-      myProfile: "My profile", login: "Log in", crewChat: "Crew chat",
-      uploadPhotos: "Upload photos", leaderboard: "Leaderboard", parts: "Parts catalog", dashboard: "Dashboard", myMeets: "My meets", admin: "Admin",
+      myProfile: "My profile", login: "Log in", inbox: "Notifications", crewChat: "Crew chat",
+      uploadPhotos: "Upload photos", leaderboard: "Leaderboard", parts: "Parts catalog", manuals: "Manuals", dashboard: "Dashboard", myMeets: "My meets", admin: "Admin",
       logout: "Log out", viewProfile: "View your profile", joinCrew: "Join the crew",
       openMenu: "Open menu", closeMenu: "Close menu", toTop: "West Side Car Crew — to top",
       settings: "Settings", themeLight: "Light theme", themeDark: "Dark theme",
@@ -395,7 +395,7 @@ const M = {
     lightbox: {
       gallery: "{title} gallery", profile: "Profile", profileAria: "Car profile & build thread",
       close: "Close gallery", prev: "Previous", next: "Next", goTo: "Go to image {n}",
-      play: "Start slideshow", pause: "Stop slideshow",
+      play: "Start slideshow", pause: "Stop slideshow", openPage: "Open the car's page",
     },
     photo: {
       close: "Close", prev: "Previous", next: "Next", untitled: "Untitled",
@@ -439,8 +439,8 @@ const M = {
     nav: {
       crew: "Die Crew", garage: "Die Garage", members: "Mitglieder", meets: "Meets",
       calendar: "Kalender", map: "Karte", instagram: "Instagram",
-      myProfile: "Mein Profil", login: "Anmelden", crewChat: "Crew-Chat",
-      uploadPhotos: "Fotos hochladen", leaderboard: "Bestenliste", parts: "Ersatzteilkatalog", dashboard: "Dashboard", myMeets: "Meine Meets", admin: "Admin",
+      myProfile: "Mein Profil", login: "Anmelden", inbox: "Benachrichtigungen", crewChat: "Crew-Chat",
+      uploadPhotos: "Fotos hochladen", leaderboard: "Bestenliste", parts: "Ersatzteilkatalog", manuals: "Handbücher", dashboard: "Dashboard", myMeets: "Meine Meets", admin: "Admin",
       logout: "Abmelden", viewProfile: "Dein Profil ansehen", joinCrew: "Teil der Crew werden",
       openMenu: "Menü öffnen", closeMenu: "Menü schließen", toTop: "West Side Car Crew — nach oben",
       settings: "Einstellungen", themeLight: "Helles Design", themeDark: "Dunkles Design",
@@ -600,7 +600,7 @@ const M = {
     lightbox: {
       gallery: "{title} Galerie", profile: "Profil", profileAria: "Auto-Profil & Build-Thread",
       close: "Galerie schließen", prev: "Zurück", next: "Weiter", goTo: "Zu Bild {n} gehen",
-      play: "Diashow starten", pause: "Diashow stoppen",
+      play: "Diashow starten", pause: "Diashow stoppen", openPage: "Zur Auto-Seite",
     },
     photo: {
       close: "Schließen", prev: "Zurück", next: "Weiter", untitled: "Ohne Titel",

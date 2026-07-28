@@ -21,6 +21,13 @@ const memberSince = (t) => new Date(t).toLocaleDateString("da-DK", { month: "lon
 const carsBySlug = Object.fromEntries(cars.map((c) => [c.slug, c]));
 const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
+// Preset accent colours a member can pick for their profile.
+const ACCENTS = [
+  { name: "Guld", hex: "#c9a877" }, { name: "Rød", hex: "#d05c5c" }, { name: "Blå", hex: "#5c8bd0" },
+  { name: "Grøn", hex: "#4ec27a" }, { name: "Lilla", hex: "#b07cd0" }, { name: "Sølv", hex: "#b9c0c7" },
+  { name: "Orange", hex: "#e0913f" }, { name: "Pink", hex: "#e07ab0" },
+];
+
 function ProfileInner() {
   const params = useSearchParams();
   const username = params.get("u");
@@ -39,17 +46,20 @@ function ProfileInner() {
   const [gallery, setGallery] = useState(null);
   const [lb, setLb] = useState(null);
   const [editing, setEditing] = useState(false);
-  const [edit, setEdit] = useState({ bio: "", location: "" });
+  const [edit, setEdit] = useState({ bio: "", location: "", accent: "" });
   const [avatarFile, setAvatarFile] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
   const [cropSource, setCropSource] = useState(null);
   const [savingProfile, setSavingProfile] = useState(false);
   const avatarRef = useRef(null);
+  const coverRef = useRef(null);
 
   const me = !!user && profile?.id === user.id;
 
   const openEditor = () => {
-    setEdit({ bio: profile.bio || "", location: profile.location || "" });
+    setEdit({ bio: profile.bio || "", location: profile.location || "", accent: profile.accent_color || "" });
     setAvatarFile(null);
+    setCoverFile(null);
     setEditing(true);
   };
 
@@ -63,9 +73,17 @@ function ProfileInner() {
         const up = await supabase.storage.from(PUBLIC_BUCKET).upload(avatar_path, avatarFile, { cacheControl: "3600", contentType: avatarFile.type });
         if (up.error) throw up.error;
       }
-      const { error } = await supabase.rpc("update_my_profile", { p_bio: edit.bio, p_location: edit.location, p_avatar_path: avatar_path });
+      let cover_path = profile.cover_path || null;
+      if (coverFile) {
+        const ext = (coverFile.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+        cover_path = `${user.id}/cover/${crypto.randomUUID()}.${ext}`;
+        const up = await supabase.storage.from(PUBLIC_BUCKET).upload(cover_path, coverFile, { cacheControl: "3600", contentType: coverFile.type });
+        if (up.error) throw up.error;
+      }
+      const accent = edit.accent || null;
+      const { error } = await supabase.rpc("update_my_profile", { p_bio: edit.bio, p_location: edit.location, p_avatar_path: avatar_path, p_cover_path: cover_path, p_accent_color: accent });
       if (error) throw error;
-      setProfile((p) => ({ ...p, bio: edit.bio.trim() || null, location: edit.location.trim() || null, avatar_path }));
+      setProfile((p) => ({ ...p, bio: edit.bio.trim() || null, location: edit.location.trim() || null, avatar_path, cover_path, accent_color: accent }));
       setEditing(false);
       refreshProfile?.();
     } catch (err) {
@@ -164,9 +182,15 @@ function ProfileInner() {
     </div>
   );
 
+  const accentStyle = profile.accent_color
+    ? { "--gold": profile.accent_color, "--gold-bright": profile.accent_color, "--gold-deep": profile.accent_color }
+    : undefined;
+  const coverSrc = profile.cover_path ? avatarUrl(profile.cover_path) : null;
+
   return (
-    <div className="wrap profil-body">
-      <div className="profil-head">
+    <div className="wrap profil-body" style={accentStyle}>
+      {coverSrc && <div className="profil-cover"><img src={coverSrc} alt="" /></div>}
+      <div className={`profil-head${coverSrc ? " has-cover" : ""}`}>
         <div className="profil-avatar">
           {profile.avatar_path ? <img src={avatarUrl(profile.avatar_path)} alt={profile.username} /> : initials}
         </div>
@@ -194,6 +218,22 @@ function ProfileInner() {
             <div className="profil-avatar sm">{avatarFile ? <img src={URL.createObjectURL(avatarFile)} alt="" /> : (profile.avatar_path ? <img src={avatarUrl(profile.avatar_path)} alt="" /> : initials)}</div>
             <input ref={avatarRef} type="file" accept="image/*" hidden onChange={(e) => { const fl = e.target.files?.[0]; if (fl) setCropSource(fl); e.target.value = ""; }} />
             <button type="button" className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.45rem 0.9rem" }} onClick={() => avatarRef.current?.click()}>Skift profilbillede</button>
+          </div>
+          <div className="pe-cover-row">
+            {coverFile
+              ? <img className="pe-cover-preview" src={URL.createObjectURL(coverFile)} alt="" />
+              : (profile.cover_path ? <img className="pe-cover-preview" src={avatarUrl(profile.cover_path)} alt="" /> : <div className="pe-cover-preview empty">Intet cover</div>)}
+            <input ref={coverRef} type="file" accept="image/*" hidden onChange={(e) => { const fl = e.target.files?.[0]; if (fl) setCoverFile(fl); e.target.value = ""; }} />
+            <button type="button" className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.45rem 0.9rem" }} onClick={() => coverRef.current?.click()}>Skift cover-billede</button>
+          </div>
+          <div className="pe-accent">
+            <span className="pe-accent-label">Accent-farve</span>
+            <div className="pe-swatches">
+              {ACCENTS.map((a) => (
+                <button key={a.hex} type="button" className={`pe-swatch${edit.accent === a.hex ? " on" : ""}`} style={{ background: a.hex }} title={a.name} aria-label={a.name} onClick={() => setEdit({ ...edit, accent: a.hex })} />
+              ))}
+              <button type="button" className={`pe-swatch reset${!edit.accent ? " on" : ""}`} title="Standard (guld)" aria-label="Standard" onClick={() => setEdit({ ...edit, accent: "" })}>↺</button>
+            </div>
           </div>
           <label className="post-field"><span>Om mig</span>
             <textarea rows={3} value={edit.bio} onChange={(e) => setEdit({ ...edit, bio: e.target.value })} placeholder="Fortæl lidt om dig selv og dine biler…" maxLength={600} /></label>
