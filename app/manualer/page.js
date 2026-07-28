@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../lib/AuthProvider";
 import { getAlbums } from "../lib/albums";
-import { getCarDocs, uploadCarDoc, deleteCarDoc, docUrl } from "../lib/cardocs";
+import { getCarDocs, uploadCarDoc, createLinkDoc, deleteCarDoc, docUrl } from "../lib/cardocs";
 
 const DOC_TYPES = ["Servicemanual", "Ejermanual", "Reparationsvejledning", "El-diagram", "Andet"];
 
@@ -19,6 +19,8 @@ export default function Manualer() {
   const [selected, setSelected] = useState(null);
   const [title, setTitle] = useState("");
   const [docType, setDocType] = useState(DOC_TYPES[0]);
+  const [mode, setMode] = useState("file"); // "file" | "link"
+  const [linkUrl, setLinkUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
   const fileRef = useRef(null);
@@ -40,8 +42,22 @@ export default function Manualer() {
   const selDocs = selected ? docs.filter((d) => d.album_id === selected.id) : [];
 
   const open = async (doc) => {
+    if (doc.link_url) { window.open(doc.link_url, "_blank", "noopener"); return; }
     const url = await docUrl(doc.file_path);
     if (url) window.open(url, "_blank", "noopener");
+  };
+
+  const addLink = async () => {
+    if (!selected) return;
+    if (!title.trim()) { setMsg("Giv dokumentet en titel."); return; }
+    setBusy(true); setMsg("");
+    try {
+      await createLinkDoc({ title, docType, linkUrl, albumId: selected.id, userId: user.id });
+      setTitle(""); setLinkUrl("");
+      await load();
+      setMsg("✓ Link tilføjet.");
+    } catch (e) { setMsg(e.message); }
+    finally { setBusy(false); }
   };
 
   const upload = async (fileList) => {
@@ -116,10 +132,10 @@ export default function Manualer() {
                 <p className="pk-empty">Ingen dokumenter til denne bil endnu.</p>
               ) : selDocs.map((d) => (
                 <div className="doc-row" key={d.id}>
-                  <span className="doc-ico" aria-hidden="true">📄</span>
+                  <span className="doc-ico" aria-hidden="true">{d.link_url ? "🔗" : "📄"}</span>
                   <button className="doc-open" onClick={() => open(d)}>
                     <span className="doc-title">{d.title}</span>
-                    <span className="doc-sub">{[d.doc_type, d.file_name].filter(Boolean).join(" · ")}</span>
+                    <span className="doc-sub">{[d.doc_type, d.link_url ? "Link" : d.file_name].filter(Boolean).join(" · ")}</span>
                   </button>
                   {isAdmin && <button className="ph-btn del" style={{ flex: "none", width: "auto", padding: "0.35rem 0.7rem" }} onClick={() => remove(d)}>Slet</button>}
                 </div>
@@ -128,14 +144,28 @@ export default function Manualer() {
 
             {isAdmin && (
               <div className="doc-upload">
-                <span className="cp-label">Upload dokument</span>
+                <span className="cp-label">Tilføj dokument</span>
+                <div className="set-seg" style={{ marginTop: "0.6rem" }}>
+                  <button className={mode === "file" ? "on" : ""} onClick={() => { setMode("file"); setMsg(""); }}>📄 Upload fil</button>
+                  <button className={mode === "link" ? "on" : ""} onClick={() => { setMode("link"); setMsg(""); }}>🔗 Indsæt link</button>
+                </div>
+                <p className="set-hint">Filer op til 50 MB uploades direkte. Større filer (fx en stor PDF) lægges på Google Drive o.l. og indsættes som link.</p>
                 <div className="doc-upform">
                   <input className="doc-input" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Titel — fx Servicemanual 2018" maxLength={120} />
                   <select className="doc-input" value={docType} onChange={(e) => setDocType(e.target.value)}>
                     {DOC_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
                   </select>
-                  <input ref={fileRef} type="file" hidden onChange={(e) => { upload(e.target.files); e.target.value = ""; }} />
-                  <button className="btn-gold" style={{ width: "auto" }} disabled={busy || !title.trim()} onClick={() => fileRef.current?.click()}>{busy ? "Uploader…" : "Vælg fil & upload"}</button>
+                  {mode === "file" ? (
+                    <>
+                      <input ref={fileRef} type="file" hidden onChange={(e) => { upload(e.target.files); e.target.value = ""; }} />
+                      <button className="btn-gold" style={{ width: "auto" }} disabled={busy || !title.trim()} onClick={() => fileRef.current?.click()}>{busy ? "Uploader…" : "Vælg fil & upload"}</button>
+                    </>
+                  ) : (
+                    <>
+                      <input className="doc-input" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} placeholder="https://drive.google.com/…" />
+                      <button className="btn-gold" style={{ width: "auto" }} disabled={busy || !title.trim() || !linkUrl.trim()} onClick={addLink}>{busy ? "Gemmer…" : "Tilføj link"}</button>
+                    </>
+                  )}
                 </div>
                 {msg && <div className={`auth-msg ${msg.startsWith("✓") ? "ok" : "err"}`}>{msg}</div>}
               </div>

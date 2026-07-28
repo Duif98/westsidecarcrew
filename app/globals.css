@@ -537,7 +537,8 @@ a {
 .card img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   transition: transform 0.9s var(--ease), filter 0.9s var(--ease);
   filter: saturate(1.02) contrast(1.02);
 }
@@ -1686,9 +1687,10 @@ button.md-dir { cursor: pointer; line-height: 1; }
 
 /* ---------- Public car page ---------- */
 .car-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }
-.car-hero { display: block; width: 100%; padding: 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; cursor: pointer; background: var(--bg-2); margin-bottom: 1.4rem; }
-.car-hero img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; transition: transform 0.5s var(--ease); }
-.car-hero:hover img { transform: scale(1.03); }
+.car-hero { display: block; width: 100%; padding: 0; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; cursor: pointer; background: var(--bg-2); margin-bottom: 1.4rem; text-align: center; }
+/* Whole car, always centred — no cropping (car photos are usually portrait). */
+.car-hero img { display: block; margin: 0 auto; max-width: 100%; max-height: 74vh; width: auto; height: auto; transition: transform 0.5s var(--ease); }
+.car-hero:hover img { transform: scale(1.02); }
 .car-model { color: var(--muted); font-weight: 340; }
 .car-owner { font-family: var(--font-mono), monospace; font-size: 0.9rem; color: var(--gold); margin-top: 0.5rem; }
 .car-specs { color: var(--muted); font-size: 0.95rem; margin-top: 0.3rem; }
@@ -1791,12 +1793,12 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .dash-foot-link:hover { color: var(--gold-bright); }
 
 /* ---------- Profile cover + accent ---------- */
-.profil-cover { margin: 0 0 clamp(-2.6rem, -5vw, -3.4rem); border-radius: 18px; overflow: hidden; border: 1px solid var(--line); aspect-ratio: 4 / 1; background: var(--bg-2); }
+.profil-cover { margin: 0 0 clamp(-2.6rem, -5vw, -3.4rem); border-radius: 18px; overflow: hidden; border: 1px solid var(--line); aspect-ratio: 3 / 1; background: var(--bg-2); }
 .profil-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .profil-head.has-cover { padding-left: 0.4rem; }
 .profil-head.has-cover .profil-avatar { box-shadow: 0 0 0 4px var(--bg); }
 .pe-cover-row { display: flex; align-items: center; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.9rem; }
-.pe-cover-preview { width: 160px; aspect-ratio: 4 / 1; border-radius: 10px; object-fit: cover; border: 1px solid var(--line-2); background: var(--bg-3); }
+.pe-cover-preview { width: 180px; aspect-ratio: 3 / 1; border-radius: 10px; object-fit: cover; border: 1px solid var(--line-2); background: var(--bg-3); }
 .pe-cover-preview.empty { display: grid; place-items: center; font-family: var(--font-mono), monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); }
 .pe-accent { margin-top: 1rem; }
 .pe-accent-label { display: block; font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.5rem; }
@@ -1895,7 +1897,26 @@ button.md-dir { cursor: pointer; line-height: 1; }
   top: calc(0.9rem + env(safe-area-inset-top));
   right: calc(max(1.1rem, env(safe-area-inset-right)) + 46px + 0.55rem);
   z-index: 121;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
 }
+.notif-bell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  background: var(--glass);
+  backdrop-filter: blur(10px);
+  color: var(--text);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+.notif-bell:hover { border-color: var(--gold); color: var(--gold-bright); }
+.notif-bell-badge { top: -6px; right: -6px; box-shadow: 0 0 0 2px var(--bg); }
 .lang-fab {
   display: flex;
   align-items: center;

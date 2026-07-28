@@ -50,6 +50,7 @@ function ProfileInner() {
   const [avatarFile, setAvatarFile] = useState(null);
   const [coverFile, setCoverFile] = useState(null);
   const [cropSource, setCropSource] = useState(null);
+  const [coverCropSource, setCoverCropSource] = useState(null);
   const [savingProfile, setSavingProfile] = useState(false);
   const avatarRef = useRef(null);
   const coverRef = useRef(null);
@@ -223,7 +224,7 @@ function ProfileInner() {
             {coverFile
               ? <img className="pe-cover-preview" src={URL.createObjectURL(coverFile)} alt="" />
               : (profile.cover_path ? <img className="pe-cover-preview" src={avatarUrl(profile.cover_path)} alt="" /> : <div className="pe-cover-preview empty">Intet cover</div>)}
-            <input ref={coverRef} type="file" accept="image/*" hidden onChange={(e) => { const fl = e.target.files?.[0]; if (fl) setCoverFile(fl); e.target.value = ""; }} />
+            <input ref={coverRef} type="file" accept="image/*" hidden onChange={(e) => { const fl = e.target.files?.[0]; if (fl) setCoverCropSource(fl); e.target.value = ""; }} />
             <button type="button" className="ph-btn" style={{ flex: "none", width: "auto", padding: "0.45rem 0.9rem" }} onClick={() => coverRef.current?.click()}>Skift cover-billede</button>
           </div>
           <div className="pe-accent">
@@ -345,6 +346,16 @@ function ProfileInner() {
           file={cropSource}
           onCancel={() => setCropSource(null)}
           onDone={(f) => { setAvatarFile(f); setCropSource(null); }}
+        />
+      )}
+
+      {coverCropSource && (
+        <AvatarCropper
+          file={coverCropSource}
+          aspect={3} cropShape="rect" outW={1500} outH={500}
+          title="Cover-billede" filename="cover.jpg"
+          onCancel={() => setCoverCropSource(null)}
+          onDone={(f) => { setCoverFile(f); setCoverCropSource(null); }}
         />
       )}
 

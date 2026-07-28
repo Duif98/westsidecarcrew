@@ -13,18 +13,24 @@ function createImage(url) {
     img.src = url;
   });
 }
-async function croppedFile(src, area, size = 512) {
+async function croppedFile(src, area, outW, outH, name) {
   const img = await createImage(src);
   const canvas = document.createElement("canvas");
-  canvas.width = size; canvas.height = size;
+  canvas.width = outW; canvas.height = outH;
   const ctx = canvas.getContext("2d");
-  ctx.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, size, size);
+  ctx.drawImage(img, area.x, area.y, area.width, area.height, 0, 0, outW, outH);
   const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", 0.9));
-  return new File([blob], "avatar.jpg", { type: "image/jpeg" });
+  return new File([blob], name, { type: "image/jpeg" });
 }
 
-// Square avatar cropper: drag to center, slider to zoom. Returns a cropped File.
-export default function AvatarCropper({ file, onCancel, onDone }) {
+// Crop-and-place dialog: drag to position, slider to zoom. Square/round by
+// default (avatar); pass aspect + cropShape + output size for other shapes
+// (e.g. a wide cover banner). Returns a cropped JPEG File.
+export default function AvatarCropper({
+  file, onCancel, onDone,
+  aspect = 1, cropShape = "round", outW = 512, outH = 512,
+  title = "Profilbillede", filename = "avatar.jpg",
+}) {
   const [src] = useState(() => URL.createObjectURL(file));
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -39,7 +45,7 @@ export default function AvatarCropper({ file, onCancel, onDone }) {
     if (!area) return;
     setBusy(true);
     try {
-      const out = await croppedFile(src, area);
+      const out = await croppedFile(src, area, outW, outH, filename);
       onDone(out);
     } finally { setBusy(false); }
   };
@@ -48,7 +54,7 @@ export default function AvatarCropper({ file, onCancel, onDone }) {
     <div className="md" role="dialog" aria-modal="true" onClick={(e) => e.target === e.currentTarget && onCancel()}>
       <div className="md-panel crop-panel">
         <button className="md-close" onClick={onCancel} aria-label="Luk">✕</button>
-        <span className="overline">Profilbillede</span>
+        <span className="overline">{title}</span>
         <h2 className="md-title">Placér & beskær</h2>
 
         <div className="crop-stage">
@@ -56,9 +62,9 @@ export default function AvatarCropper({ file, onCancel, onDone }) {
             image={src}
             crop={crop}
             zoom={zoom}
-            aspect={1}
-            cropShape="round"
-            showGrid={false}
+            aspect={aspect}
+            cropShape={cropShape}
+            showGrid={cropShape !== "round"}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onComplete}

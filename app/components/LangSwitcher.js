@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { LANGS, useT } from "../lib/i18n";
+import NotifBell from "./NotifBell";
 
 // Globe pill that sits just left of the global menu hamburger — visible on every
 // page at every size. Click to open a small popover and switch DA / EN / DE.
@@ -24,6 +25,7 @@ export default function LangSwitcher() {
 
   return (
     <div className="lang-switch" ref={ref}>
+      <NotifBell />
       <button
         className="lang-fab"
         onClick={() => setOpen((o) => !o)}
