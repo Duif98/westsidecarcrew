@@ -76,8 +76,8 @@ export default function CarShowcase({ slug }) {
             <img src={cover} alt={`${title} ${model}`} />
           </button>
         )}
-        <span className="overline">Bil</span>
-        <h1 className="member-title">{title}{model ? <span className="car-model"> {model}</span> : null}</h1>
+        <span className="overline">Bil{album?.sold ? " · Solgt" : ""}</span>
+        <h1 className="member-title">{title}{model ? <span className="car-model"> {model}</span> : null}{album?.sold ? <span className="car-soldtag">Solgt</span> : null}</h1>
         {owner && <p className="car-owner">@{owner}</p>}
         {specs && <p className="car-specs">{specs}</p>}
         {car?.blurb && <p className="car-blurb">{car.blurb}</p>}

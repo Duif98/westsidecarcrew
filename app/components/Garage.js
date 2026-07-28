@@ -34,6 +34,7 @@ export default function Garage() {
   const [open, setOpen] = useState(null); // { items, title, subtitle }
   const [extra, setExtra] = useState({ bySlug: {}, covers: {}, newAlbums: [], albumBySlug: {} });
   const [seed, setSeed] = useState(null);
+  const [orient, setOrient] = useState({}); // { key: "wide" | "tall" } — box shape follows the cover's orientation
 
   // Set the shuffle seed after mount (keeps SSR/first render stable -> no hydration mismatch).
   useEffect(() => { setSeed(Math.floor(Math.random() * 1e9)); }, []);
@@ -63,7 +64,7 @@ export default function Garage() {
           if (cp) covers[a.slug] = cp.url;
         }
       });
-      const newAlbums = albums.filter((a) => !a.is_curated && bySlug[a.slug]?.length);
+      const newAlbums = albums.filter((a) => !a.is_curated && bySlug[a.slug]?.length && !a.sold);
       const albumBySlug = Object.fromEntries(albums.map((a) => [a.slug, a]));
       setExtra({ bySlug, covers, newAlbums, albumBySlug });
     })();
@@ -83,11 +84,11 @@ export default function Garage() {
       return ci > 0 ? [items[ci], ...items.slice(0, ci), ...items.slice(ci + 1)] : items;
     };
 
-    const curated = cars.map((car) => {
+    const curated = cars.filter((car) => !extra.albumBySlug[car.slug]?.sold).map((car) => {
       const coverUrl = extra.covers[car.slug] || asset(`/cars/${car.slug}/thumb/${car.cover}`);
       const items = coverFirst([...repoItems(car), ...uploadItems(car.slug)], coverUrl);
       return {
-        key: car.slug, coverUrl,
+        key: car.slug, coverUrl, cw: car.coverW, ch: car.coverH,
         tag: car.spec, title: car.make, model: car.model, owner: car.owner,
         count: items.length, items,
         lbTitle: car.make, lbSubtitle: [car.owner, car.spec].filter(Boolean).join(" · "),
@@ -101,7 +102,7 @@ export default function Garage() {
       const items = coverFirst(raw, coverUrl);
       const specTag = [a.model_year, a.power_hp ? `${a.power_hp} hk` : null].filter(Boolean).join(" · ");
       return {
-        key: a.slug, coverUrl,
+        key: a.slug, coverUrl, cw: null, ch: null,
         tag: specTag || t("garage.crewAlbum"), title: a.make || a.title, model: a.model || "", owner: a.owner_name,
         count: items.length, items,
         lbTitle: a.make || a.title, lbSubtitle: [a.owner_name, a.model].filter(Boolean).join(" · "),
@@ -113,6 +114,25 @@ export default function Garage() {
     const pool = [...curated, ...news];
     return seed == null ? pool : shuffle(pool, seed);
   }, [extra, seed, t]);
+
+  // Measure each cover so a landscape photo lands in a wide box and a portrait
+  // photo in a tall box (no more portrait cars stuffed into wide tiles).
+  useEffect(() => {
+    let active = true;
+    showcases.forEach((s) => {
+      if (!s.coverUrl) return;
+      const img = new Image();
+      img.onload = () => {
+        if (active) setOrient((o) => ({ ...o, [s.key]: img.naturalWidth > img.naturalHeight ? "wide" : "tall" }));
+      };
+      img.src = s.coverUrl;
+    });
+    return () => { active = false; };
+  }, [showcases]);
+
+  // Wide box for landscape covers; tall (default) for portrait. Guess from the
+  // repo dimensions first so curated cars don't shift once measured.
+  const isWide = (s) => (orient[s.key] || (s.cw && s.ch ? (s.cw > s.ch ? "wide" : "tall") : "tall")) === "wide";
 
   return (
     <section className="section garage" id="garagen">
@@ -128,7 +148,7 @@ export default function Garage() {
             <Reveal
               key={s.key}
               as="button"
-              className={`card ${idx === 0 || idx === 5 ? "feature" : ""}`}
+              className={`card ${isWide(s) ? "feature" : ""}`}
               delay={(idx % 3) * 90}
               onClick={() => setOpen({ items: s.items, title: s.lbTitle, subtitle: s.lbSubtitle, album: s.album, curated: s.curated })}
               aria-label={t("garage.openAria", { title: `${s.title}${s.owner ? " — " + s.owner : ""}` })}

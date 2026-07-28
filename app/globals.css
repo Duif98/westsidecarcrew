@@ -478,6 +478,7 @@ a {
 .grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-auto-flow: row dense;
   gap: clamp(0.8rem, 1.6vw, 1.3rem);
   margin-top: clamp(2.5rem, 5vw, 4rem);
 }
@@ -537,7 +538,7 @@ a {
 .card img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   transition: transform 0.9s var(--ease), filter 0.9s var(--ease);
   filter: saturate(1.02) contrast(1.02);
@@ -1661,6 +1662,9 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .profil-cars { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 0.9rem; }
 .pcar { text-align: left; background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; cursor: pointer; transition: transform 0.2s var(--ease), border-color 0.2s; }
 .pcar:hover { transform: translateY(-3px); border-color: var(--gold); }
+.pcar.sold { position: relative; }
+.pcar.sold img { filter: grayscale(0.55) brightness(0.82); }
+.pcar-sold { position: absolute; top: 0.5rem; left: 0.5rem; z-index: 2; font-family: var(--font-mono), monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; background: rgba(200,60,60,0.92); border-radius: 6px; padding: 0.2rem 0.5rem; }
 .pcar img, .pcar-noimg { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
 .pcar-noimg { background: var(--bg-3); }
 .pcar-body { padding: 0.7rem 0.85rem; display: flex; flex-direction: column; gap: 0.15rem; }
@@ -1692,6 +1696,7 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .car-hero img { display: block; margin: 0 auto; max-width: 100%; max-height: 74vh; width: auto; height: auto; transition: transform 0.5s var(--ease); }
 .car-hero:hover img { transform: scale(1.02); }
 .car-model { color: var(--muted); font-weight: 340; }
+.car-soldtag { display: inline-block; vertical-align: middle; margin-left: 0.7rem; font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; background: rgba(200,60,60,0.92); border-radius: 6px; padding: 0.25rem 0.55rem; }
 .car-owner { font-family: var(--font-mono), monospace; font-size: 0.9rem; color: var(--gold); margin-top: 0.5rem; }
 .car-specs { color: var(--muted); font-size: 0.95rem; margin-top: 0.3rem; }
 .car-blurb { color: var(--text); font-size: 1rem; line-height: 1.6; margin-top: 1rem; max-width: 60ch; }
@@ -1917,6 +1922,18 @@ button.md-dir { cursor: pointer; line-height: 1; }
 }
 .notif-bell:hover { border-color: var(--gold); color: var(--gold-bright); }
 .notif-bell-badge { top: -6px; right: -6px; box-shadow: 0 0 0 2px var(--bg); }
+.notif-pop { position: fixed; z-index: 1300; top: calc(0.9rem + 46px + 10px + env(safe-area-inset-top)); right: max(1.1rem, env(safe-area-inset-right)); width: min(340px, calc(100vw - 1.6rem)); background: var(--glass-menu); backdrop-filter: blur(16px); border: 1px solid var(--line-2); border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; animation: langMenuIn 0.16s var(--ease); }
+.notif-pop-head { font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); padding: 0.8rem 1rem 0.5rem; }
+.notif-pop-list { max-height: min(60vh, 420px); overflow-y: auto; }
+.notif-pop-empty { color: var(--muted); font-size: 0.88rem; padding: 0.5rem 1rem 1rem; }
+.notif-pop-row { display: flex; align-items: center; gap: 0.7rem; padding: 0.7rem 1rem; border-top: 1px solid var(--line); transition: background 0.15s; }
+.notif-pop-row:hover { background: var(--bg-3); }
+.notif-pop-row.unread { border-left: 3px solid var(--gold); }
+.notif-pop-ico { flex: none; font-size: 1rem; }
+.notif-pop-text { flex: 1; min-width: 0; font-size: 0.85rem; line-height: 1.35; }
+.notif-pop-when { flex: none; font-family: var(--font-mono), monospace; font-size: 0.64rem; color: var(--faint); white-space: nowrap; }
+.notif-pop-all { display: block; text-align: center; padding: 0.75rem; border-top: 1px solid var(--line-2); font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold); }
+.notif-pop-all:hover { background: var(--bg-3); color: var(--gold-bright); }
 .lang-fab {
   display: flex;
   align-items: center;

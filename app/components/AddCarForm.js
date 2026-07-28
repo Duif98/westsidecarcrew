@@ -13,7 +13,7 @@ export default function AddCarForm({ userId, ownerName, onCreated }) {
   const [open, setOpen] = useState(false);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [form, setForm] = useState({ make: "", model: "", model_year: "", power_hp: "", engine: "", drivetrain: "", mods: "", vin: "" });
+  const [form, setForm] = useState({ make: "", model: "", model_year: "", power_hp: "", engine: "", drivetrain: "", mods: "", vin: "", sold: false });
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
 
@@ -29,7 +29,7 @@ export default function AddCarForm({ userId, ownerName, onCreated }) {
   const reset = () => {
     if (preview) URL.revokeObjectURL(preview);
     setFile(null); setPreview(null);
-    setForm({ make: "", model: "", model_year: "", power_hp: "", engine: "", drivetrain: "", mods: "", vin: "" });
+    setForm({ make: "", model: "", model_year: "", power_hp: "", engine: "", drivetrain: "", mods: "", vin: "", sold: false });
   };
 
   const submit = async (e) => {
@@ -48,12 +48,16 @@ export default function AddCarForm({ userId, ownerName, onCreated }) {
         drivetrain: form.drivetrain.trim() || null,
         mods: form.mods.trim() || null,
         vin: form.vin.trim().toUpperCase() || null,
+        sold: !!form.sold,
       };
       const { error } = await supabase.from("albums").update(patch).eq("id", album.id);
       if (error) throw error;
       await uploadPhoto({ file, isPublic: true, car: form.make.trim(), caption: "", userId, albumId: album.id });
+      const wasSold = form.sold;
       reset();
-      setMsg("✓ Bilen er tilføjet! Billedet afventer admin-godkendelse — så ryger den med i rotationen på forsiden.");
+      setMsg(wasSold
+        ? "✓ Solgt bil tilføjet! Den vises under “Solgte biler” på din profil (billedet afventer godkendelse)."
+        : "✓ Bilen er tilføjet! Billedet afventer admin-godkendelse — så ryger den med i rotationen på forsiden.");
       onCreated?.();
     } catch (err) {
       setMsg("Kunne ikke tilføje bilen: " + (err.message || err));
@@ -81,6 +85,11 @@ export default function AddCarForm({ userId, ownerName, onCreated }) {
         <label className="post-field ef-full"><span>Modifikationer (valgfri)</span><textarea rows={2} value={form.mods} onChange={(e) => setForm({ ...form, mods: e.target.value })} placeholder="Downpipe, coilovers…" /></label>
         <label className="post-field ef-full"><span>VIN (valgfri — låser reservedelskataloget op)</span><input value={form.vin} onChange={(e) => setForm({ ...form, vin: e.target.value.toUpperCase() })} placeholder="17 tegn" maxLength={17} spellCheck={false} style={{ fontFamily: "var(--font-mono), monospace", letterSpacing: "0.05em" }} /></label>
       </div>
+
+      <label className="check-row">
+        <input type="checkbox" checked={form.sold} onChange={(e) => setForm({ ...form, sold: e.target.checked })} />
+        <span><b>Bilen er solgt</b> — vises under "Solgte biler" på din profil (ikke på forsiden).</span>
+      </label>
 
       {msg && <div className={`auth-msg ${msg.startsWith("✓") ? "ok" : "err"}`}>{msg}</div>}
 

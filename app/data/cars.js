@@ -100,6 +100,8 @@ export const cars = CARS.map((c) => {
     ...c,
     photos: set,
     cover: set[0]?.src ?? null,
+    coverW: set[0]?.w ?? null,
+    coverH: set[0]?.h ?? null,
     count: set.length,
   };
 });

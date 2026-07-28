@@ -187,6 +187,27 @@ function ProfileInner() {
     ? { "--gold": profile.accent_color, "--gold-bright": profile.accent_color, "--gold-deep": profile.accent_color }
     : undefined;
   const coverSrc = profile.cover_path ? avatarUrl(profile.cover_path) : null;
+  const currentCars = albums.filter((a) => !a.sold);
+  const soldCars = albums.filter((a) => a.sold);
+
+  // One car card, reused by the garage and the "sold" sections.
+  const carCard = (a, sold) => {
+    const car = carsBySlug[a.slug];
+    const items = itemsByAlbum[a.id] || [];
+    const curated = car ? { spec: car.spec, tags: car.tags, blurb: car.blurb, owner: car.owner } : null;
+    return (
+      <button className={`pcar${sold ? " sold" : ""}`} key={a.id} disabled={items.length === 0}
+        onClick={() => items.length && setGallery({ items, title: a.make || car?.make || a.title, subtitle: [a.model || car?.model, a.owner_name || car?.owner].filter(Boolean).join(" · "), album: a, curated })}>
+        {sold && <span className="pcar-sold">Solgt</span>}
+        {covers[a.id] ? <img src={covers[a.id]} alt={a.title} loading="lazy" /> : <div className="pcar-noimg" />}
+        <div className="pcar-body">
+          <span className="pcar-title">{a.make || a.title}</span>
+          <span className="pcar-sub">{items.length ? `${items.length} billeder` : (a.model || (car ? car.model : "") || "Ingen billeder endnu")}</span>
+          {specLine(a) && <span className="pcar-specs">{specLine(a)}</span>}
+        </div>
+      </button>
+    );
+  };
 
   return (
     <div className="wrap profil-body" style={accentStyle}>
@@ -260,31 +281,24 @@ function ProfileInner() {
         <div className="pstat"><b>{stats?.photos ?? 0}</b><span>Billeder</span></div>
         <div className="pstat"><b>{stats?.likes_received ?? 0}</b><span>Likes</span></div>
         <div className="pstat"><b>{stats?.comments ?? 0}</b><span>Kommentarer</span></div>
-        <div className="pstat"><b>{albums.length}</b><span>Biler</span></div>
+        <div className="pstat"><b>{currentCars.length}</b><span>Biler</span></div>
       </div>
 
-      {albums.length > 0 && (
+      {currentCars.length > 0 && (
         <section className="profil-section">
           <span className="overline">Garage</span>
           <div className="profil-cars">
-            {albums.map((a) => {
-              const car = carsBySlug[a.slug];
-              const items = itemsByAlbum[a.id] || [];
-              const curated = car ? { spec: car.spec, tags: car.tags, blurb: car.blurb, owner: car.owner } : null;
-              return (
-                <button className="pcar" key={a.id} disabled={items.length === 0}
-                  onClick={() => items.length && setGallery({ items, title: a.make || car?.make || a.title, subtitle: [a.model || car?.model, a.owner_name || car?.owner].filter(Boolean).join(" · "), album: a, curated })}>
-                  {covers[a.id]
-                    ? <img src={covers[a.id]} alt={a.title} loading="lazy" />
-                    : <div className="pcar-noimg" />}
-                  <div className="pcar-body">
-                    <span className="pcar-title">{a.make || a.title}</span>
-                    <span className="pcar-sub">{items.length ? `${items.length} billeder` : (a.model || (car ? car.model : "") || "Ingen billeder endnu")}</span>
-                    {specLine(a) && <span className="pcar-specs">{specLine(a)}</span>}
-                  </div>
-                </button>
-              );
-            })}
+            {currentCars.map((a) => carCard(a, false))}
+          </div>
+        </section>
+      )}
+
+      {soldCars.length > 0 && (
+        <section className="profil-section">
+          <span className="overline">Solgte biler</span>
+          <p className="muted" style={{ fontSize: "0.88rem", margin: "0 0 0.9rem" }}>Biler @{profile.username} har ejet, men solgt.</p>
+          <div className="profil-cars">
+            {soldCars.map((a) => carCard(a, true))}
           </div>
         </section>
       )}
