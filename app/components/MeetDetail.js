@@ -161,6 +161,7 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
           </div>
         )}
         <p className="md-when">🗓 {fmt(event.starts_at)}</p>
+        {event.creator?.username && <p className="md-creator">{t("meet.createdBy", { name: "@" + event.creator.username })}</p>}
         {event.location && (
           <p className="md-where">📍 {event.location_url
             ? <a href={event.location_url} target="_blank" rel="noopener noreferrer" className="c-link">{event.location}</a>

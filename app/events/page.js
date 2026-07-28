@@ -35,7 +35,7 @@ export default function EventsPage() {
   const load = async () => {
     const { data: evs } = await supabase
       .from("events")
-      .select("*")
+      .select("*, creator:profiles!events_created_by_fkey(username)")
       .gte("starts_at", new Date(Date.now() - 6 * 3600 * 1000).toISOString())
       .order("starts_at", { ascending: true });
     const list = evs || [];
@@ -167,6 +167,7 @@ export default function EventsPage() {
                     )}
                   </div>
                   <p className="event-when">🗓 {fmt(ev.starts_at)}</p>
+                  {ev.creator?.username && <p className="event-creator">{t("meet.createdBy", { name: "@" + ev.creator.username })}</p>}
                   {ev.location && (
                     <p className="event-where">📍 {ev.location_url
                       ? <a href={ev.location_url} target="_blank" rel="noopener noreferrer" className="c-link">{ev.location}</a>

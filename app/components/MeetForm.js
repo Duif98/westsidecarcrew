@@ -149,9 +149,10 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
       lng: pin?.lng ?? null,
       starts_at,
     };
+    const sel = "*, creator:profiles!events_created_by_fkey(username)";
     const run = (p) => editing
-      ? supabase.from("events").update(p).eq("id", event.id).select().single()
-      : supabase.from("events").insert({ ...p, created_by: user.id }).select().single();
+      ? supabase.from("events").update(p).eq("id", event.id).select(sel).single()
+      : supabase.from("events").insert({ ...p, created_by: user.id }).select(sel).single();
     let { data, error } = await run(payload);
     // Fail-safe: if the link_url column isn't there yet (migration 018 not run),
     // save the meet without it rather than blocking the whole save.

@@ -1245,6 +1245,7 @@ a.btn-gold { text-decoration: none; }
 .event-del:hover { color: #d98a7a; }
 .event-actions { display: flex; align-items: center; gap: 0.5rem; flex: none; }
 .event-when, .event-where { color: var(--muted); font-size: 0.9rem; margin-top: 0.3rem; }
+.event-creator { color: var(--faint); font-size: 0.78rem; margin-top: 0.2rem; font-family: var(--font-mono), monospace; }
 .event-desc { color: var(--text); font-size: 0.95rem; margin-top: 0.6rem; }
 .event-going { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; align-items: baseline; margin-top: 0.8rem; }
 .eg-count { font-family: var(--font-mono), monospace; font-size: 0.72rem; color: var(--gold); }
@@ -1565,6 +1566,7 @@ a.btn-gold { text-decoration: none; }
 .md-close:hover { background: var(--gold); color: #100c04; }
 .md-title { font-family: var(--font-display), serif; font-weight: 400; font-size: clamp(1.6rem, 5vw, 2.2rem); letter-spacing: -0.02em; margin: 0.4rem 0 0.7rem; }
 .md-when, .md-where { color: var(--muted); font-size: 0.95rem; margin-top: 0.35rem; }
+.md-creator { color: var(--faint); font-size: 0.8rem; margin-top: 0.25rem; font-family: var(--font-mono), monospace; }
 .md-desc { color: var(--text); font-size: 0.98rem; margin-top: 1rem; white-space: pre-wrap; }
 .md-wx { display: flex; align-items: center; gap: 0.7rem; margin-top: 1rem; padding: 0.7rem 0.9rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; font-size: 0.92rem; }
 .md-wx-emoji { font-size: 1.5rem; line-height: 1; }

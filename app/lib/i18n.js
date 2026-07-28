@@ -128,6 +128,7 @@ const M = {
     },
     meet: {
       tag: "Meet", close: "Luk", edit: "✎ Rediger", delete: "Slet", confirmDelete: "Slet dette meet?",
+      createdBy: "Oprettet af {name}",
       whoComing: "Hvem kommer", noneComing: "Ingen tilmeldte endnu.",
       comingLabel: "✅ Kommer:", maybeLabel: "🤔 Måske:",
       yrLink: "Se timevejr for dagen på yr.no",
@@ -319,6 +320,7 @@ const M = {
     },
     meet: {
       tag: "Meet", close: "Close", edit: "✎ Edit", delete: "Delete", confirmDelete: "Delete this meet?",
+      createdBy: "Created by {name}",
       whoComing: "Who’s coming", noneComing: "No RSVPs yet.",
       comingLabel: "✅ Coming:", maybeLabel: "🤔 Maybe:",
       yrLink: "See the hourly forecast on yr.no",
@@ -509,6 +511,7 @@ const M = {
     },
     meet: {
       tag: "Meet", close: "Schließen", edit: "✎ Bearbeiten", delete: "Löschen", confirmDelete: "Dieses Meet löschen?",
+      createdBy: "Erstellt von {name}",
       whoComing: "Wer kommt", noneComing: "Noch keine Zusagen.",
       comingLabel: "✅ Kommt:", maybeLabel: "🤔 Vielleicht:",
       yrLink: "Stündliche Vorhersage auf yr.no ansehen",

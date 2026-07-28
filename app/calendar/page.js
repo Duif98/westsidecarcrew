@@ -40,7 +40,7 @@ export default function CalendarPage() {
   const [creating, setCreating] = useState(null); // null | { date }
 
   const loadEvents = async () => {
-    const { data } = await supabase.from("events").select("*").order("starts_at", { ascending: true });
+    const { data } = await supabase.from("events").select("*, creator:profiles!events_created_by_fkey(username)").order("starts_at", { ascending: true });
     setEvents(data || []);
   };
 
