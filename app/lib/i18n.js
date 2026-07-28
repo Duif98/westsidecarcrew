@@ -205,6 +205,11 @@ const M = {
       heavysnow: "Kraftig sne", thunder: "Torden", unknown: "—",
     },
     common: { member: "Medlem", loginShort: "Log ind", back: "‹ Medlem", meetsList: "Meets-liste" },
+    pushPrompt: {
+      title: "Få besked om nye meets 🔔",
+      body: "Slå notifikationer til, så ved du det med det samme, når der er et nyt meet eller opslag.",
+      enable: "Slå til", enabling: "Vent…", later: "Ikke nu",
+    },
   },
 
   en: {
@@ -388,6 +393,11 @@ const M = {
       heavysnow: "Heavy snow", thunder: "Thunder", unknown: "—",
     },
     common: { member: "Member", loginShort: "Log in", back: "‹ Member", meetsList: "Meets list" },
+    pushPrompt: {
+      title: "Get notified about new meets 🔔",
+      body: "Turn on notifications so you know the moment there's a new meet or post.",
+      enable: "Turn on", enabling: "Wait…", later: "Not now",
+    },
   },
 
   de: {
@@ -571,6 +581,11 @@ const M = {
       heavysnow: "Starker Schneefall", thunder: "Gewitter", unknown: "—",
     },
     common: { member: "Mitglied", loginShort: "Anmelden", back: "‹ Mitglied", meetsList: "Meets-Liste" },
+    pushPrompt: {
+      title: "Erfahre von neuen Meets 🔔",
+      body: "Aktiviere Benachrichtigungen, dann weißt du sofort Bescheid bei einem neuen Meet oder Beitrag.",
+      enable: "Aktivieren", enabling: "Moment…", later: "Nicht jetzt",
+    },
   },
 };
 

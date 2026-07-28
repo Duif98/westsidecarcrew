@@ -1442,6 +1442,21 @@ a.btn-gold { text-decoration: none; }
 .nav-m-static:hover { background: none; color: var(--muted); }
 .nav-m-hint { font-family: var(--font-body), sans-serif; font-size: 0.78rem; line-height: 1.45; letter-spacing: 0; text-transform: none; color: var(--muted); padding: 0.5rem 0.9rem 0.7rem; }
 
+/* ---------- Push-notification nudge ---------- */
+.push-prompt { position: fixed; z-index: 1250; left: 50%; transform: translateX(-50%); bottom: calc(1rem + env(safe-area-inset-bottom)); width: min(440px, calc(100vw - 1.6rem)); display: flex; align-items: flex-start; gap: 0.85rem; padding: 1rem 1.1rem; background: var(--glass-menu); backdrop-filter: blur(16px); border: 1px solid var(--line-2); border-radius: 16px; box-shadow: 0 18px 50px rgba(0,0,0,0.45); animation: pushPromptIn 0.3s var(--ease); }
+@keyframes pushPromptIn { from { opacity: 0; transform: translate(-50%, 14px); } to { opacity: 1; transform: translate(-50%, 0); } }
+.push-prompt-ico { font-size: 1.35rem; line-height: 1.2; flex: none; }
+.push-prompt-text { display: flex; flex-direction: column; gap: 0.2rem; flex: 1; min-width: 0; }
+.push-prompt-text b { font-family: var(--font-display), serif; font-weight: 400; font-size: 1.02rem; letter-spacing: -0.01em; }
+.push-prompt-text span { color: var(--muted); font-size: 0.85rem; line-height: 1.4; }
+.push-prompt-actions { display: flex; flex-direction: column; gap: 0.4rem; flex: none; align-self: center; }
+.push-prompt-enable { font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; background: var(--gold); color: var(--on-gold); border: none; border-radius: 100px; padding: 0.55rem 0.95rem; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+.push-prompt-enable:hover { background: var(--gold-bright); }
+.push-prompt-enable:disabled { opacity: 0.6; cursor: default; }
+.push-prompt-later { font-family: var(--font-mono), monospace; font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; background: none; border: none; color: var(--faint); cursor: pointer; padding: 0.2rem; transition: color 0.2s; }
+.push-prompt-later:hover { color: var(--muted); }
+@media (max-width: 460px) { .push-prompt { align-items: stretch; flex-wrap: wrap; } .push-prompt-actions { flex-direction: row; width: 100%; justify-content: flex-end; margin-top: 0.2rem; } }
+
 /* ============ Light theme ============ */
 /* Opt-in via the toggle (data-theme="light"); dark stays the brand default.
    Everything themable is driven by these variables, so the whole site flips

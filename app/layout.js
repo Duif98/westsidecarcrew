@@ -4,6 +4,8 @@ import AuthProvider from "./lib/AuthProvider";
 import NavMenu from "./components/NavMenu";
 import LangSwitcher from "./components/LangSwitcher";
 import { PwaProvider } from "./components/PwaProvider";
+import PushPrompt from "./components/PushPrompt";
+import AppleSplash from "./components/AppleSplash";
 import { I18nProvider } from "./lib/i18n";
 import "./globals.css";
 
@@ -79,6 +81,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="da" suppressHydrationWarning className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
+        <AppleSplash />
         {/* Apply the saved light/dark theme before paint to avoid a flash. */}
         <script
           dangerouslySetInnerHTML={{
@@ -96,6 +99,7 @@ export default function RootLayout({ children }) {
               {children}
               <NavMenu />
               <LangSwitcher />
+              <PushPrompt />
             </PwaProvider>
           </AuthProvider>
         </I18nProvider>
