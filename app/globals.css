@@ -20,6 +20,12 @@
   --line: rgba(255, 255, 255, 0.08);
   --line-2: rgba(255, 255, 255, 0.14);
 
+  /* Themed surfaces (overridden in light mode) */
+  --glass: rgba(10, 11, 13, 0.72);       /* sticky bars + fabs */
+  --glass-menu: rgba(16, 18, 22, 0.94);  /* dropdowns */
+  --vignette: rgba(0, 0, 0, 0.55);       /* ambient page edge shade */
+  --on-gold: #100c04;                    /* text/icons on a gold fill */
+
   /* Structure */
   --maxw: 1240px;
   --pad: clamp(1.25rem, 4vw, 4rem);
@@ -66,7 +72,7 @@ body::before {
   background: radial-gradient(
     130% 90% at 50% 0%,
     transparent 55%,
-    rgba(0, 0, 0, 0.55) 100%
+    var(--vignette) 100%
   );
 }
 
@@ -567,7 +573,7 @@ a {
   font-size: 0.6rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--bg);
+  color: var(--on-gold);
   background: var(--gold);
   padding: 0.28rem 0.6rem;
   border-radius: 100px;
@@ -739,7 +745,7 @@ a {
 }
 .lb-nav:hover {
   background: rgba(201, 168, 119, 0.9);
-  color: var(--bg);
+  color: var(--on-gold);
 }
 .lb-nav.prev {
   left: clamp(0.4rem, 2vw, 1.4rem);
@@ -856,7 +862,7 @@ a {
 .ig-btn:hover {
   border-color: var(--gold);
   background: var(--gold);
-  color: var(--bg);
+  color: var(--on-gold);
 }
 .footer-fine {
   margin-top: 3rem;
@@ -941,7 +947,7 @@ a.btn-gold { text-decoration: none; }
 
 /* Member / admin shell */
 .member { min-height: 100svh; position: relative; z-index: 2; }
-.member-bar { position: sticky; top: 0; z-index: 50; background: rgba(10,11,13,0.8); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+.member-bar { position: sticky; top: 0; z-index: 50; background: var(--glass); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
 .member-bar-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 1rem; }
 .member-actions { display: flex; align-items: center; gap: 1.1rem; }
 .mlink { font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); background: none; border: none; cursor: pointer; transition: color 0.2s; }
@@ -1409,7 +1415,7 @@ a.btn-gold { text-decoration: none; }
 /* Global floating menu button — the primary navigation on every page, at every
    size. The hamburger + slide-over drawer replaces the horizontal desktop nav
    and the per-page top-bar links, so phone and PC behave identically. */
-.menu-fab { display: flex; position: fixed; top: calc(0.9rem + env(safe-area-inset-top)); right: max(1.1rem, env(safe-area-inset-right)); z-index: 120; width: 46px; height: 46px; border: 1px solid var(--line-2); border-radius: 12px; background: rgba(10,11,13,0.66); backdrop-filter: blur(10px); flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
+.menu-fab { display: flex; position: fixed; top: calc(0.9rem + env(safe-area-inset-top)); right: max(1.1rem, env(safe-area-inset-right)); z-index: 120; width: 46px; height: 46px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--glass); backdrop-filter: blur(10px); flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; transition: border-color 0.2s, background 0.2s; }
 .menu-fab:hover { border-color: var(--gold); }
 .menu-fab span { display: block; width: 18px; height: 2px; border-radius: 2px; background: var(--text); }
 .menu-fab-badge { top: -6px; right: -6px; box-shadow: 0 0 0 2px var(--bg); }
@@ -1428,6 +1434,37 @@ a.btn-gold { text-decoration: none; }
 .nav-m-sep { height: 1px; background: var(--line); margin: 0.5rem 0.4rem; }
 .nav-m-logout { text-align: left; width: 100%; background: none; border: none; cursor: pointer; color: #d98a7a; }
 .nav-m-logout:hover, .nav-m-logout:active { background: rgba(217,138,122,0.12); color: #e6a496; }
+.nav-m-heading { font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); padding: 0.2rem 0.9rem 0.3rem; }
+.nav-m-tool { display: flex; align-items: center; justify-content: space-between; text-align: left; width: 100%; background: none; border: none; cursor: pointer; font: inherit; }
+.nav-m-tool:disabled { opacity: 0.55; cursor: default; }
+.nav-m-tool:disabled:hover { background: none; color: var(--text); }
+.nav-m-static { color: var(--muted); }
+.nav-m-static:hover { background: none; color: var(--muted); }
+.nav-m-hint { font-family: var(--font-body), sans-serif; font-size: 0.78rem; line-height: 1.45; letter-spacing: 0; text-transform: none; color: var(--muted); padding: 0.5rem 0.9rem 0.7rem; }
+
+/* ============ Light theme ============ */
+/* Opt-in via the toggle (data-theme="light"); dark stays the brand default.
+   Everything themable is driven by these variables, so the whole site flips
+   from one place — no per-component light overrides needed. */
+:root[data-theme="light"] {
+  --bg: #f5f3ee;
+  --bg-1: #ffffff;
+  --bg-2: #ffffff;
+  --bg-3: #ece7de;
+  --text: #1a1c1f;
+  --muted: #5b5e62;
+  --faint: #8a8d91;
+  --gold: #9a7b41;
+  --gold-bright: #7c6130;
+  --gold-deep: #b9985f;
+  --steel: #5f6f7b;
+  --line: rgba(0, 0, 0, 0.10);
+  --line-2: rgba(0, 0, 0, 0.16);
+  --glass: rgba(255, 255, 255, 0.82);
+  --glass-menu: rgba(255, 255, 255, 0.96);
+  --vignette: rgba(0, 0, 0, 0.05);
+  /* --on-gold stays #100c04: gold buttons keep dark text in both themes. */
+}
 .hub-badge { position: absolute; top: clamp(1rem, 3vw, 1.6rem); right: clamp(1rem, 3vw, 1.6rem); z-index: 2; display: inline-flex; align-items: center; background: #d9534f; color: #fff; font-family: var(--font-mono), monospace; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.03em; padding: 0.25rem 0.6rem; border-radius: 100px; box-shadow: 0 4px 14px rgba(217,83,79,0.4); }
 
 /* ---------- Calendar ---------- */
@@ -1738,7 +1775,7 @@ button.md-dir { cursor: pointer; line-height: 1; }
   padding: 0 0.8rem;
   border: 1px solid var(--line-2);
   border-radius: 12px;
-  background: rgba(10, 11, 13, 0.66);
+  background: var(--glass);
   backdrop-filter: blur(10px);
   color: var(--text);
   cursor: pointer;
@@ -1760,7 +1797,7 @@ button.md-dir { cursor: pointer; line-height: 1; }
   list-style: none;
   margin: 0;
   padding: 6px;
-  background: rgba(16, 18, 22, 0.94);
+  background: var(--glass-menu);
   backdrop-filter: blur(14px);
   border: 1px solid var(--line-2);
   border-radius: 14px;

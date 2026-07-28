@@ -3,6 +3,7 @@ import { asset } from "./lib/asset";
 import AuthProvider from "./lib/AuthProvider";
 import NavMenu from "./components/NavMenu";
 import LangSwitcher from "./components/LangSwitcher";
+import { PwaProvider } from "./components/PwaProvider";
 import { I18nProvider } from "./lib/i18n";
 import "./globals.css";
 
@@ -41,8 +42,15 @@ export const metadata = {
     type: "website",
   },
   icons: {
-    icon: [{ url: asset("/favicon.svg"), type: "image/svg+xml" }],
+    icon: [
+      { url: asset("/favicon.svg"), type: "image/svg+xml" },
+      { url: asset("/icon-192.png"), sizes: "192x192", type: "image/png" },
+      { url: asset("/icon-512.png"), sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: asset("/apple-touch-icon.png"), sizes: "180x180" }],
   },
+  appleWebApp: { capable: true, title: "West Side", statusBarStyle: "black-translucent" },
+  applicationName: "West Side Car Crew",
 };
 
 export const viewport = {
@@ -69,17 +77,26 @@ const orgJsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="da" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="da" suppressHydrationWarning className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body>
+        {/* Apply the saved light/dark theme before paint to avoid a flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "(function(){try{var t=localStorage.getItem('wscc_theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();",
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}
         />
         <I18nProvider>
           <AuthProvider>
-            {children}
-            <NavMenu />
-            <LangSwitcher />
+            <PwaProvider>
+              {children}
+              <NavMenu />
+              <LangSwitcher />
+            </PwaProvider>
           </AuthProvider>
         </I18nProvider>
       </body>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { getPosts, createPost, updatePost, deletePost, togglePin } from "../lib/posts";
+import { notifyCrew } from "../lib/pwa";
 
 const fmtDate = (t) => new Date(t).toLocaleDateString("da-DK", { day: "numeric", month: "short", year: "numeric" });
 const EMPTY = { title: "", body: "", pinned: false, editingId: null, oldImagePath: null, removeImage: false };
@@ -39,6 +40,8 @@ export default function PostManager({ userId }) {
         await updatePost(f.editingId, { title: f.title, body: f.body, pinned: f.pinned, imageFile: file, removeImage: f.removeImage, oldImagePath: f.oldImagePath, userId });
       } else {
         await createPost({ title: f.title, body: f.body, imageFile: file, pinned: f.pinned, userId });
+        // Notify the crew about the news post (best-effort; no-op until push is set up).
+        notifyCrew({ title: "Nyt opslag 📣", body: f.title.trim(), url: "/", tag: "news" });
       }
       reset();
       setMsg("✓ Gemt.");

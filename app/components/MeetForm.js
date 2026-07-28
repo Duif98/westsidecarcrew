@@ -7,6 +7,7 @@ import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
 import { geocode, mapsSearchUrl } from "../lib/geo";
 import { googleSearch, resolvePlace, newSessionToken } from "../lib/googleMaps";
+import { notifyCrew } from "../lib/pwa";
 import MapPicker from "./MapPicker";
 
 const pad = (n) => String(n).padStart(2, "0");
@@ -160,7 +161,19 @@ export default function MeetForm({ presetDate = "", event = null, onClose, onCre
     }
     setBusy(false);
     if (error) { setErr(error.message); return; }
-    if (editing) onSaved?.(data); else onCreated?.(data);
+    if (editing) {
+      onSaved?.(data);
+    } else {
+      // Tell the crew about the new meet (best-effort; no-op until push is set up).
+      const whenTxt = new Date(starts_at).toLocaleDateString("da-DK", { day: "numeric", month: "long" });
+      notifyCrew({
+        title: "Nyt meet 🏁",
+        body: `${data.title} — ${whenTxt}${data.location ? " · " + data.location : ""}`,
+        url: "/events/",
+        tag: "meet-" + data.id,
+      });
+      onCreated?.(data);
+    }
     onClose();
   };
 
