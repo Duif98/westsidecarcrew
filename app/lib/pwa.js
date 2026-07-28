@@ -81,11 +81,14 @@ export async function subscribePush(userId) {
   return !error;
 }
 
-// Fan a notification out to the crew via the send-push Edge Function. Fail-soft:
-// if the function isn't deployed yet (or the call errors) nothing breaks.
+// Fan a notification out to the crew via the push Edge Function. Fail-soft: if
+// the function isn't deployed yet (or the call errors) nothing breaks.
+// NB: the deployed function's slug is "swift-service" (its display name is
+// "send-push" but the Supabase-generated slug can't be renamed after creation).
+const PUSH_FN = "swift-service";
 export async function notifyCrew({ title, body, url, tag }) {
   try {
-    await supabase.functions.invoke("send-push", { body: { title, body, url, tag } });
+    await supabase.functions.invoke(PUSH_FN, { body: { title, body, url, tag } });
   } catch {
     /* function not deployed / offline — ignore */
   }
