@@ -53,6 +53,34 @@ const devStatus = (dev) => {
   return { cls: "bad", label: "For stor forskel" };
 };
 
+const clampStr = (n, step, min, max) => {
+  const c = Math.min(max, Math.max(min, n));
+  return step < 1 ? String(Math.round(c * 10) / 10) : String(Math.round(c));
+};
+
+// Numeric field with −/+ steppers. On focus the value is selected so typing
+// replaces it straight away (fixes the iOS "cursor lands on the left" annoyance).
+function Stepper({ label, value, onChange, step = 1, min = 0, max = 999 }) {
+  const bump = (dir) => {
+    const v = parseFloat(value);
+    onChange(clampStr((isFinite(v) ? v : 0) + dir * step, step, min, max));
+  };
+  return (
+    <div className="stp">
+      {label && <span className="stp-lab">{label}</span>}
+      <div className="stp-row">
+        <button type="button" className="stp-btn" onClick={() => bump(-1)} aria-label="mindre">−</button>
+        <input
+          inputMode="decimal" value={value}
+          onChange={(e) => onChange(e.target.value)}
+          onFocus={(e) => { const el = e.target; setTimeout(() => { try { el.select(); } catch {} }, 0); }}
+        />
+        <button type="button" className="stp-btn" onClick={() => bump(1)} aria-label="mere">+</button>
+      </div>
+    </div>
+  );
+}
+
 export default function DaekPage() {
   const [single, setSingle] = useState({ w: "225", a: "40", rim: "18" });
   const [cmpA, setCmpA] = useState({ w: "225", a: "40", rim: "18" });
@@ -97,12 +125,10 @@ export default function DaekPage() {
   };
 
   const Size3 = ({ val, on }) => (
-    <div className="dk-size">
-      <input inputMode="numeric" value={val.w} onChange={(e) => on({ ...val, w: e.target.value })} aria-label="bredde" />
-      <span>/</span>
-      <input inputMode="numeric" value={val.a} onChange={(e) => on({ ...val, a: e.target.value })} aria-label="profil" />
-      <span>R</span>
-      <input inputMode="numeric" value={val.rim} onChange={(e) => on({ ...val, rim: e.target.value })} aria-label="fælg" />
+    <div className="dk-sizes">
+      <Stepper label="Bredde" value={val.w} step={10} min={125} max={385} onChange={(w) => on({ ...val, w })} />
+      <Stepper label="Profil" value={val.a} step={5} min={20} max={85} onChange={(a) => on({ ...val, a })} />
+      <Stepper label="Fælg (″)" value={val.rim} step={1} min={10} max={24} onChange={(rim) => on({ ...val, rim })} />
     </div>
   );
 
@@ -127,9 +153,9 @@ export default function DaekPage() {
         <section className="dk-card">
           <h2 className="dk-h">1 · Hvilke dæk passer på fælgen?</h2>
           <p className="dk-sub">Vælg din fælgbredde i tommer og se min./anbefalet/maks. dækbredde.</p>
-          <label className="dk-inline"><span>Fælgbredde (tommer)</span>
-            <input inputMode="decimal" value={rimW} onChange={(e) => setRimW(e.target.value)} className="dk-num" />
-          </label>
+          <div className="dk-rimw">
+            <Stepper label="Fælgbredde (tommer)" value={rimW} step={0.5} min={4} max={14} onChange={setRimW} />
+          </div>
           <div className="dk-scroll">
             <table className="dk-table">
               <thead><tr><th>Fælg</th><th>Min.</th><th>Anbefalet</th><th>Maks.</th></tr></thead>
@@ -191,10 +217,10 @@ export default function DaekPage() {
             </div>
             <div>
               <span className="dk-lab">{otherLabel === "for" ? "For (ønsket bredde/fælg)" : "Bag (ønsket bredde/fælg)"}</span>
-              <div className="dk-size">
-                <input inputMode="numeric" value={other.w} onChange={(e) => setOther({ ...other, w: e.target.value })} aria-label="bredde" />
-                <span>/</span><span className="dk-q">?</span><span>R</span>
-                <input inputMode="numeric" value={other.rim} onChange={(e) => setOther({ ...other, rim: e.target.value })} aria-label="fælg" />
+              <div className="dk-sizes">
+                <Stepper label="Bredde" value={other.w} step={10} min={125} max={385} onChange={(w) => setOther({ ...other, w })} />
+                <div className="stp"><span className="stp-lab">Profil</span><div className="stp-q">?</div></div>
+                <Stepper label="Fælg (″)" value={other.rim} step={1} min={10} max={24} onChange={(rim) => setOther({ ...other, rim })} />
               </div>
               <span className="dk-mini">Ideel profil: <b>{oW && refD ? f1(idealAspect) : "–"}</b> (mål)</span>
             </div>
