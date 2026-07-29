@@ -120,7 +120,7 @@ export default function DaekPage() {
 
       <div className="wrap daek-body">
         <span className="overline">Værktøj</span>
-        <h1 className="member-title">Dæk & fælge 🛞</h1>
+        <h1 className="member-title">Dæk & fælge</h1>
         <p className="daek-intro">Regn på dæk- og fælgstørrelser: hvad passer på fælgen, hvor meget flytter speedometeret sig, og — vigtigst for Quattro/AWD — find en for-størrelse med samme rullediameter som bag.</p>
 
         {/* 1. Rim width → tyre width */}

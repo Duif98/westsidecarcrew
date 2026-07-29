@@ -114,7 +114,7 @@ export default function MedlemHub() {
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3.5" /><path d="M12 3v3.5M12 17.5V21M3 12h3.5M17.5 12H21" /></svg>
             </span>
-            <span className="hub-card-title">Dæk & fælge 🛞</span>
+            <span className="hub-card-title">Dæk & fælge</span>
             <span className="hub-card-sub">Regn på dækstørrelser og rullediameter — også til Quattro</span>
             <span className="hub-go">Åbn værktøj →</span>
           </Link>
