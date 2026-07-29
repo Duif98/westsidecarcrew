@@ -1830,6 +1830,33 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .convoy-pin.me { background: var(--gold); color: #16130d; }
 .convoy-pin span { line-height: 1; }
 
+/* ---------- Car care & owner review ---------- */
+.care-form { gap: 0.7rem; }
+.care-divider { height: 1px; background: var(--line); margin: 0.3rem 0; }
+.care-label { font-family: var(--font-mono), monospace; font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); }
+.care-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.care-row { display: flex; align-items: center; gap: 0.6rem; background: var(--bg-1); border: 1px solid var(--line); border-radius: 10px; padding: 0.45rem 0.7rem; }
+.care-cat { flex: none; font-family: var(--font-mono), monospace; font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold-bright); background: rgba(201,168,119,0.1); border: 1px solid var(--gold-deep, rgba(201,168,119,0.3)); border-radius: 999px; padding: 0.2rem 0.55rem; }
+.care-name { flex: 1; min-width: 0; font-size: 0.88rem; }
+.care-note { color: var(--muted); }
+.care-del { flex: none; background: transparent; border: none; color: var(--faint); cursor: pointer; font-size: 0.9rem; padding: 0.2rem 0.4rem; }
+.care-del:hover { color: #d05c5c; }
+.care-add { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+.care-add select, .care-add input { background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 8px; padding: 0.5rem 0.6rem; color: var(--text); font-size: 0.85rem; }
+.care-add select { flex: none; }
+.care-add input { flex: 1; min-width: 140px; }
+.care-add select:focus, .care-add input:focus { outline: none; border-color: var(--gold); }
+/* Read-only display on the public car page */
+.car-review { margin-top: 1.5rem; background: var(--bg-2); border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: 12px; padding: 1rem 1.2rem; }
+.car-review-label, .car-care-label { display: block; font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.5rem; }
+.car-review p { color: var(--text); line-height: 1.65; font-size: 0.95rem; white-space: pre-wrap; }
+.car-care { margin-top: 1.4rem; }
+.car-care-list { display: flex; flex-direction: column; gap: 0.4rem; }
+.car-care-item { display: flex; align-items: center; gap: 0.7rem; background: var(--bg-2); border: 1px solid var(--line); border-radius: 10px; padding: 0.5rem 0.8rem; }
+.car-care-cat { flex: none; font-family: var(--font-mono), monospace; font-size: 0.6rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--gold-bright); background: rgba(201,168,119,0.1); border-radius: 999px; padding: 0.2rem 0.55rem; }
+.car-care-name { font-size: 0.9rem; }
+.car-care-note { color: var(--muted); }
+
 /* ---------- Crew dashboard (members-only) ---------- */
 .dash-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }
 .dash-intro { color: var(--muted); font-size: 0.95rem; margin-top: 0.6rem; }

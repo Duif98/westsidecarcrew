@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "../../lib/supabaseClient";
 import { withUrls } from "../../lib/photos";
+import { getCarProducts } from "../../lib/carcare";
 import { cars } from "../../data/cars";
 import { asset } from "../../lib/asset";
 import Lightbox from "../../components/Lightbox";
@@ -18,6 +19,7 @@ export default function CarShowcase({ slug }) {
   const car = carsBySlug[slug];
   const [album, setAlbum] = useState(undefined); // undefined = loading
   const [items, setItems] = useState([]);
+  const [products, setProducts] = useState([]);
   const [gallery, setGallery] = useState(null);
 
   useEffect(() => {
@@ -30,6 +32,7 @@ export default function CarShowcase({ slug }) {
           .select("id, bucket, path, album_id, car")
           .eq("album_id", al.id).eq("visibility", "public").eq("approved", true);
         up = await withUrls(ph || []);
+        getCarProducts(al.id).then((p) => { if (active) setProducts(p); });
       }
       const repoItems = car
         ? car.photos.map((p) => ({ full: asset(`/cars/${car.slug}/${p.src}`), thumb: asset(`/cars/${car.slug}/thumb/${p.src}`), alt: `${car.make} ${car.model}` }))
@@ -82,6 +85,27 @@ export default function CarShowcase({ slug }) {
         {specs && <p className="car-specs">{specs}</p>}
         {car?.blurb && <p className="car-blurb">{car.blurb}</p>}
         {car?.tags?.length ? <div className="car-tags">{car.tags.map((tg) => <span className="car-tag" key={tg}>{tg}</span>)}</div> : null}
+
+        {album?.owner_review && (
+          <div className="car-review">
+            <span className="car-review-label">Ejerens ord</span>
+            <p>{album.owner_review}</p>
+          </div>
+        )}
+
+        {products.length > 0 && (
+          <div className="car-care">
+            <span className="car-care-label">Bilpleje &amp; væsker</span>
+            <div className="car-care-list">
+              {products.map((p) => (
+                <div className="car-care-item" key={p.id}>
+                  <span className="car-care-cat">{p.category}</span>
+                  <span className="car-care-name">{p.name}{p.note ? <span className="car-care-note"> · {p.note}</span> : null}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {items.length > 0 ? (
           <div className="car-grid">

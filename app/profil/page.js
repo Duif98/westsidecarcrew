@@ -13,6 +13,7 @@ import PhotoLightbox from "../components/PhotoLightbox";
 import ProfileWall from "../components/ProfileWall";
 import AvatarCropper from "../components/AvatarCropper";
 import CarInfoEditor from "../components/CarInfoEditor";
+import CarCareEditor from "../components/CarCareEditor";
 import AddCarForm from "../components/AddCarForm";
 
 const specLine = (a) => [a.model_year, a.engine, a.power_hp ? `${a.power_hp} hk` : null, a.drivetrain].filter(Boolean).join(" · ");
@@ -340,6 +341,18 @@ function ProfileInner() {
           <div className="cie-list">
             {albums.filter((a) => a.created_by === user.id).map((a) => (
               <CarInfoEditor key={a.id} album={a} onSaved={(patch) => setAlbums((prev) => prev.map((x) => (x.id === a.id ? { ...x, ...patch } : x)))} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {me && albums.some((a) => a.created_by === user.id) && (
+        <section className="profil-section">
+          <span className="overline">Bilpleje & væsker</span>
+          <p className="muted" style={{ fontSize: "0.88rem", margin: "0 0 0.9rem" }}>Notér hvad du bruger — motorolie, voks, dæk, bremser — og skriv en kort ejer-anmeldelse. Vises på bilens side.</p>
+          <div className="cie-list">
+            {albums.filter((a) => a.created_by === user.id).map((a) => (
+              <CarCareEditor key={a.id} album={a} userId={user.id} onReviewSaved={(rev) => setAlbums((prev) => prev.map((x) => (x.id === a.id ? { ...x, owner_review: rev } : x)))} />
             ))}
           </div>
         </section>
