@@ -74,7 +74,6 @@ export default function NavMenu() {
                 <Link href="/notifikationer" className="nav-m-link" onClick={close}>{t("nav.inbox")}</Link>
                 <Link href="/chat" className="nav-m-link" onClick={close}>{t("nav.crewChat")}</Link>
                 <Link href="/vask" className="nav-m-link" onClick={close}>{t("nav.wash")}</Link>
-                <Link href="/konvoj" className="nav-m-link" onClick={close}>{t("nav.convoy")}</Link>
                 <Link href="/upload" className="nav-m-link" onClick={close}>{t("nav.uploadPhotos")}</Link>
                 <Link href="/mine-meets" className="nav-m-link" onClick={close}>{t("nav.myMeets")}</Link>
                 <Link href="/reservedelskatalog" className="nav-m-link" onClick={close}>{t("nav.parts")}</Link>
