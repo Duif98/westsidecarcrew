@@ -28,7 +28,7 @@ const M = {
     nav: {
       crew: "Crewet", garage: "Garagen", members: "Medlemmer", meets: "Meets",
       calendar: "Kalender", map: "Kort", instagram: "Instagram",
-      myProfile: "Min profil", login: "Log ind", inbox: "Notifikationer", crewChat: "Crew chat", wash: "Vask bil",
+      myProfile: "Min profil", login: "Log ind", inbox: "Notifikationer", crewChat: "Crew chat", wash: "Vask bil", convoy: "Konvoj",
       uploadPhotos: "Upload billeder", leaderboard: "Leaderboard", parts: "Reservedelskatalog", manuals: "Manualer", dashboard: "Dashboard", myMeets: "Mine meets", admin: "Admin",
       logout: "Log ud", viewProfile: "Se din profil", joinCrew: "Bliv en del af crewet",
       openMenu: "Åbn menu", closeMenu: "Luk menu", toTop: "West Side Car Crew — til toppen",
@@ -234,7 +234,7 @@ const M = {
     nav: {
       crew: "The Crew", garage: "The Garage", members: "Members", meets: "Meets",
       calendar: "Calendar", map: "Map", instagram: "Instagram",
-      myProfile: "My profile", login: "Log in", inbox: "Notifications", crewChat: "Crew chat", wash: "Wash car",
+      myProfile: "My profile", login: "Log in", inbox: "Notifications", crewChat: "Crew chat", wash: "Wash car", convoy: "Convoy",
       uploadPhotos: "Upload photos", leaderboard: "Leaderboard", parts: "Parts catalog", manuals: "Manuals", dashboard: "Dashboard", myMeets: "My meets", admin: "Admin",
       logout: "Log out", viewProfile: "View your profile", joinCrew: "Join the crew",
       openMenu: "Open menu", closeMenu: "Close menu", toTop: "West Side Car Crew — to top",
@@ -439,7 +439,7 @@ const M = {
     nav: {
       crew: "Die Crew", garage: "Die Garage", members: "Mitglieder", meets: "Meets",
       calendar: "Kalender", map: "Karte", instagram: "Instagram",
-      myProfile: "Mein Profil", login: "Anmelden", inbox: "Benachrichtigungen", crewChat: "Crew-Chat", wash: "Auto waschen",
+      myProfile: "Mein Profil", login: "Anmelden", inbox: "Benachrichtigungen", crewChat: "Crew-Chat", wash: "Auto waschen", convoy: "Konvoi",
       uploadPhotos: "Fotos hochladen", leaderboard: "Bestenliste", parts: "Ersatzteilkatalog", manuals: "Handbücher", dashboard: "Dashboard", myMeets: "Meine Meets", admin: "Admin",
       logout: "Abmelden", viewProfile: "Dein Profil ansehen", joinCrew: "Teil der Crew werden",
       openMenu: "Menü öffnen", closeMenu: "Menü schließen", toTop: "West Side Car Crew — nach oben",

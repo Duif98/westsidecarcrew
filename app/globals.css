@@ -1805,6 +1805,31 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .wash-join:hover { background: var(--gold); color: var(--on-gold, #16130d); }
 .wash-join.on { background: rgba(201,168,119,0.14); }
 
+/* ---------- Konvoj (live convoy tracker) ---------- */
+.convoy-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }
+.convoy-intro { color: var(--muted); font-size: 0.95rem; margin-top: 0.6rem; max-width: 52ch; line-height: 1.6; }
+.convoy-toggle { display: flex; align-items: center; gap: 1rem; justify-content: space-between; background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; padding: 1rem 1.2rem; margin-top: 1.4rem; }
+.convoy-toggle.on { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold-deep, rgba(201,168,119,0.3)); }
+.convoy-toggle-txt { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.convoy-toggle-txt b { font-size: 1.05rem; }
+.convoy-toggle-txt span { font-size: 0.85rem; color: var(--muted); }
+.convoy-btn { flex: none; border: none; border-radius: 999px; padding: 0.65rem 1.2rem; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: filter 0.2s, background 0.2s; }
+.convoy-btn.go { background: var(--gold); color: var(--on-gold, #16130d); }
+.convoy-btn.go:hover { filter: brightness(1.08); }
+.convoy-btn.stop { background: rgba(208,92,92,0.16); color: #e08a8a; border: 1px solid rgba(208,92,92,0.5); }
+.convoy-map-wrap { position: relative; margin-top: 1.4rem; border-radius: 16px; overflow: hidden; border: 1px solid var(--line); }
+.convoy-map { width: 100%; height: min(60vh, 460px); background: var(--bg-1); }
+.convoy-map-empty { position: absolute; inset: 0; z-index: 500; display: flex; align-items: center; justify-content: center; text-align: center; padding: 1.5rem; color: var(--muted); font-size: 0.9rem; background: rgba(10,10,12,0.55); pointer-events: none; }
+.convoy-people { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.convoy-chip { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; color: var(--text); background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 999px; padding: 0.35rem 0.75rem; }
+.convoy-chip.me { border-color: var(--gold); color: var(--gold-bright); }
+.convoy-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ec27a; box-shadow: 0 0 0 3px rgba(78,194,122,0.2); }
+.convoy-note { margin-top: 1.2rem; font-size: 0.82rem; color: var(--faint); line-height: 1.6; }
+/* Live position marker */
+.convoy-pin { width: 30px; height: 30px; border-radius: 50%; background: #5c8bd0; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; color: #fff; font-family: var(--font-mono), monospace; font-weight: 700; font-size: 0.8rem; }
+.convoy-pin.me { background: var(--gold); color: #16130d; }
+.convoy-pin span { line-height: 1; }
+
 /* ---------- Crew dashboard (members-only) ---------- */
 .dash-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }
 .dash-intro { color: var(--muted); font-size: 0.95rem; margin-top: 0.6rem; }

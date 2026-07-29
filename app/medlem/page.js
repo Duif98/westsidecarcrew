@@ -92,6 +92,15 @@ export default function MedlemHub() {
             <span className="hub-go">Til meets →</span>
           </Link>
 
+          <Link href="/konvoj" className="hub-card events">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 21s7-5.2 7-11a7 7 0 0 0-14 0c0 5.8 7 11 7 11z" /><circle cx="12" cy="10" r="2.5" /></svg>
+            </span>
+            <span className="hub-card-title">Konvoj 🛰</span>
+            <span className="hub-card-sub">Del position under fælles ture, så I holder sammen</span>
+            <span className="hub-go">Åbn konvoj →</span>
+          </Link>
+
           <Link href="/leaderboard" className="hub-card board">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21h8M12 17v4" /><path d="M7 4h10v4a5 5 0 0 1-10 0z" /><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" /></svg>
