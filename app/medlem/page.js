@@ -64,6 +64,15 @@ export default function MedlemHub() {
             <span className="hub-go">Åbn chat →</span>
           </Link>
 
+          <Link href="/vask" className="hub-card garage">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 20V10l2-5h6l2 5v10" /><path d="M7 15h10" /><circle cx="9.5" cy="17.5" r="1" /><circle cx="14.5" cy="17.5" r="1" /><path d="M6 6c0 1-1 1.5-1 2.5M9.5 5c0 1-1 1.5-1 2.5M13 6c0 1-1 1.5-1 2.5" /></svg>
+            </span>
+            <span className="hub-card-title">Vask bil 🧽</span>
+            <span className="hub-card-sub">Sig til når du vasker — så kan de andre komme og vaske med</span>
+            <span className="hub-go">Til vask →</span>
+          </Link>
+
           <Link href="/upload" className="hub-card garage">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5 12 4l9 5.5" /><path d="M5 10v9h14v-9" /><path d="M8 19v-5h8v5" /><circle cx="12" cy="12" r="1" /></svg>

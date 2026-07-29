@@ -1776,6 +1776,35 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .mm-status.yes { color: #4ec27a; border-color: rgba(78,194,122,0.4); background: rgba(78,194,122,0.1); }
 .mm-status.maybe { color: var(--gold-bright); border-color: var(--gold-deep); background: rgba(201,168,119,0.1); }
 
+/* ---------- Vask bil (members-only) ---------- */
+.wash-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }
+.wash-intro { color: var(--muted); font-size: 0.95rem; margin-top: 0.6rem; max-width: 46ch; }
+.wash-start { background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; padding: 1.2rem; margin-top: 1.4rem; display: flex; flex-direction: column; gap: 0.85rem; }
+.wash-seg { display: flex; gap: 0.5rem; background: var(--bg-1); border: 1px solid var(--line); border-radius: 999px; padding: 0.25rem; }
+.wash-seg button { flex: 1; border: none; background: transparent; color: var(--muted); font-size: 0.9rem; font-weight: 500; padding: 0.55rem 0.6rem; border-radius: 999px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.wash-seg button.on { background: var(--gold); color: var(--on-gold, #16130d); }
+.wash-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1.8rem; }
+.wash-empty { text-align: center; color: var(--muted); background: var(--bg-2); border: 1px dashed var(--line-2); border-radius: 16px; padding: 2rem 1.2rem; }
+.wash-empty-ico { font-size: 2rem; display: block; margin-bottom: 0.4rem; }
+.wash-card { background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.6rem; }
+.wash-card.live { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold-deep, rgba(201,168,119,0.3)); }
+.wash-card-head { display: flex; align-items: center; gap: 0.8rem; }
+.wash-av { flex: none; width: 42px; height: 42px; border-radius: 50%; overflow: hidden; background: var(--bg-1); border: 1px solid var(--line-2); display: flex; align-items: center; justify-content: center; font-family: var(--font-display), serif; font-size: 1.1rem; color: var(--gold-bright); }
+.wash-av img { width: 100%; height: 100%; object-fit: cover; }
+.wash-who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.1rem; }
+.wash-who b { font-size: 1.02rem; font-weight: 600; }
+.wash-when { font-size: 0.8rem; color: var(--muted); }
+.wash-when.now { color: var(--gold-bright); font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.05em; }
+.wash-end { flex: none; background: transparent; border: 1px solid var(--line-2); color: var(--muted); font-size: 0.78rem; padding: 0.35rem 0.7rem; border-radius: 999px; cursor: pointer; }
+.wash-end:hover { border-color: #d05c5c; color: #d05c5c; }
+.wash-loc { font-size: 0.9rem; color: var(--text); }
+.wash-note { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
+.wash-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; flex-wrap: wrap; margin-top: 0.2rem; }
+.wash-joiners { font-size: 0.82rem; color: var(--muted); }
+.wash-join { margin-left: auto; background: transparent; border: 1px solid var(--gold-deep, var(--gold)); color: var(--gold-bright); font-size: 0.82rem; font-weight: 500; padding: 0.4rem 0.85rem; border-radius: 999px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.wash-join:hover { background: var(--gold); color: var(--on-gold, #16130d); }
+.wash-join.on { background: rgba(201,168,119,0.14); }
+
 /* ---------- Crew dashboard (members-only) ---------- */
 .dash-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }
 .dash-intro { color: var(--muted); font-size: 0.95rem; margin-top: 0.6rem; }
