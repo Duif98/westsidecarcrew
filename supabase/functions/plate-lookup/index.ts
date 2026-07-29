@@ -13,7 +13,10 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const ANON = Deno.env.get("SUPABASE_ANON_KEY")!;
-const MOTORAPI_TOKEN = Deno.env.get("MOTORAPI_TOKEN") || "";
+// Trim whitespace/newlines and strip surrounding quotes — pasting a secret into
+// the dashboard often drags along a trailing newline or quotes, which MotorAPI
+// then rejects as a bad token (the real key is 32 chars, no quotes).
+const MOTORAPI_TOKEN = (Deno.env.get("MOTORAPI_TOKEN") || "").trim().replace(/^["']+|["']+$/g, "").trim();
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -40,7 +43,9 @@ Deno.serve(async (req) => {
       headers: { "X-AUTH-TOKEN": MOTORAPI_TOKEN, Accept: "application/json" },
     });
     if (r.status === 404) return json({ ok: false, error: "notfound" });
-    if (r.status === 401 || r.status === 403) return json({ ok: false, error: "badtoken" });
+    // `len` is the trimmed token length (32 for a valid key) — safe to expose and
+    // lets us tell "wrong characters" (len 32) from "stray whitespace/quotes" (len ≠ 32).
+    if (r.status === 401 || r.status === 403) return json({ ok: false, error: "badtoken", len: MOTORAPI_TOKEN.length });
     if (r.status === 429) return json({ ok: false, error: "quota" });
     if (!r.ok) return json({ ok: false, error: "upstream", status: r.status });
 
