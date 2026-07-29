@@ -1805,6 +1805,53 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .wash-join:hover { background: var(--gold); color: var(--on-gold, #16130d); }
 .wash-join.on { background: rgba(201,168,119,0.14); }
 
+/* ---------- Dæk & fælge (tyre toolbox) ---------- */
+.daek-body { padding-top: clamp(5rem, 12vw, 7rem); padding-bottom: clamp(3rem, 8vw, 5rem); }
+.daek-intro { color: var(--muted); font-size: 0.95rem; margin-top: 0.6rem; max-width: 60ch; line-height: 1.6; }
+.dk-card { background: var(--bg-2); border: 1px solid var(--line); border-radius: 16px; padding: 1.2rem; margin-top: 1.4rem; }
+.dk-card.dk-star { border-color: var(--gold); box-shadow: 0 0 0 1px var(--gold-deep, rgba(201,168,119,0.3)); }
+.dk-h { font-family: var(--font-display), serif; font-size: 1.2rem; letter-spacing: -0.01em; margin-bottom: 0.3rem; }
+.dk-sub { color: var(--muted); font-size: 0.88rem; line-height: 1.55; margin-bottom: 0.9rem; }
+.dk-note { color: var(--faint); font-size: 0.8rem; line-height: 1.55; margin-top: 0.9rem; }
+.dk-inline { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.9rem; font-size: 0.85rem; color: var(--muted); }
+.dk-num { width: 90px; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 8px; padding: 0.5rem 0.6rem; color: var(--text); font-size: 1rem; text-align: center; }
+.dk-lab { display: block; font-family: var(--font-mono), monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.4rem; }
+.dk-size { display: inline-flex; align-items: center; gap: 0.35rem; font-family: var(--font-mono), monospace; font-size: 1.05rem; color: var(--text); }
+.dk-size input { width: 3.4ch; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 8px; padding: 0.5rem 0.3rem; color: var(--text); font: inherit; text-align: center; }
+.dk-size input:focus { outline: none; border-color: var(--gold); }
+.dk-size .dk-q { color: var(--gold-bright); width: 3.4ch; text-align: center; }
+.dk-out { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 0.7rem; margin-top: 1rem; }
+.dk-out > div { background: var(--bg-1); border: 1px solid var(--line); border-radius: 12px; padding: 0.7rem; text-align: center; }
+.dk-out b { display: block; font-size: 1.05rem; color: var(--text); }
+.dk-out span { font-size: 0.66rem; color: var(--faint); font-family: var(--font-mono), monospace; letter-spacing: 0.04em; text-transform: uppercase; }
+.dk-out .ok b { color: #4ec27a; } .dk-out .warn b { color: var(--gold-bright); } .dk-out .bad b { color: #e08a8a; }
+.dk-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.dk-mini { display: block; font-size: 0.78rem; color: var(--muted); margin-top: 0.5rem; }
+.dk-seg { display: flex; gap: 0.5rem; background: var(--bg-1); border: 1px solid var(--line); border-radius: 999px; padding: 0.25rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.dk-seg button { flex: 1; min-width: 150px; border: none; background: transparent; color: var(--muted); font-size: 0.85rem; font-weight: 500; padding: 0.55rem 0.6rem; border-radius: 999px; cursor: pointer; }
+.dk-seg button.on { background: var(--gold); color: var(--on-gold, #16130d); }
+.dk-scroll { overflow-x: auto; margin-top: 1rem; }
+.dk-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.dk-table th { text-align: left; font-family: var(--font-mono), monospace; font-size: 0.6rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--line); }
+.dk-table td { padding: 0.45rem 0.6rem; border-bottom: 1px solid var(--line); color: var(--text); white-space: nowrap; }
+.dk-table tr.hit td { background: rgba(201,168,119,0.12); color: var(--gold-bright); }
+.dk-opts tr.ok td { background: rgba(78,194,122,0.08); } .dk-opts tr.warn td { background: rgba(201,168,119,0.08); } .dk-opts tr.bad td { opacity: 0.6; }
+.dk-chip { display: inline-block; font-family: var(--font-mono), monospace; font-size: 0.6rem; letter-spacing: 0.04em; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 999px; border: 1px solid var(--line-2); }
+.dk-chip.ok { color: #4ec27a; border-color: rgba(78,194,122,0.4); background: rgba(78,194,122,0.1); }
+.dk-chip.warn { color: var(--gold-bright); border-color: var(--gold-deep, rgba(201,168,119,0.4)); background: rgba(201,168,119,0.1); }
+.dk-chip.bad { color: #e08a8a; border-color: rgba(208,92,92,0.4); background: rgba(208,92,92,0.1); }
+.dk-presets { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.7rem; }
+.dk-preset { background: var(--bg-1); border: 1px solid var(--line); border-radius: 12px; padding: 0.8rem; }
+.dk-preset-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.dk-preset-head b { font-size: 0.92rem; }
+.dk-preset-use { flex: none; background: transparent; border: 1px solid var(--gold-deep, var(--gold)); color: var(--gold-bright); font-size: 0.72rem; padding: 0.3rem 0.6rem; border-radius: 999px; cursor: pointer; }
+.dk-preset-use:hover { background: var(--gold); color: var(--on-gold, #16130d); }
+.dk-preset-sizes { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.8rem; margin-top: 0.5rem; font-size: 0.82rem; color: var(--muted); }
+.dk-preset-sizes b { color: var(--text); }
+.dk-preset-note { display: block; font-size: 0.76rem; color: var(--faint); margin-top: 0.4rem; }
+.daek-foot { margin-top: 1.6rem; }
+@media (max-width: 560px) { .dk-cmp { grid-template-columns: 1fr; } }
+
 /* ---------- Car care & owner review ---------- */
 .care-form { gap: 0.7rem; }
 .care-divider { height: 1px; background: var(--line); margin: 0.3rem 0; }
