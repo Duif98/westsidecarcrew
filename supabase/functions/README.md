@@ -92,3 +92,52 @@ Sender automatisk en push ~3 timer før et meet til dem der har sagt ja/måske.
    - Se kørsler: `select * from cron.job_run_details order by start_time desc limit 20;`
 
 Funktionen er idempotent (`reminder_sent_at`), så hvert meet minder kun én gang.
+
+---
+
+# Nummerplade-opslag (`plate-lookup`)
+
+Slår en dansk nummerplade op i motorregisteret (via **MotorAPI**, `v1.motorapi.dk`)
+og udfylder bilens mærke/model/årgang/effekt/stelnummer automatisk i "Tilføj bil".
+API-nøglen ligger **kun** på serveren (Edge Function) — aldrig i den offentlige bundle,
+og der er ingen browser-CORS at slås med.
+
+## 1. Hent en gratis MotorAPI-nøgle
+
+Gå til [motorapi.dk](https://motorapi.dk/), skriv din e-mail, og få en **auth token**
+tilsendt. Gratis-niveauet er **100 opslag/dag** — rigeligt til et crew på 15.
+(Alternativ med 500/dag: [autotelli.dk](https://autotelli.dk/) — kræver en credit-
+link tilbage; hvis I skifter dertil, ret endpoint/header i `index.ts`.)
+
+## 2. Deploy funktionen
+
+1. **Deploy** funktionen `plate-lookup` (kode i
+   `supabase/functions/plate-lookup/index.ts`) — via dashboard eller CLI.
+2. **Slå "Verify JWT" FRA** for funktionen. (Platformens JWT-gate 401'er browserens
+   CORS-preflight — samme fælde som `send-push`/`swift-service` ramte. Funktionen
+   tjekker selv medlems-login via `getUser()`, så kun indloggede medlemmer kan bruge
+   den og bruge af dagskvoten.)
+
+## 3. Sæt API-nøglen som secret
+
+```bash
+supabase secrets set MOTORAPI_TOKEN=DIN_MOTORAPI_TOKEN
+```
+
+…eller i dashboardet: **Edge Functions → plate-lookup → Secrets** (alternativt
+Project Settings → Edge Functions → Secrets). `SUPABASE_URL` + `SUPABASE_ANON_KEY`
+er sat automatisk.
+
+## 4. Verificér + finjustér felt-mapping
+
+MotorAPI's præcise JSON-feltnavne er ikke offentlige uden nøgle, så funktionen leder
+efter felterne på flere mulige navne **og returnerer også `raw`** (hele svaret).
+Ved første rigtige opslag: kig i `raw` (fx i Network-fanen eller funktionens logs)
+og bekræft at mærke/model/årgang/effekt/VIN rammer rigtigt. Rammer et felt forbi,
+tilføj feltnavnet i `normalize()` i `index.ts` og re-deploy.
+
+> **Slug-fælde igen:** hvis dashboardet auto-navngiver funktionen (fx `brave-xxx`),
+> skal `PLATE_FN` i `app/lib/plate.js` opdateres — ellers 404'er kaldet og opslaget
+> falder blødt tilbage til manuel indtastning. Sigt efter slug `plate-lookup`.
+
+Ingen migration nødvendig — bilens specs gemmes i de eksisterende `albums`-kolonner.

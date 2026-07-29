@@ -4,6 +4,7 @@ import { useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { createAlbum } from "../lib/albums";
 import { uploadPhoto } from "../lib/photos";
+import { lookupPlate } from "../lib/plate";
 
 // Add a whole new car from your own profile: creates an album (created_by = you),
 // writes its specs + optional VIN, and uploads a public cover photo. Once an
@@ -14,8 +15,41 @@ export default function AddCarForm({ userId, ownerName, onCreated }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [form, setForm] = useState({ make: "", model: "", model_year: "", power_hp: "", engine: "", drivetrain: "", mods: "", vin: "", sold: false });
+  const [plate, setPlate] = useState("");
+  const [looking, setLooking] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState("");
+
+  // Look the plate up in the Danish motor register and prefill the specs. Fails
+  // soft: any problem just shows a note and leaves the manual fields for the user.
+  const lookup = async () => {
+    const p = plate.trim();
+    if (!p) return;
+    setLooking(true); setMsg("");
+    const res = await lookupPlate(p);
+    setLooking(false);
+    if (!res.ok) {
+      setMsg({
+        notfound: "Ingen bil fundet på den nummerplade — skriv felterne selv.",
+        unauthorized: "Log ind for at slå nummerplade op.",
+        unconfigured: "Nummerplade-opslag er ikke sat op endnu — skriv felterne selv.",
+        quota: "Dagens gratis opslag er brugt op — prøv igen i morgen, eller skriv felterne selv.",
+        badtoken: "Nummerplade-opslag mangler en gyldig nøgle — skriv felterne selv.",
+      }[res.error] || "Kunne ikke slå nummerpladen op — skriv felterne selv.");
+      return;
+    }
+    const c = res.car || {};
+    setForm((f) => ({
+      ...f,
+      make: [c.make, c.model].filter(Boolean).join(" ") || f.make,
+      model: c.variant || f.model,
+      model_year: c.model_year ? String(c.model_year) : f.model_year,
+      power_hp: c.power_hp ? String(c.power_hp) : f.power_hp,
+      engine: c.engine || f.engine,
+      vin: c.vin || f.vin,
+    }));
+    setMsg("✓ Bil-data hentet fra nummerpladen — tjek felterne og ret hvis nødvendigt.");
+  };
 
   const pickFile = (f) => {
     if (preview) URL.revokeObjectURL(preview);
@@ -29,6 +63,7 @@ export default function AddCarForm({ userId, ownerName, onCreated }) {
   const reset = () => {
     if (preview) URL.revokeObjectURL(preview);
     setFile(null); setPreview(null);
+    setPlate("");
     setForm({ make: "", model: "", model_year: "", power_hp: "", engine: "", drivetrain: "", mods: "", vin: "", sold: false });
   };
 
@@ -74,6 +109,22 @@ export default function AddCarForm({ userId, ownerName, onCreated }) {
         <input type="file" accept="image/*" onChange={(e) => pickFile(e.target.files?.[0] || null)} />
         {preview ? <img className="file-preview" src={preview} alt="Forhåndsvisning" /> : <span>Vælg et billede af bilen…</span>}
       </label>
+
+      <div className="plate-row">
+        <div className="plate-input">
+          <span className="plate-flag">DK</span>
+          <input
+            value={plate}
+            onChange={(e) => setPlate(e.target.value.toUpperCase())}
+            onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); lookup(); } }}
+            placeholder="AB12345" maxLength={8} spellCheck={false} aria-label="Nummerplade"
+          />
+        </div>
+        <button type="button" className="ph-btn" style={{ flex: "none", width: "auto" }} onClick={lookup} disabled={looking || !plate.trim()}>
+          {looking ? "Henter…" : "Hent bil-data"}
+        </button>
+      </div>
+      <p className="plate-hint">Skriv nummerpladen, så udfylder vi mærke, model, årgang, effekt og stelnummer automatisk. Du kan altid rette bagefter.</p>
 
       <div className="ef-grid">
         <label className="post-field"><span>Bil (mærke & model)</span><input value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} placeholder="fx Porsche Cayenne Turbo" /></label>
