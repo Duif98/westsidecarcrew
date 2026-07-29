@@ -73,7 +73,7 @@ function deepFind(obj: any, names: string[]): any {
 function normalize(raw: any) {
   const make = deepFind(raw, ["make", "brand", "maerke", "vehicleMake", "manufacturer", "fabrikat"]);
   const model = deepFind(raw, ["model", "vehicleModel", "modelName"]);
-  const variant = deepFind(raw, ["variant", "version", "type"]);
+  const variant = deepFind(raw, ["variant", "version"]);
   const vin = deepFind(raw, ["vin", "chassisNumber", "stelnummer", "chassis"]);
   const fuel = deepFind(raw, ["fuelType", "fuel", "drivkraft", "drivmiddel", "braendstof"]);
 
@@ -99,8 +99,10 @@ function normalize(raw: any) {
   let engine = deepFind(raw, ["engine", "engineDescription", "motor", "engineName"]);
   if (!engine) {
     const disp = deepFind(raw, ["engineVolume", "displacement", "slagvolumen", "ccm", "cylinderVolume"]);
+    const cyl = deepFind(raw, ["engineCylinders", "cylinders", "cylindre", "antalCylindre"]);
     const litre = disp ? (Number(disp) >= 100 ? (Number(disp) / 1000).toFixed(1) + "L" : Number(disp).toFixed(1) + "L") : "";
-    engine = [litre, fuel].filter(Boolean).join(" ").trim() || null;
+    const cylLabel = cyl ? `${cyl}-cyl.` : "";
+    engine = [litre, cylLabel, fuel].filter(Boolean).join(" ").trim() || null;
   }
 
   return {
