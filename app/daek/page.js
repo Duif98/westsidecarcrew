@@ -219,10 +219,10 @@ export default function DaekPage() {
               <span className="dk-lab">{otherLabel === "for" ? "For (ønsket bredde/fælg)" : "Bag (ønsket bredde/fælg)"}</span>
               <div className="dk-sizes">
                 <Stepper label="Bredde" value={other.w} step={10} min={125} max={385} onChange={(w) => setOther({ ...other, w })} />
-                <div className="stp"><span className="stp-lab">Profil</span><div className="stp-q">?</div></div>
+                <div className="stp"><span className="stp-lab">Profil (mål)</span><div className="stp-q">{oW && refD ? f1(idealAspect) : "?"}</div></div>
                 <Stepper label="Fælg (″)" value={other.rim} step={1} min={10} max={24} onChange={(rim) => setOther({ ...other, rim })} />
               </div>
-              <span className="dk-mini">Ideel profil: <b>{oW && refD ? f1(idealAspect) : "–"}</b> (mål)</span>
+              <span className="dk-mini">Profilen udregnes så rullediameteren matcher — vælg den nærmeste standardstørrelse fra listen nedenfor.</span>
             </div>
           </div>
 
