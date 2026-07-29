@@ -1313,7 +1313,9 @@ a.btn-gold { text-decoration: none; }
 
 /* ---------- Admin: car manager (assign + VIN) ---------- */
 .cm-list { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 1rem; }
-.cm-row { display: grid; grid-template-columns: 1.3fr 1fr 1.1fr 1.1fr; gap: 0.9rem; align-items: end; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 0.9rem 1rem; }
+.cm-row { display: grid; grid-template-columns: 1.3fr 1fr 0.7fr 1.1fr 1.1fr; gap: 0.9rem; align-items: end; background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 0.9rem 1rem; }
+.cm-check { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0; font-size: 0.85rem; color: var(--text); cursor: pointer; text-transform: none; letter-spacing: 0; }
+.cm-check input { width: auto; accent-color: var(--gold); cursor: pointer; }
 .cm-car { display: flex; flex-direction: column; gap: 0.2rem; }
 .cm-car b { font-size: 1rem; font-weight: 500; }
 .cm-sub { color: var(--faint); font-family: var(--font-mono), monospace; font-size: 0.68rem; }
@@ -1663,7 +1665,6 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .pcar { text-align: left; background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; cursor: pointer; transition: transform 0.2s var(--ease), border-color 0.2s; }
 .pcar:hover { transform: translateY(-3px); border-color: var(--gold); }
 .pcar.sold { position: relative; }
-.pcar.sold img { filter: grayscale(0.55) brightness(0.82); }
 .pcar-sold { position: absolute; top: 0.5rem; left: 0.5rem; z-index: 2; font-family: var(--font-mono), monospace; font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; background: rgba(200,60,60,0.92); border-radius: 6px; padding: 0.2rem 0.5rem; }
 .pcar img, .pcar-noimg { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
 .pcar-noimg { background: var(--bg-3); }

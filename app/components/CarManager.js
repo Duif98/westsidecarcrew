@@ -71,6 +71,16 @@ export default function CarManager() {
     }
   };
 
+  // Admin marks any car sold/unsold (albums.sold, migration 027). Relies on the
+  // "albums update admin" RLS policy — same as assign/VIN.
+  const setSold = async (albumId, sold) => {
+    setBusy(albumId);
+    const { error } = await supabase.from("albums").update({ sold }).eq("id", albumId);
+    setBusy(null);
+    if (error) { alert(error.message); return; }
+    setAlbums((list) => list.map((a) => (a.id === albumId ? { ...a, sold } : a)));
+  };
+
   const saveVin = async (albumId) => {
     const vin = (vinDraft[albumId] ?? "").trim().toUpperCase();
     setBusy(albumId);
@@ -106,6 +116,15 @@ export default function CarManager() {
                   <option value="">— ikke tildelt —</option>
                   {profiles.map((p) => <option key={p.id} value={p.id}>@{p.username}</option>)}
                 </select>
+              </label>
+
+              <label className="cm-field cm-sold">
+                <span>Status</span>
+                <label className="cm-check">
+                  <input type="checkbox" checked={!!a.sold} disabled={busy === a.id}
+                    onChange={(e) => setSold(a.id, e.target.checked)} />
+                  <span>Solgt</span>
+                </label>
               </label>
 
               <label className="cm-field">
