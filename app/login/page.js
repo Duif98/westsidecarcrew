@@ -64,7 +64,9 @@ export default function LoginPage() {
     // 4) Create the gated profile.
     const { error: pErr } = await supabase.rpc("create_profile", { p_username: username, p_code: f.code.trim() });
     if (pErr) throw new Error(pErr.message.includes("Ugyldig") ? t("login.errCodeShort") : t("login.errProfile") + pErr.message);
-    router.replace("/medlem");
+    // New members land on their own profile with the editor open + a welcome nudge
+    // to add a profile + cover photo (so profiles feel alive from day one).
+    router.replace(`/profil?u=${encodeURIComponent(username)}&welcome=1`);
   };
 
   const submit = async (e) => {

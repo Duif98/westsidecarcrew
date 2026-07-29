@@ -31,6 +31,7 @@ const ACCENTS = [
 function ProfileInner() {
   const params = useSearchParams();
   const username = params.get("u");
+  const welcome = params.get("welcome") === "1";
   const { session, user, refreshProfile } = useAuth();
   const [profile, setProfile] = useState(null);
   const [albums, setAlbums] = useState([]);
@@ -52,8 +53,10 @@ function ProfileInner() {
   const [cropSource, setCropSource] = useState(null);
   const [coverCropSource, setCoverCropSource] = useState(null);
   const [savingProfile, setSavingProfile] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
   const avatarRef = useRef(null);
   const coverRef = useRef(null);
+  const welcomedRef = useRef(false);
 
   const me = !!user && profile?.id === user.id;
 
@@ -63,6 +66,18 @@ function ProfileInner() {
     setCoverFile(null);
     setEditing(true);
   };
+
+  // Just signed up (…/profil?u=…&welcome=1): open the editor once and show the
+  // welcome nudge so new members are invited to add a profile + cover photo.
+  useEffect(() => {
+    if (welcome && me && profile && !welcomedRef.current) {
+      welcomedRef.current = true;
+      openEditor();
+      setShowWelcome(true);
+      try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch {}
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [welcome, me, profile]);
 
   const saveProfile = async () => {
     setSavingProfile(true);
@@ -86,6 +101,7 @@ function ProfileInner() {
       if (error) throw error;
       setProfile((p) => ({ ...p, bio: edit.bio.trim() || null, location: edit.location.trim() || null, avatar_path, cover_path, accent_color: accent }));
       setEditing(false);
+      setShowWelcome(false);
       refreshProfile?.();
     } catch (err) {
       alert("Kunne ikke gemme profil: " + (err.message || err));
@@ -236,6 +252,12 @@ function ProfileInner() {
 
       {me && editing && (
         <div className="profil-editor">
+          {showWelcome && (
+            <div className="pe-welcome">
+              <b>Velkommen i crewet! 🎉</b>
+              <span>Upload et <b>profilbillede</b> og et <b>coverbillede</b>, så de andre kan sætte ansigt på dig. Du kan altid ændre det senere.</span>
+            </div>
+          )}
           <div className="pe-avatar-row">
             <div className="profil-avatar sm">{avatarFile ? <img src={URL.createObjectURL(avatarFile)} alt="" /> : (profile.avatar_path ? <img src={avatarUrl(profile.avatar_path)} alt="" /> : initials)}</div>
             <input ref={avatarRef} type="file" accept="image/*" hidden onChange={(e) => { const fl = e.target.files?.[0]; if (fl) setCropSource(fl); e.target.value = ""; }} />
@@ -263,7 +285,7 @@ function ProfileInner() {
             <input value={edit.location} onChange={(e) => setEdit({ ...edit, location: e.target.value })} placeholder="fx Esbjerg" maxLength={80} /></label>
           <div className="post-actions">
             <button className="btn-gold" style={{ width: "auto" }} onClick={saveProfile} disabled={savingProfile}>{savingProfile ? "Gemmer…" : "Gem profil"}</button>
-            <button className="ph-btn" style={{ flex: "none", width: "auto" }} onClick={() => setEditing(false)}>Annullér</button>
+            <button className="ph-btn" style={{ flex: "none", width: "auto" }} onClick={() => { setEditing(false); setShowWelcome(false); }}>Annullér</button>
           </div>
         </div>
       )}
