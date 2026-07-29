@@ -81,15 +81,55 @@ function Stepper({ label, value, onChange, step = 1, min = 0, max = 999 }) {
   );
 }
 
+// A width/profile/rim size, three steppers. Module-level so it isn't a fresh
+// component type each render (which would remount and drop input focus).
+function Size3({ val, on }) {
+  return (
+    <div className="dk-sizes">
+      <Stepper label="Bredde" value={val.w} step={10} min={125} max={385} onChange={(w) => on({ ...val, w })} />
+      <Stepper label="Profil" value={val.a} step={5} min={20} max={85} onChange={(a) => on({ ...val, a })} />
+      <Stepper label="Fælg (″)" value={val.rim} step={1} min={10} max={24} onChange={(rim) => on({ ...val, rim })} />
+    </div>
+  );
+}
+
+// One physical side of the rolling-diameter tool. Positions are FIXED (Bag left /
+// For right); the toggle only flips which side is "fastlåst" (fully editable) vs
+// "beregnes" (profile shown as the computed target) — the sides never swap places.
+function MatchSide({ title, locked, size, setSize, refD, idealAspect }) {
+  const w = num(size.w);
+  return (
+    <div className="dk-side">
+      <span className="dk-side-title">{title} <span className="dk-side-tag">{locked ? "fastlåst" : "beregnes"}</span></span>
+      {locked ? (
+        <>
+          <Size3 val={size} on={setSize} />
+          <span className="dk-mini">Rullediameter: <b>{f0(refD)} mm</b> · omkreds {f0(circ(refD))} mm</span>
+        </>
+      ) : (
+        <>
+          <div className="dk-sizes">
+            <Stepper label="Bredde" value={size.w} step={10} min={125} max={385} onChange={(v) => setSize({ ...size, w: v })} />
+            <div className="stp"><span className="stp-lab">Profil (mål)</span><div className="stp-q">{w && refD ? f1(idealAspect) : "?"}</div></div>
+            <Stepper label="Fælg (″)" value={size.rim} step={1} min={10} max={24} onChange={(v) => setSize({ ...size, rim: v })} />
+          </div>
+          <span className="dk-mini">Profilen udregnes så rullediameteren matcher — vælg den nærmeste standardstørrelse fra listen nedenfor.</span>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function DaekPage() {
   const [single, setSingle] = useState({ w: "225", a: "40", rim: "18" });
   const [cmpA, setCmpA] = useState({ w: "225", a: "40", rim: "18" });
   const [cmpB, setCmpB] = useState({ w: "235", a: "35", rim: "19" });
   const [rimW, setRimW] = useState("9");
-  // Rolling-diameter match: one side locked (reference), the other suggested.
+  // Rolling-diameter match. Bag/for keep their own state so they never swap
+  // places; `lock` only picks which side is the fixed reference.
   const [lock, setLock] = useState("rear");
-  const [ref, setRef] = useState({ w: "285", a: "30", rim: "20" });
-  const [other, setOther] = useState({ w: "255", rim: "20" });
+  const [bag, setBag] = useState({ w: "285", a: "30", rim: "20" });
+  const [front, setFront] = useState({ w: "255", a: "35", rim: "20" });
 
   // --- single tyre ---
   const sD = diameter(num(single.w), num(single.a), num(single.rim));
@@ -103,34 +143,27 @@ export default function DaekPage() {
   // --- rim table ---
   const rows = useMemo(rimTable, []);
 
-  // --- match ---
-  const refD = diameter(num(ref.w), num(ref.a), num(ref.rim));
-  const oW = num(other.w), oRim = num(other.rim);
-  const idealAspect = oW ? ((refD - oRim * MM_IN) / (2 * oW)) * 100 : 0;
+  // --- match --- (Bag left / For right, fixed; lock picks the reference side)
+  const refSide = lock === "rear" ? bag : front;   // fully-specified, locked side
+  const compSide = lock === "rear" ? front : bag;  // computed side (profile derived)
+  const refD = diameter(num(refSide.w), num(refSide.a), num(refSide.rim));
+  const cW = num(compSide.w), cRim = num(compSide.rim);
+  const idealAspect = cW ? ((refD - cRim * MM_IN) / (2 * cW)) * 100 : 0;
   const options = useMemo(() => {
-    if (!refD || !oW || !oRim) return [];
+    if (!refD || !cW || !cRim) return [];
     return STD_ASPECTS.map((a) => {
-      const d = diameter(oW, a, oRim);
+      const d = diameter(cW, a, cRim);
       return { a, d, dev: ((d - refD) / refD) * 100 };
     }).sort((x, y) => Math.abs(x.dev) - Math.abs(y.dev));
-  }, [refD, oW, oRim]);
+  }, [refD, cW, cRim]);
   const otherLabel = lock === "rear" ? "for" : "bag";
-  const refLabel = lock === "rear" ? "bag" : "for";
 
   const applyPreset = (p) => {
     const r = parseSize(p.rear), fr = parseSize(p.front);
-    if (r) setRef({ w: String(r.w), a: String(r.a), rim: String(r.rim) });
-    if (fr) setOther({ w: String(fr.w), rim: String(fr.rim) });
+    if (r) setBag({ w: String(r.w), a: String(r.a), rim: String(r.rim) });
+    if (fr) setFront({ w: String(fr.w), a: String(fr.a), rim: String(fr.rim) });
     setLock("rear");
   };
-
-  const Size3 = ({ val, on }) => (
-    <div className="dk-sizes">
-      <Stepper label="Bredde" value={val.w} step={10} min={125} max={385} onChange={(w) => on({ ...val, w })} />
-      <Stepper label="Profil" value={val.a} step={5} min={20} max={85} onChange={(a) => on({ ...val, a })} />
-      <Stepper label="Fælg (″)" value={val.rim} step={1} min={10} max={24} onChange={(rim) => on({ ...val, rim })} />
-    </div>
-  );
 
   return (
     <main className="member daek-main">
@@ -210,20 +243,8 @@ export default function DaekPage() {
           </div>
 
           <div className="dk-cmp">
-            <div>
-              <span className="dk-lab">{refLabel === "bag" ? "Bag (fastlåst)" : "For (fastlåst)"}</span>
-              <Size3 val={ref} on={setRef} />
-              <span className="dk-mini">Rullediameter: <b>{f0(refD)} mm</b> · omkreds {f0(circ(refD))} mm</span>
-            </div>
-            <div>
-              <span className="dk-lab">{otherLabel === "for" ? "For (ønsket bredde/fælg)" : "Bag (ønsket bredde/fælg)"}</span>
-              <div className="dk-sizes">
-                <Stepper label="Bredde" value={other.w} step={10} min={125} max={385} onChange={(w) => setOther({ ...other, w })} />
-                <div className="stp"><span className="stp-lab">Profil (mål)</span><div className="stp-q">{oW && refD ? f1(idealAspect) : "?"}</div></div>
-                <Stepper label="Fælg (″)" value={other.rim} step={1} min={10} max={24} onChange={(rim) => setOther({ ...other, rim })} />
-              </div>
-              <span className="dk-mini">Profilen udregnes så rullediameteren matcher — vælg den nærmeste standardstørrelse fra listen nedenfor.</span>
-            </div>
+            <MatchSide title="Bag" locked={lock === "rear"} size={bag} setSize={setBag} refD={refD} idealAspect={idealAspect} />
+            <MatchSide title="For" locked={lock === "front"} size={front} setSize={setFront} refD={refD} idealAspect={idealAspect} />
           </div>
 
           {options.length > 0 && (
@@ -235,7 +256,7 @@ export default function DaekPage() {
                     const st = devStatus(o.dev);
                     return (
                       <tr key={o.a} className={st.cls}>
-                        <td><b>{sizeStr(oW, o.a, oRim)}</b></td>
+                        <td><b>{sizeStr(cW, o.a, cRim)}</b></td>
                         <td>{f0(o.d)} mm</td>
                         <td>{o.dev >= 0 ? "+" : ""}{f1(o.dev)} %</td>
                         <td><span className={`dk-chip ${st.cls}`}>{st.label}</span></td>

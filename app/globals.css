@@ -1834,6 +1834,8 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .dk-out span { font-size: 0.66rem; color: var(--faint); font-family: var(--font-mono), monospace; letter-spacing: 0.04em; text-transform: uppercase; }
 .dk-out .ok b { color: #4ec27a; } .dk-out .warn b { color: var(--gold-bright); } .dk-out .bad b { color: #e08a8a; }
 .dk-cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.dk-side-title { display: block; font-family: var(--font-display), serif; font-size: 1.3rem; color: var(--gold-bright); margin-bottom: 0.7rem; }
+.dk-side-tag { font-family: var(--font-mono), monospace; font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); vertical-align: middle; margin-left: 0.4rem; }
 .dk-mini { display: block; font-size: 0.78rem; color: var(--muted); margin-top: 0.5rem; }
 .dk-seg { display: flex; gap: 0.5rem; background: var(--bg-1); border: 1px solid var(--line); border-radius: 999px; padding: 0.25rem; margin-bottom: 1rem; flex-wrap: wrap; }
 .dk-seg button { flex: 1; min-width: 150px; border: none; background: transparent; color: var(--muted); font-size: 0.85rem; font-weight: 500; padding: 0.55rem 0.6rem; border-radius: 999px; cursor: pointer; }
