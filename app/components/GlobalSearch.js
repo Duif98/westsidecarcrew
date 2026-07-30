@@ -62,7 +62,7 @@ export default function GlobalSearch() {
   const ql = q.trim().toLowerCase();
   const results = !ql || !index
     ? []
-    : index.filter((it) => it.label.toLowerCase().includes(ql) || (it.sub && it.sub.toLowerCase().includes(ql))).slice(0, 30);
+    : index.filter((it) => (it.kw || it.label.toLowerCase()).includes(ql)).slice(0, 30);
 
   const go = (href) => { close(); router.push(href); };
 
