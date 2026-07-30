@@ -275,6 +275,8 @@ export default function UndervognPage() {
   const [spr, setSpr] = useState({ rate: "60", mr: "1", corner: "320", unit: "Nmm" });
   // 6 · Offset / fitment
   const [fit, setFit] = useState({ ow: "9", oet: "35", nw: "9.5", net: "25" });
+  // 7 · Tyre pressure vs temperature
+  const [pt, setPt] = useState({ vf: "2.2", hf: "2.2", vb: "2.4", hb: "2.4", t1: "15", t2: "45", atm: "1.013" });
 
   // ---- 1 · camber -------------------------------------------------------
   const camD = num(cam.rim) * MM_IN;                       // measuring span (mm)
@@ -315,6 +317,23 @@ export default function UndervognPage() {
   const outerCh = dWidthMm / 2 - dEt;                      // + = mere poke (ud)
   const innerCh = dWidthMm / 2 + dEt;                      // + = tættere på fjederben
 
+  // ---- 7 · tyre pressure vs temperature --------------------------------
+  // Gay-Lussac at constant volume on ABSOLUTE pressure + Kelvin:
+  //   P2_abs = P1_abs · T2/T1  →  P2_gauge = (P1_gauge + atm)·T2/T1 − atm
+  const ptAtm = num(pt.atm) || 1.013;
+  const ptT1 = num(pt.t1) + 273.15;
+  const ptT2 = num(pt.t2) + 273.15;
+  const ptRatio = ptT1 > 0 ? ptT2 / ptT1 : 1;
+  const hotPressure = (cold) => { const c = num(cold); return c > 0 ? (c + ptAtm) * ptRatio - ptAtm : 0; };
+  const ptCorners = [
+    { t: "VF", cold: pt.vf }, { t: "HF", cold: pt.hf },
+    { t: "VB", cold: pt.vb }, { t: "HB", cold: pt.hb },
+  ];
+  const ptDT = num(pt.t2) - num(pt.t1);
+  const ptAvgCold = (num(pt.vf) + num(pt.hf) + num(pt.vb) + num(pt.hb)) / 4;
+  const ptAvgDelta = ptAvgCold > 0 ? hotPressure(ptAvgCold) - ptAvgCold : 0;
+  const ptPer10 = ptDT !== 0 ? (ptAvgDelta / ptDT) * 10 : 0;
+
   // ---- save / log ------------------------------------------------------
   const { session, user } = useAuth();
   const [setupName, setSetupName] = useState("");
@@ -333,7 +352,7 @@ export default function UndervognPage() {
     return () => { on = false; };
   }, [session]);
 
-  const snapshot = () => ({ cam, camConv, toe, cast, cw, spr, fit });
+  const snapshot = () => ({ cam, camConv, toe, cast, cw, spr, fit, pt });
   const restore = (d) => {
     if (!d) return;
     if (d.cam) setCam(d.cam);
@@ -343,6 +362,7 @@ export default function UndervognPage() {
     if (d.cw) setCw(d.cw);
     if (d.spr) setSpr(d.spr);
     if (d.fit) setFit(d.fit);
+    if (d.pt) setPt(d.pt);
     setSaveMsg("✓ Setup indlæst i beregnerne ovenfor.");
     if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -378,6 +398,7 @@ export default function UndervognPage() {
     ["Hjørnevægt", `VF ${cw.vf} · HF ${cw.hf} · VB ${cw.vb} · HB ${cw.hb} kg`, `total ${f0(total)} kg · for/bag ${f1(frontP)}/${f1(rearP)}% · cross ${f1(crossP)}%`],
     ["Fjeder/hjul", `${spr.rate} ${spr.unit === "Nmm" ? "N/mm" : spr.unit === "kgmm" ? "kg/mm" : "lbs/in"} · MR ${spr.mr} · ${spr.corner} kg`, `hjulrate ${f1(wheelRate)} N/mm · ${f2(freq)} Hz`],
     ["Offset/ET", `${fit.ow}″ ET${fit.oet} → ${fit.nw}″ ET${fit.net}`, `poke ${sign(outerCh)}${f1(Math.abs(outerCh))} mm · inder ${sign(innerCh)}${f1(Math.abs(innerCh))} mm`],
+    ["Dæktryk v. temp", `${pt.vf}/${pt.hf}/${pt.vb}/${pt.hb} bar · ${pt.t1}→${pt.t2} °C`, `${ptCorners.map((c) => f2(hotPressure(c.cold))).join(" / ")} bar (varm)`],
   ];
 
   return (
@@ -670,9 +691,61 @@ export default function UndervognPage() {
           <p className="dk-note">Positiv yderkant = mere poke/tættere på skærmen. Positiv inderkant = tættere på fjederben/bremse — tjek altid fysisk frigang. Dette regner kun på fælgen; husk at bredere dæk også vokser i bredden (se dæk-beregneren).</p>
         </section>
 
-        {/* 7 · TARGET REFERENCE */}
+        {/* 7 · TYRE PRESSURE vs TEMPERATURE */}
         <section className="dk-card">
-          <h2 className="dk-h">7 · Vejledende mål-værdier</h2>
+          <h2 className="dk-h">7 · Dæktryk vs. temperatur</h2>
+          <p className="dk-sub">Trykket stiger når luften i dækket bliver varm (koldt morgentryk → varmt tryk efter kørsel/på banen, eller kold vinter → varm sommer). Indtast de fire kolde tryk, den kolde temperatur og en ny temperatur — så regnes de nye tryk for <b>almindelig luft</b>.</p>
+          <Guide
+            tools={[
+              "En præcis dæktryksmåler — aflæs KOLDT, før bilen har kørt.",
+              "Et termometer til lufttemperaturen (den kolde tilstand + den nye/varme du vil regne til).",
+            ]}
+            setup={[
+              "Mål de kolde tryk før kørsel, mens dækkene har omgivelsestemperatur.",
+              "‘Ny temperatur’ er den lufttemperatur i dækket du vil kende trykket ved — fx dæk-temp efter et par baneomgange, eller en varm sommerdag holdt op mod en kold morgen.",
+              "Dækstørrelsen er uden betydning: volumenet går ud i regnestykket, så den procentvise stigning er ens for alle fire uanset dimension.",
+            ]}
+            steps={[
+              "Tast de fire kolde tryk (VF/HF/VB/HB) i bar.",
+              "Tast den kolde (ambient) temperatur og den nye temperatur i °C.",
+              "Aflæs de nye tryk og trykstigningen pr. dæk. Atmosfæretrykket kan finjusteres (avanceret, standard 1,013 bar).",
+            ]}
+            inputs={["4 kolde dæktryk (bar)", "Kold temperatur (°C)", "Ny temperatur (°C)"]}
+          />
+          <div className="uv-corner">
+            <Stepper label="VF tryk" unit="bar" value={pt.vf} step={0.1} min={0} max={6} onChange={(vf) => setPt({ ...pt, vf })} />
+            <Stepper label="HF tryk" unit="bar" value={pt.hf} step={0.1} min={0} max={6} onChange={(hf) => setPt({ ...pt, hf })} />
+            <Stepper label="VB tryk" unit="bar" value={pt.vb} step={0.1} min={0} max={6} onChange={(vb) => setPt({ ...pt, vb })} />
+            <Stepper label="HB tryk" unit="bar" value={pt.hb} step={0.1} min={0} max={6} onChange={(hb) => setPt({ ...pt, hb })} />
+          </div>
+          <div className="uv-inputs uv-pt-temps">
+            <Stepper label="Kold temp" unit="°C" value={pt.t1} step={1} min={-30} max={60} onChange={(t1) => setPt({ ...pt, t1 })} />
+            <Stepper label="Ny temp" unit="°C" value={pt.t2} step={1} min={-30} max={120} onChange={(t2) => setPt({ ...pt, t2 })} />
+            <Stepper label="Atmosfæretryk" unit="bar" value={pt.atm} step={0.01} min={0.9} max={1.1} onChange={(atm) => setPt({ ...pt, atm })} />
+          </div>
+          <div className="dk-out">
+            {ptCorners.map((c) => {
+              const hot = hotPressure(c.cold);
+              const d = hot - num(c.cold);
+              return (
+                <div key={c.t} className={ptDT > 0 ? "warn" : ptDT < 0 ? "ok" : ""}>
+                  <b>{f2(hot)} bar</b>
+                  <span>{c.t} · {sign(d)}{f2(Math.abs(d))} bar</span>
+                </div>
+              );
+            })}
+          </div>
+          <p className="dk-note">Ved {sign(ptDT)}{f0(Math.abs(ptDT))} °C: ca. <b>{sign(ptPer10)}{f2(Math.abs(ptPer10))} bar pr. 10 °C</b> (tommelfingerregel ≈ 0,1 bar/10 °C). Beregnet med Gay-Lussacs lov på absolut tryk og Kelvin: P₂ = (P₁ + atmosfæretryk) · T₂/T₁ − atmosfæretryk. Husk: dæktryk skal altid sættes/aflæses koldt.</p>
+          <div className="uv-callout">
+            <h4>🧪 Nitrogen (N₂) i stedet for luft?</h4>
+            <p><b>Selve temperatur-stigningen er stort set ens.</b> Tør nitrogen og tør luft følger nøjagtig samme gaslov — tallene ovenfor gælder for begge. Nitrogen giver <b>ikke</b> en markant mindre trykstigning når dækket bliver varmt.</p>
+            <p><b>Hvor nitrogen faktisk hjælper:</b> det er tørt (ingen vanddamp) og siver langsommere ud end luftens ilt-molekyler. Derfor holder trykket sig mere stabilt <b>over tid</b>, og svinger mindre når fugtig værkstedsluft ellers ville bidrage ekstra ved opvarmning. Den forskel på selve temperatur-stigningen er i praksis typisk <b>under ~0,05 bar</b> — altså ubetydelig; den reelle gevinst er stabilitet og færre efterfyldninger, ikke en lavere varm-stigning.</p>
+          </div>
+        </section>
+
+        {/* 8 · TARGET REFERENCE */}
+        <section className="dk-card">
+          <h2 className="dk-h">8 · Vejledende mål-værdier</h2>
           <p className="dk-sub">Typiske udgangspunkter — ikke facit. Den enkelte bils fabriksdata (værkstedshåndbog) og dæk/brug afgør det rigtige. Justér altid i små skridt.</p>
           <div className="dk-scroll">
             <table className="dk-table">

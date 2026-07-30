@@ -1880,6 +1880,7 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .uv-g-inputs h4 { margin-top: 0; }
 .uv-inputs { display: flex; flex-wrap: wrap; gap: 0.7rem 1rem; align-items: flex-end; }
 .uv-corner { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem 1rem; max-width: 420px; }
+.uv-pt-temps { margin-top: 0.9rem; }
 .uv-cmp2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
 .uv-cmp2 .dk-lab { display: block; font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.5rem; }
 .uv-callout { background: rgba(201,168,119,0.06); border: 1px solid var(--gold-deep, rgba(201,168,119,0.3)); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.1rem; }
