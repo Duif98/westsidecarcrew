@@ -1866,8 +1866,8 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .uv-pre .uv-pre-list { margin: 0.4rem 0 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.5rem; }
 .uv-pre-list li { color: var(--muted); font-size: 0.86rem; line-height: 1.55; }
 .uv-pre-list b { color: var(--text); }
-.uv-diagram { display: flex; justify-content: center; background: var(--bg-1); border: 1px solid var(--line); border-radius: 12px; padding: 0.6rem; margin: 0.2rem 0 1rem; }
-.uv-svg { width: 100%; max-width: 320px; height: auto; }
+.uv-diagram { display: flex; justify-content: center; background: var(--bg-1); border: 1px solid var(--line); border-radius: 12px; padding: 0.5rem; margin: 0.2rem 0 1rem; }
+.uv-svg { width: 100%; max-width: 380px; height: auto; border-radius: 12px; }
 .uv-guide { background: var(--bg-1); border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: 12px; padding: 0.9rem 1rem; margin-bottom: 1.1rem; }
 .uv-g-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1.4rem; }
 .uv-g-block h4 { font-family: var(--font-mono), monospace; font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-bright); margin: 0.7rem 0 0.35rem; }
@@ -1893,6 +1893,46 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .uv-h3 { font-family: var(--font-display), serif; font-size: 1rem; margin-bottom: 0.3rem; }
 .uv-seg.dk-seg { max-width: 360px; }
 @media (max-width: 560px) { .uv-g-grid { grid-template-columns: 1fr; } .uv-cmp2 { grid-template-columns: 1fr; } }
+
+/* Gem & log */
+.uv-field { display: flex; flex-direction: column; gap: 0.3rem; flex: 1; min-width: 160px; }
+.uv-field-wide { margin-top: 0.7rem; }
+.uv-field input, .uv-field textarea { width: 100%; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 10px; color: var(--text); font-family: inherit; font-size: 0.9rem; padding: 0.6rem 0.7rem; }
+.uv-field textarea { resize: vertical; }
+.uv-field input:focus, .uv-field textarea:focus { outline: none; border-color: var(--gold); }
+.uv-save-btns { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+.uv-btn { display: inline-flex; align-items: center; gap: 0.35rem; background: var(--bg-1); border: 1px solid var(--line-2); color: var(--text); font-size: 0.85rem; font-weight: 500; padding: 0.6rem 0.9rem; border-radius: 999px; cursor: pointer; text-decoration: none; }
+.uv-btn:hover { border-color: var(--gold-deep, var(--gold)); }
+.uv-btn-gold { background: var(--gold); border-color: var(--gold); color: var(--on-gold, #16130d); }
+.uv-btn-gold:disabled { opacity: 0.55; cursor: default; }
+.uv-save-msg { margin-top: 0.8rem; font-size: 0.85rem; color: var(--gold-bright); }
+.uv-saved { margin-top: 1.3rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.uv-saved > .stp-lab { margin-bottom: 0.1rem; }
+.uv-saved-row { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; background: var(--bg-1); border: 1px solid var(--line); border-radius: 10px; padding: 0.55rem 0.75rem; }
+.uv-saved-meta { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; min-width: 0; }
+.uv-saved-name { font-weight: 600; font-size: 0.88rem; color: var(--text); }
+.uv-saved-car { font-size: 0.8rem; color: var(--muted); }
+.uv-saved-actions { display: flex; gap: 0.4rem; flex: none; }
+.uv-mini { background: transparent; border: 1px solid var(--line-2); color: var(--gold-bright); font-size: 0.76rem; padding: 0.3rem 0.65rem; border-radius: 999px; cursor: pointer; }
+.uv-mini:hover { background: var(--gold); color: var(--on-gold, #16130d); }
+.uv-mini-del { color: #e08a8a; }
+.uv-mini-del:hover { background: #e08a8a; color: #1a0e0e; }
+
+/* Printable PDF report — hidden on screen, only shown when printing */
+.uv-print { display: none; }
+@media print {
+  .uv-noprint, .member-bar, .menu-fab, .lang-switch, .notif-bell, .push-prompt { display: none !important; }
+  body { background: #fff !important; }
+  .uv-print { display: block; color: #111; font-family: Georgia, "Times New Roman", serif; }
+  .uv-print h1 { font-size: 20px; margin: 0 0 4px; color: #111; }
+  .uv-print-sub { font-size: 13px; color: #444; margin: 0 0 2px; }
+  .uv-print-note { font-size: 12px; color: #555; font-style: italic; margin: 4px 0 10px; }
+  .uv-print-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+  .uv-print-table th { text-align: left; border-bottom: 2px solid #111; padding: 5px 8px; }
+  .uv-print-table td { border-bottom: 1px solid #bbb; padding: 5px 8px; vertical-align: top; }
+  .uv-print-table td:first-child { font-weight: 700; white-space: nowrap; }
+  .uv-print-foot { margin-top: 14px; font-size: 10px; color: #777; }
+}
 
 /* ---------- Car care & owner review ---------- */
 .care-form { gap: 0.7rem; }

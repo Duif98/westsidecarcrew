@@ -1,7 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useAuth } from "../lib/AuthProvider";
+import {
+  getLocalPresets, saveLocalPreset, deleteLocalPreset,
+  getProfileSetups, saveProfileSetup, deleteProfileSetup,
+} from "../lib/suspension";
 
 // ---- Geometry maths (pure) ---------------------------------------------
 const MM_IN = 25.4;
@@ -67,90 +72,192 @@ function Guide({ tools, setup, steps, inputs }) {
   );
 }
 
-// --- little inline diagrams (stroke = gold, so they follow the theme) ---
-const S = { fill: "none", stroke: "var(--gold-bright)", strokeWidth: 1.6, strokeLinecap: "round", strokeLinejoin: "round" };
-const Sd = { ...S, strokeDasharray: "4 4", stroke: "var(--faint)" };
-const Lbl = { fill: "var(--muted)", fontSize: 9, fontFamily: "var(--font-mono), monospace" };
+// --- Hunter-style 3D instrument diagrams -------------------------------
+// Dark "display screen" look: shaded 3D tyres with gold rims, glowing teal
+// reference lines and a perspective floor. Instrument colours are fixed
+// (they mimic real hardware) rather than following the site theme.
+const scrFont = { fontFamily: "var(--font-mono, monospace)" };
+
+function ScreenDefs({ id }) {
+  return (
+    <defs>
+      <linearGradient id={`${id}-scr`} x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stopColor="#182338" />
+        <stop offset="1" stopColor="#05080f" />
+      </linearGradient>
+      <radialGradient id={`${id}-tyre`} cx="0.36" cy="0.30" r="0.9">
+        <stop offset="0" stopColor="#4b5464" />
+        <stop offset="0.55" stopColor="#1b212c" />
+        <stop offset="1" stopColor="#080b11" />
+      </radialGradient>
+      <linearGradient id={`${id}-rim`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#f6e8c4" />
+        <stop offset="0.5" stopColor="#caa974" />
+        <stop offset="1" stopColor="#7d6337" />
+      </linearGradient>
+      <radialGradient id={`${id}-hub`} cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0" stopColor="#fdf3d7" />
+        <stop offset="1" stopColor="#9a7d49" />
+      </radialGradient>
+      <linearGradient id={`${id}-body`} x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stopColor="#35527c" />
+        <stop offset="0.5" stopColor="#1a2c46" />
+        <stop offset="1" stopColor="#0b1524" />
+      </linearGradient>
+      <filter id={`${id}-glow`} x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="1.7" result="b" />
+        <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
+      </filter>
+    </defs>
+  );
+}
+
+// A shared instrument "screen" frame with a titled status pill.
+function Panel({ id, title, children }) {
+  const tw = title.length * 5.6 + 22;
+  return (
+    <svg viewBox="0 0 240 150" className="uv-svg" role="img" aria-label={`${title} — instrumentvisning`}>
+      <ScreenDefs id={id} />
+      <rect x="1.5" y="1.5" width="237" height="147" rx="13" fill={`url(#${id}-scr)`} stroke="#27384e" strokeWidth="1.2" />
+      <rect x="9" y="7" width="222" height="28" rx="9" fill="#ffffff" opacity="0.04" />
+      <rect x="11" y="10" width={tw} height="16" rx="8" fill="#08201c" stroke="#1f8f74" strokeWidth="0.8" />
+      <circle cx="21" cy="18" r="2.5" fill="#39e9b4" filter={`url(#${id}-glow)`} />
+      <text x="29" y="21" fill="#5ff3c8" fontSize="8" fontWeight="700" style={{ ...scrFont, letterSpacing: "1.3px" }}>{title}</text>
+      {children}
+    </svg>
+  );
+}
 
 function CamberDiagram() {
+  const id = "cam";
+  const cx = 90, cy = 82, rx = 25, ry = 39, dx = 9;
   return (
-    <svg viewBox="0 0 200 130" className="uv-svg" role="img" aria-label="Camber-måling set forfra">
-      {/* ground */}
-      <line x1="10" y1="118" x2="190" y2="118" {...S} />
-      {/* plumb line */}
-      <line x1="150" y1="14" x2="150" y2="118" {...Sd} />
-      <circle cx="150" cy="14" r="3" fill="var(--faint)" stroke="none" />
-      {/* tilted wheel (negative camber: top leans left/in) */}
-      <g transform="rotate(-9 90 70)">
-        <rect x="70" y="30" width="40" height="80" rx="6" {...S} />
-        <line x1="90" y1="30" x2="90" y2="110" {...Sd} />
+    <Panel id={id} title="CAMBER">
+      <g opacity="0.5" stroke="#1e4650" strokeWidth="0.8">
+        <line x1="14" y1="126" x2="226" y2="126" />
+        <line x1="44" y1="138" x2="196" y2="138" opacity="0.5" />
       </g>
-      {/* top gap */}
-      <line x1="84" y1="34" x2="150" y2="34" {...{ ...S, stroke: "var(--gold)" }} />
-      <text x="112" y="28" {...Lbl}>top-afstand</text>
-      {/* bottom gap */}
-      <line x1="97" y1="106" x2="150" y2="106" {...{ ...S, stroke: "var(--gold)" }} />
-      <text x="106" y="115" {...Lbl}>bund</text>
-    </svg>
+      <ellipse cx={cx} cy="127" rx="30" ry="5" fill="#000" opacity="0.4" />
+      <g transform={`rotate(-11 ${cx} 126)`}>
+        <ellipse cx={cx - dx} cy={cy} rx={rx} ry={ry} fill="#070a10" />
+        <rect x={cx - dx} y={cy - ry} width={dx} height={ry * 2} fill={`url(#${id}-tyre)`} />
+        <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill={`url(#${id}-tyre)`} stroke="#05070c" strokeWidth="1" />
+        <ellipse cx={cx} cy={cy} rx={rx - 9} ry={ry - 13} fill={`url(#${id}-rim)`} stroke="#6a5330" strokeWidth="0.7" />
+        <g stroke="#6a5330" strokeWidth="1.1" opacity="0.85">
+          {/* Fixed spoke endpoints (5 spokes around cx,cy). Hardcoded, not
+              computed with trig, so server (build) and client render byte-
+              identical strings — runtime Math.cos differs in the last float
+              digit and would break hydration. */}
+          {[[90, 106], [103.31, 89.42], [98.23, 62.58], [81.77, 62.58], [76.69, 89.42]].map(([x2, y2], i) => (
+            <line key={i} x1={cx} y1={cy} x2={x2} y2={y2} />
+          ))}
+        </g>
+        <ellipse cx={cx} cy={cy} rx="4.5" ry="6.5" fill={`url(#${id}-hub)`} />
+        <line x1={cx} y1={cy - ry - 4} x2={cx} y2={cy + ry + 4} stroke="#39e9b4" strokeWidth="0.9" strokeDasharray="3 3" opacity="0.9" />
+      </g>
+      <line x1="172" y1="34" x2="172" y2="126" stroke="#8390a6" strokeWidth="1" strokeDasharray="4 4" />
+      <circle cx="172" cy="34" r="3" fill="#8390a6" />
+      <text x="176" y="44" fill="#8390a6" fontSize="7.5" style={scrFont}>lodline</text>
+      <g filter={`url(#${id}-glow)`} stroke="#ecd6a0" strokeWidth="1.5">
+        <line x1="118" y1="52" x2="172" y2="52" />
+        <line x1="104" y1="116" x2="172" y2="116" />
+      </g>
+      <text x="120" y="49" fill="#ecd6a0" fontSize="7.5" style={scrFont}>top-afstand</text>
+      <text x="106" y="112" fill="#ecd6a0" fontSize="7.5" style={scrFont}>bund</text>
+      <path d="M 90 110 A 20 20 0 0 0 74 102" fill="none" stroke="#39e9b4" strokeWidth="1.5" filter={`url(#${id}-glow)`} />
+      <text x="60" y="102" fill="#5ff3c8" fontSize="9" style={scrFont}>θ</text>
+    </Panel>
   );
 }
 
 function ToeDiagram() {
+  const id = "toe";
+  const cx = 92, cy = 82;
   return (
-    <svg viewBox="0 0 200 130" className="uv-svg" role="img" aria-label="Toe-måling set fra oven">
-      {/* string */}
-      <line x1="14" y1="20" x2="186" y2="20" {...Sd} />
-      <text x="150" y="14" {...Lbl}>snor</text>
-      {/* wheel from above, slight toe-in (front edge = left, further from string) */}
-      <g transform="rotate(6 90 70)">
-        <rect x="70" y="35" width="40" height="70" rx="5" {...S} />
+    <Panel id={id} title="TOE">
+      <g opacity="0.4" stroke="#1e4650" strokeWidth="0.7">
+        <line x1="24" y1="130" x2="206" y2="130" />
+        <line x1="58" y1="46" x2="58" y2="130" opacity="0.5" />
+        <line x1="128" y1="46" x2="128" y2="130" opacity="0.5" />
       </g>
-      <text x="60" y="120" {...Lbl}>forkant</text>
-      <text x="112" y="120" {...Lbl}>bagkant</text>
-      {/* front gap */}
-      <line x1="66" y1="20" x2="66" y2="44" {...{ ...S, stroke: "var(--gold)" }} />
-      {/* rear gap */}
-      <line x1="114" y1="20" x2="114" y2="38" {...{ ...S, stroke: "var(--gold)" }} />
-    </svg>
+      <line x1="150" y1="40" x2="150" y2="134" stroke="#8390a6" strokeWidth="1" strokeDasharray="5 4" />
+      <text x="154" y="50" fill="#8390a6" fontSize="7.5" style={scrFont}>snor</text>
+      <g transform={`rotate(7 ${cx} ${cy})`}>
+        <ellipse cx={cx} cy={cy} rx="20" ry="42" fill="#000" opacity="0.2" />
+        <path d={`M ${cx + 13} ${cy - 40} L ${cx + 19} ${cy - 32} L ${cx + 19} ${cy + 32} L ${cx + 13} ${cy + 40} Z`} fill="#0a0e15" />
+        <rect x={cx - 13} y={cy - 40} width="26" height="80" rx="9" fill={`url(#${id}-tyre)`} stroke="#05070c" strokeWidth="1" />
+        <g stroke="#04060b" strokeWidth="0.8" opacity="0.6">
+          <line x1={cx - 6} y1={cy - 36} x2={cx - 6} y2={cy + 36} />
+          <line x1={cx} y1={cy - 38} x2={cx} y2={cy + 38} />
+          <line x1={cx + 6} y1={cy - 36} x2={cx + 6} y2={cy + 36} />
+        </g>
+        <line x1={cx} y1={cy - 48} x2={cx} y2={cy + 48} stroke="#39e9b4" strokeWidth="0.9" strokeDasharray="3 3" opacity="0.9" />
+        <path d={`M ${cx} ${cy - 54} l -3.5 6 l 7 0 Z`} fill="#39e9b4" />
+      </g>
+      <g filter={`url(#${id}-glow)`} stroke="#ecd6a0" strokeWidth="1.5">
+        <line x1="112" y1="50" x2="150" y2="50" />
+        <line x1="118" y1="116" x2="150" y2="116" />
+      </g>
+      <text x="70" y="46" fill="#ecd6a0" fontSize="7.5" style={scrFont}>forkant</text>
+      <text x="74" y="126" fill="#ecd6a0" fontSize="7.5" style={scrFont}>bagkant</text>
+    </Panel>
   );
 }
 
 function OffsetDiagram() {
+  const id = "off";
+  const cy = 84, ryO = 40, rxE = 10;
+  const xin = 72, xout = 152, xmount = 132, xcen = 112;
   return (
-    <svg viewBox="0 0 200 130" className="uv-svg" role="img" aria-label="Fælg-offset (ET) set ovenfra">
-      {/* car side (inboard) at left */}
-      <text x="8" y="66" {...Lbl}>ind</text>
-      <text x="180" y="66" {...Lbl}>ud</text>
-      {/* wheel width */}
-      <rect x="60" y="30" width="80" height="70" rx="4" {...S} />
-      {/* centerline */}
-      <line x1="100" y1="18" x2="100" y2="112" {...Sd} />
-      <text x="86" y="14" {...Lbl}>midt</text>
-      {/* mounting face */}
-      <line x1="118" y1="24" x2="118" y2="106" {...{ ...S, stroke: "var(--gold)" }} />
-      <text x="120" y="120" {...Lbl}>anlægsflade</text>
-      {/* ET arrow */}
-      <line x1="100" y1="65" x2="118" y2="65" {...{ ...S, stroke: "var(--gold)" }} />
-      <text x="100" y="60" {...Lbl}>ET</text>
-    </svg>
+    <Panel id={id} title="OFFSET · ET">
+      <line x1="20" y1="132" x2="220" y2="132" stroke="#1e4650" strokeWidth="0.8" opacity="0.5" />
+      <text x="26" y="80" fill="#8390a6" fontSize="7.5" style={scrFont}>ind</text>
+      <text x="206" y="80" fill="#8390a6" fontSize="7.5" style={scrFont}>ud</text>
+      <line x1="42" y1={cy} x2="206" y2={cy} stroke="#55627a" strokeWidth="2" strokeLinecap="round" />
+      <path d={`M ${xin} ${cy - ryO} L ${xout} ${cy - ryO} A ${rxE} ${ryO} 0 0 1 ${xout} ${cy + ryO} L ${xin} ${cy + ryO} A ${rxE} ${ryO} 0 0 0 ${xin} ${cy - ryO} Z`} fill={`url(#${id}-tyre)`} stroke="#05070c" strokeWidth="1" />
+      <ellipse cx={xin} cy={cy} rx={rxE} ry={ryO} fill="#0a0e15" stroke="#05070c" strokeWidth="1" />
+      <ellipse cx={xout} cy={cy} rx={rxE} ry={ryO} fill={`url(#${id}-rim)`} stroke="#6a5330" strokeWidth="0.8" />
+      <ellipse cx={xout} cy={cy} rx={rxE - 4} ry={ryO - 15} fill="#0d1017" />
+      <ellipse cx={xout} cy={cy} rx="3" ry="6" fill={`url(#${id}-hub)`} />
+      <line x1={xcen} y1="30" x2={xcen} y2="132" stroke="#8390a6" strokeWidth="1" strokeDasharray="4 4" />
+      <text x={xcen - 8} y="26" fill="#8390a6" fontSize="7.5" style={scrFont}>midt</text>
+      <ellipse cx={xmount} cy={cy} rx="3.5" ry={ryO - 4} fill="none" stroke="#39e9b4" strokeWidth="1.4" strokeDasharray="3 3" filter={`url(#${id}-glow)`} />
+      <text x={xmount - 14} y="142" fill="#5ff3c8" fontSize="7.5" style={scrFont}>anlægsflade</text>
+      <g filter={`url(#${id}-glow)`} stroke="#ecd6a0" strokeWidth="1.5">
+        <line x1={xcen} y1={cy - 30} x2={xmount} y2={cy - 30} />
+        <line x1={xcen} y1={cy - 33} x2={xcen} y2={cy - 27} />
+        <line x1={xmount} y1={cy - 33} x2={xmount} y2={cy - 27} />
+      </g>
+      <text x={xcen + 3} y={cy - 34} fill="#ecd6a0" fontSize="8" style={scrFont}>ET</text>
+    </Panel>
   );
 }
 
 function CornerDiagram() {
+  const id = "cor";
+  const pads = [
+    { t: "VF", x: 66, y: 58 }, { t: "HF", x: 174, y: 58 },
+    { t: "VB", x: 66, y: 116 }, { t: "HB", x: 174, y: 116 },
+  ];
   return (
-    <svg viewBox="0 0 200 130" className="uv-svg" role="img" aria-label="Hjørnevægt — bilens fire hjørner">
-      <rect x="55" y="20" width="90" height="90" rx="10" {...S} />
-      <text x="92" y="14" {...Lbl}>front</text>
-      {[["VF", 48, 26], ["HF", 140, 26], ["VB", 48, 108], ["HB", 140, 108]].map(([t, x, y]) => (
-        <g key={t}>
-          <circle cx={x} cy={y - 4} r="9" {...{ ...S, stroke: "var(--gold)" }} />
-          <text x={x} y={y - 1} textAnchor="middle" style={{ fill: "var(--gold-bright)", fontSize: 8, fontFamily: "var(--font-mono), monospace" }}>{t}</text>
+    <Panel id={id} title="CORNER WEIGHTS">
+      <line x1="174" y1="58" x2="66" y2="116" stroke="#39e9b4" strokeWidth="1.6" strokeDasharray="5 4" opacity="0.85" filter={`url(#${id}-glow)`} />
+      <rect x="96" y="46" width="48" height="84" rx="18" fill={`url(#${id}-body)`} stroke="#2b3f5c" strokeWidth="1" />
+      <path d="M101 62 L139 62 L134 74 L106 74 Z" fill="#5a7ba6" opacity="0.4" />
+      <path d="M106 104 L134 104 L139 116 L101 116 Z" fill="#5a7ba6" opacity="0.26" />
+      <rect x="106" y="76" width="28" height="26" rx="6" fill="#0e1a2c" opacity="0.7" />
+      {[[90, 60], [150, 60], [90, 116], [150, 116]].map(([x, y], i) => (
+        <rect key={i} x={x - 5} y={y - 9} width="10" height="18" rx="4" fill="#0b0e14" stroke="#04060b" strokeWidth="0.8" />
+      ))}
+      {pads.map((p) => (
+        <g key={p.t} filter={`url(#${id}-glow)`}>
+          <rect x={p.x - 16} y={p.y - 11} width="32" height="22" rx="5" fill="#08201c" stroke="#2ad4a4" strokeWidth="1" />
+          <text x={p.x} y={p.y + 1} textAnchor="middle" fill="#5ff3c8" fontSize="8.5" fontWeight="700" style={scrFont}>{p.t}</text>
+          <text x={p.x} y={p.y + 8.5} textAnchor="middle" fill="#2ad4a4" fontSize="5.5" style={scrFont}>kg</text>
         </g>
       ))}
-      {/* diagonal */}
-      <line x1="48" y1="104" x2="140" y2="22" {...Sd} />
-      <text x="150" y="70" {...Lbl}>diagonal</text>
-    </svg>
+      <text x="120" y="145" textAnchor="middle" fill="#5ff3c8" fontSize="7.5" style={scrFont}>diagonal = cross-weight</text>
+    </Panel>
   );
 }
 
@@ -207,6 +314,71 @@ export default function UndervognPage() {
   const dEt = num(fit.net) - num(fit.oet);
   const outerCh = dWidthMm / 2 - dEt;                      // + = mere poke (ud)
   const innerCh = dWidthMm / 2 + dEt;                      // + = tættere på fjederben
+
+  // ---- save / log ------------------------------------------------------
+  const { session, user } = useAuth();
+  const [setupName, setSetupName] = useState("");
+  const [setupCar, setSetupCar] = useState("");
+  const [setupNotes, setSetupNotes] = useState("");
+  const [localPresets, setLocalPresets] = useState([]);
+  const [profileSetups, setProfileSetups] = useState([]);
+  const [saveMsg, setSaveMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => { setLocalPresets(getLocalPresets()); }, []);
+  useEffect(() => {
+    let on = true;
+    if (session) getProfileSetups().then((r) => { if (on) setProfileSetups(r); });
+    else setProfileSetups([]);
+    return () => { on = false; };
+  }, [session]);
+
+  const snapshot = () => ({ cam, camConv, toe, cast, cw, spr, fit });
+  const restore = (d) => {
+    if (!d) return;
+    if (d.cam) setCam(d.cam);
+    if (d.camConv) setCamConv(d.camConv);
+    if (d.toe) setToe(d.toe);
+    if (d.cast) setCast(d.cast);
+    if (d.cw) setCw(d.cw);
+    if (d.spr) setSpr(d.spr);
+    if (d.fit) setFit(d.fit);
+    setSaveMsg("✓ Setup indlæst i beregnerne ovenfor.");
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const defaultName = () => setupName.trim() || `Setup ${new Date().toLocaleDateString("da-DK")}`;
+  const doSaveLocal = () => {
+    saveLocalPreset({ name: defaultName(), car: setupCar.trim(), notes: setupNotes.trim(), data: snapshot() });
+    setLocalPresets(getLocalPresets());
+    setSaveMsg("💾 Gemt som preset i denne browser.");
+  };
+  const doSaveProfile = async () => {
+    if (!user) return;
+    setBusy(true);
+    const { error } = await saveProfileSetup({ userId: user.id, name: defaultName(), car: setupCar.trim(), notes: setupNotes.trim(), data: snapshot() });
+    setBusy(false);
+    if (error) { setSaveMsg("⚠︎ Kunne ikke gemme på profil — er migration 031 kørt i Supabase?"); return; }
+    setProfileSetups(await getProfileSetups());
+    setSaveMsg("⭐ Gemt på din profil.");
+  };
+  const doDeleteLocal = (id) => { deleteLocalPreset(id); setLocalPresets(getLocalPresets()); };
+  const doDeleteProfile = async (id) => { await deleteProfileSetup(id); setProfileSetups(await getProfileSetups()); };
+  const doPdf = () => { if (typeof window !== "undefined") window.print(); };
+
+  const savedRows = [
+    ...profileSetups.map((s) => ({ ...s, _b: "Profil", _del: () => doDeleteProfile(s.id) })),
+    ...localPresets.map((s) => ({ ...s, _b: "Lokal", _del: () => doDeleteLocal(s.id) })),
+  ];
+
+  // Rows for the printable / PDF report.
+  const reportRows = [
+    ["Camber", `top ${cam.top} / bund ${cam.bottom} mm · ${cam.rim}″`, `${degStr(camAngle)} (${camAngle < 0 ? "negativ" : camAngle > 0 ? "positiv" : "nul"})`],
+    ["Toe pr. hjul", `forkant ${toe.front} / bagkant ${toe.rear} mm · ${toe.rim}″`, `${degStr(toeAngle)} · ${sign(toeDiff)}${f1(Math.abs(toeDiff))} mm (${toeDiff > 0 ? "toe-in" : toeDiff < 0 ? "toe-out" : "nul"})`],
+    ["Caster", `camber ud ${cast.cOut}° / ind ${cast.cIn}° · sving ${cast.theta}°`, degStr(caster)],
+    ["Hjørnevægt", `VF ${cw.vf} · HF ${cw.hf} · VB ${cw.vb} · HB ${cw.hb} kg`, `total ${f0(total)} kg · for/bag ${f1(frontP)}/${f1(rearP)}% · cross ${f1(crossP)}%`],
+    ["Fjeder/hjul", `${spr.rate} ${spr.unit === "Nmm" ? "N/mm" : spr.unit === "kgmm" ? "kg/mm" : "lbs/in"} · MR ${spr.mr} · ${spr.corner} kg`, `hjulrate ${f1(wheelRate)} N/mm · ${f2(freq)} Hz`],
+    ["Offset/ET", `${fit.ow}″ ET${fit.oet} → ${fit.nw}″ ET${fit.net}`, `poke ${sign(outerCh)}${f1(Math.abs(outerCh))} mm · inder ${sign(innerCh)}${f1(Math.abs(innerCh))} mm`],
+  ];
 
   return (
     <main className="member daek-main">
@@ -515,7 +687,77 @@ export default function UndervognPage() {
           <p className="dk-note">Mere negativ camber + toe-out foran = kvikkere men mere dækslid og uroligere lige-kørsel. Overdreven camber koster bremselængde og dæklevetid på gaden. Er du i tvivl, så få et rigtigt 4-hjuls-opmålings-print hos en specialist og brug værktøjet her til at forstå og finjustere tallene.</p>
         </section>
 
-        <p className="daek-foot"><Link href="/medlem" className="c-link">← Tilbage til medlemsområdet</Link> · <Link href="/daek" className="c-link">Dæk & fælge →</Link></p>
+        {/* GEM & LOG */}
+        <section className="dk-card dk-star uv-save uv-noprint" id="gem">
+          <h2 className="dk-h">Gem, log & eksportér 💾</h2>
+          <p className="dk-sub">Gem dine indtastede målinger som et setup, så du kan hente det frem igen — som <b>preset</b> lokalt i browseren, eller på <b>din profil</b> (kræver login, virker på tværs af enheder). Du kan også trække en <b>PDF-rapport</b> med alle tal.</p>
+
+          <div className="uv-inputs">
+            <label className="uv-field">
+              <span className="stp-lab">Navn</span>
+              <input value={setupName} onChange={(e) => setSetupName(e.target.value)} placeholder="fx Bane-setup" />
+            </label>
+            <label className="uv-field">
+              <span className="stp-lab">Bil (valgfri)</span>
+              <input value={setupCar} onChange={(e) => setSetupCar(e.target.value)} placeholder="fx Duif M4" />
+            </label>
+          </div>
+          <label className="uv-field uv-field-wide">
+            <span className="stp-lab">Note (valgfri)</span>
+            <textarea rows={2} value={setupNotes} onChange={(e) => setSetupNotes(e.target.value)} placeholder="fx dæktryk 2,2 bar koldt, fuld tank, sommer" />
+          </label>
+
+          <div className="uv-save-btns">
+            <button type="button" className="uv-btn" onClick={doSaveLocal}>💾 Gem preset</button>
+            {session ? (
+              <button type="button" className="uv-btn uv-btn-gold" onClick={doSaveProfile} disabled={busy}>⭐ Gem på min profil</button>
+            ) : (
+              <Link href="/login" className="uv-btn">Log ind for at gemme på profil</Link>
+            )}
+            <button type="button" className="uv-btn" onClick={doPdf}>📄 Gem som PDF</button>
+          </div>
+          {saveMsg && <p className="uv-save-msg">{saveMsg}</p>}
+
+          {savedRows.length > 0 && (
+            <div className="uv-saved">
+              <span className="stp-lab">Gemte setups</span>
+              {savedRows.map((s) => (
+                <div className="uv-saved-row" key={s._b + s.id}>
+                  <div className="uv-saved-meta">
+                    <span className="uv-saved-name">{s.name}</span>
+                    {s.car && <span className="uv-saved-car">{s.car}</span>}
+                    <span className={`dk-chip ${s._b === "Profil" ? "ok" : "warn"}`}>{s._b}</span>
+                  </div>
+                  <div className="uv-saved-actions">
+                    <button type="button" className="uv-mini" onClick={() => restore(s.data)}>Indlæs</button>
+                    <button type="button" className="uv-mini uv-mini-del" onClick={s._del}>Slet</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+          {!session && <p className="dk-note">Presets gemmes kun i denne browser. Log ind for at gemme setups på din profil, så de følger med på tværs af mobil og computer.</p>}
+        </section>
+
+        {/* Printable / PDF report (hidden on screen, shown when printing) */}
+        <div className="uv-print" aria-hidden="true">
+          <h1>West Side Car Crew — Undervogns-setup</h1>
+          <p className="uv-print-sub">
+            {setupName.trim() || "Uden navn"}{setupCar.trim() ? ` · ${setupCar.trim()}` : ""} · {new Date().toLocaleDateString("da-DK")}
+          </p>
+          {setupNotes.trim() && <p className="uv-print-note">{setupNotes.trim()}</p>}
+          <table className="uv-print-table">
+            <thead><tr><th>Måling</th><th>Input</th><th>Resultat</th></tr></thead>
+            <tbody>
+              {reportRows.map((r) => (
+                <tr key={r[0]}><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td></tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="uv-print-foot">Genereret på westsidecarcrew.dk/undervogn · vejledende tal — verificér altid mod fabriksdata.</p>
+        </div>
+
+        <p className="daek-foot uv-noprint"><Link href="/medlem" className="c-link">← Tilbage til medlemsområdet</Link> · <Link href="/daek" className="c-link">Dæk & fælge →</Link></p>
       </div>
     </main>
   );
