@@ -12,17 +12,28 @@ export default function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [q, setQ] = useState("");
   const [index, setIndex] = useState(null);
+  const [rightPx, setRightPx] = useState(null); // measured: bar's right edge = magnifier's right edge
   const inputRef = useRef(null);
   const rootRef = useRef(null);
+  const fabRef = useRef(null);
   const router = useRouter();
 
   const loadIndex = () => { if (!index) getSearchIndex().then(setIndex); };
   const close = () => { setOpen(false); setQ(""); };
 
-  // Called straight from the tap — focus synchronously so iOS shows the keyboard.
-  const openSearch = () => {
+  // Anchor the bar's right edge to the magnifier so it expands LEFT and never
+  // covers the bell / language pill (which sit to its right). Measured live so
+  // it works regardless of login state or language-pill width.
+  const doOpen = () => {
+    const fab = fabRef.current;
+    if (fab) setRightPx(Math.round(window.innerWidth - fab.getBoundingClientRect().right));
     loadIndex();
     setOpen(true);
+  };
+
+  // Called straight from the tap — focus synchronously so iOS shows the keyboard.
+  const openSearch = () => {
+    doOpen();
     inputRef.current?.focus();
   };
 
@@ -31,8 +42,7 @@ export default function GlobalSearch() {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         if (open) { close(); return; }
-        loadIndex();
-        setOpen(true);
+        doOpen();
         setTimeout(() => inputRef.current?.focus(), 20);
       } else if (e.key === "Escape") {
         close();
@@ -56,16 +66,22 @@ export default function GlobalSearch() {
 
   const go = (href) => { close(); router.push(href); };
 
+  // Fill from the left margin up to the magnifier, capped so it isn't huge on
+  // desktop. Right edge pinned at the magnifier → clears bell + language pill.
+  const posStyle = rightPx != null
+    ? { right: `${rightPx}px`, width: `min(340px, calc(100vw - ${rightPx}px - 1.1rem))` }
+    : undefined;
+
   return (
     <div className={`gs ${open ? "gs-open" : ""}`} ref={rootRef}>
-      <button type="button" className="search-fab" onClick={openSearch} aria-label="Søg" title="Søg (⌘K)">
+      <button ref={fabRef} type="button" className="search-fab" onClick={openSearch} aria-label="Søg" title="Søg (⌘K)">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />
           <path d="M21 21l-4.3-4.3" />
         </svg>
       </button>
 
-      <div className="gs-bar">
+      <div className="gs-bar" style={posStyle}>
         <svg className="gs-bar-ico" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <circle cx="11" cy="11" r="7" />
           <path d="M21 21l-4.3-4.3" />
@@ -75,7 +91,7 @@ export default function GlobalSearch() {
           className="gs-bar-input"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Søg biler, medlemmer, meets…"
+          placeholder="Søg…"
           aria-label="Søg"
           enterKeyHint="search"
         />
@@ -83,7 +99,7 @@ export default function GlobalSearch() {
       </div>
 
       {open && ql && (
-        <div className="gs-drop">
+        <div className="gs-drop" style={posStyle}>
           {!index && <p className="gs-hint">Indlæser…</p>}
           {index && results.length === 0 && <p className="gs-hint">Ingen resultater for “{q}”.</p>}
           {results.map((r, i) => (
