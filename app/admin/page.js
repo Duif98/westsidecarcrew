@@ -13,6 +13,8 @@ import PostManager from "../components/PostManager";
 import EventManager from "../components/EventManager";
 import CarManager from "../components/CarManager";
 import AdminAddCar from "../components/AdminAddCar";
+import AdminOverview from "../components/AdminOverview";
+import MemberManager from "../components/MemberManager";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -71,6 +73,8 @@ export default function AdminPage() {
         <span className="overline">Admin</span>
         <h1 className="member-title">Admin</h1>
 
+        <AdminOverview pendingCount={pending.length} liveCount={live.length} />
+
         <PostManager userId={user.id} />
 
         <EventManager userId={user.id} />
@@ -79,9 +83,11 @@ export default function AdminPage() {
 
         <CarManager key={carMgrKey} />
 
+        <MemberManager />
+
         <p className="member-note" style={{ marginTop: "1.5rem" }}>Godkend billeder til forsiden, og vælg hvilket billede der skal være bilens cover (thumbnail).</p>
 
-        <div className="member-section">
+        <div className="member-section" id="godkendelser">
           <span className="overline">Afventer godkendelse ({pending.length})</span>
           {pending.length ? (
             <PhotoGrid

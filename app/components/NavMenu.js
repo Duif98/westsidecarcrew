@@ -64,6 +64,15 @@ export default function NavMenu() {
               {session && total > 0 && <span className="nav-badge" style={{ position: "static" }}>{total > 9 ? "9+" : total}</span>}
             </Link>
 
+            <button
+              type="button"
+              className="nav-m-link nav-m-search"
+              onClick={() => { close(); window.dispatchEvent(new Event("wscc-open-search")); }}
+            >
+              <span>🔍 {t("nav.search")}</span>
+              <kbd className="nav-m-kbd">⌘K</kbd>
+            </button>
+
             {LINKS.map((l) => (
               <Link key={l.href} href={l.href} className="nav-m-link" onClick={close}>{t(`nav.${l.key}`)}</Link>
             ))}

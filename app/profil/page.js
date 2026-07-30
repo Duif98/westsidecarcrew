@@ -13,6 +13,7 @@ import PhotoLightbox from "../components/PhotoLightbox";
 import ProfileWall from "../components/ProfileWall";
 import AvatarCropper from "../components/AvatarCropper";
 import CarInfoEditor from "../components/CarInfoEditor";
+import ProfileCompletion from "../components/ProfileCompletion";
 import CarCareEditor from "../components/CarCareEditor";
 import AddCarForm from "../components/AddCarForm";
 
@@ -306,6 +307,14 @@ function ProfileInner() {
         <div className="pstat"><b>{stats?.comments ?? 0}</b><span>Kommentarer</span></div>
         <div className="pstat"><b>{currentCars.length}</b><span>Biler</span></div>
       </div>
+
+      {me && !editing && (
+        <ProfileCompletion
+          profile={profile}
+          myCars={albums.filter((a) => a.created_by === user.id)}
+          onEdit={openEditor}
+        />
+      )}
 
       {currentCars.length > 0 && (
         <section className="profil-section">
