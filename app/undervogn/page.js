@@ -294,20 +294,37 @@ export default function UndervognPage() {
             tools={[
               "En taut snor/fiskeline langs bilens side (fx spændt mellem to akselbukke), parallel med bilens midterlinje.",
               "Målebånd eller skydelære.",
+              "Tape til at markere rattets position + noget til at låse rattet (rat-lås, spændebånd eller en stiv stang mellem rat og sæde).",
             ]}
             setup={[
-              "Plan overflade, rattet centreret og låst (rat-lås eller en stang mellem rat og sæde), ophænget sat.",
+              "Plan overflade, ophænget sat.",
+              "Vigtigt: rattet SKAL stå 100 % lige og være låst før du måler — ellers er tallet forkert uanset hvor præcist du måler. Se “Få rattet lige” lige under her.",
               "Snoren skal løbe vandret i navhøjde og præcis parallelt med bilens køreretning (thrust-linjen). Mål samme afstand fra snor til fælg for- og bagpå bilen for at sikre den er parallel.",
             ]}
             steps={[
+              "Få rattet lige (se metoden nedenfor) og LÅS det, så det ikke kan dreje under målingen.",
               "Spænd snoren op langs det hjul du måler, lige uden for fælgen.",
               "Mål den vandrette afstand fra snoren ind til fælgens FORKANT (i navhøjde).",
               "Mål afstanden fra samme snor ind til fælgens BAGKANT (samme højde).",
               "Tast fælgstørrelse + de to afstande ind. Er forkant-afstanden størst, toer hjulet IND.",
-              "Gentag på det andet hjul på samme aksel og læg de to tal sammen for at få akslens samlede toe.",
+              "Gentag på det andet hjul på samme aksel. TJEK: venstre og højre hjul skal have samme toe-værdi — er de forskellige, stod rattet skævt. Læg de to tal sammen for akslens samlede toe.",
             ]}
             inputs={["Fælgstørrelse i tommer", "Afstand til forkant (mm)", "Afstand til bagkant (mm)"]}
           />
+
+          <div className="uv-callout">
+            <h4>🎯 Få rattet 100 % lige — og verificér det</h4>
+            <p><b>Hvorfor:</b> Måler du toe med rattet en anelse skævt, fordeles sporingen forkert mellem de to forhjul. Bilen kan så “trække”, og rattet står skævt når du kører ligeud — selvom akslens samlede toe er rigtig. Rattets eger er <b>ikke</b> et pålideligt tjek (rattet kan være monteret skævt fra fabrik/tidligere).</p>
+            <p><b>Metode A — centrér tandstangen (mest præcis):</b></p>
+            <ol>
+              <li>Drej rattet helt i bund til venstre, og helt i bund til højre — tæl antallet af omgange mellem anslagene.</li>
+              <li>Drej tilbage til præcis halvdelen. Nu står tandstangen (rack) i sit centrum = hjulene peger lige frem.</li>
+              <li>Sæt et stykke tape lodret øverst på rattet med en markering på ratkappen bagved, så du straks kan se hvis rattet flytter sig.</li>
+              <li>Lås rattet i den position.</li>
+            </ol>
+            <p><b>Metode B — rulle-test (bekræfter at bilen faktisk kører lige):</b> Kør langsomt ligeud på en plan, lige strækning og slip rattet, så det selv-centrerer. Stop <i>uden</i> at røre rattet. Hjulene peger nu der hvor bilen naturligt kører lige. Markér ratposition med tape og lås.</p>
+            <p><b>Den endelige verifikation:</b> mål toe på <b>begge</b> forhjul mod snoren/thrust-linjen. Er venstre og højre toe lige store, står rattet korrekt. Er de forskellige, justér styrestagene (skru den ene lidt ind, den anden lidt ud med samme mængde) indtil de to hjul har samme toe — så ender rattet lige når du kører ligeud, uden at akslens samlede toe ændrer sig.</p>
+          </div>
           <div className="uv-inputs">
             <Stepper label="Fælg" unit="″" value={toe.rim} step={1} min={10} max={24} onChange={(rim) => setToe({ ...toe, rim })} />
             <Stepper label="Forkant-afstand" unit="mm" value={toe.front} step={1} min={0} max={400} onChange={(front) => setToe({ ...toe, front })} />

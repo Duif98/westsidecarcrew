@@ -1882,6 +1882,13 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .uv-corner { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem 1rem; max-width: 420px; }
 .uv-cmp2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
 .uv-cmp2 .dk-lab { display: block; font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.5rem; }
+.uv-callout { background: rgba(201,168,119,0.06); border: 1px solid var(--gold-deep, rgba(201,168,119,0.3)); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.1rem; }
+.uv-callout h4 { font-family: var(--font-display), serif; font-size: 1rem; color: var(--gold-bright); margin-bottom: 0.5rem; }
+.uv-callout p { color: var(--muted); font-size: 0.85rem; line-height: 1.6; margin-bottom: 0.55rem; }
+.uv-callout b { color: var(--text); }
+.uv-callout ol { margin: 0 0 0.55rem; padding-left: 1.2rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.uv-callout li { color: var(--muted); font-size: 0.85rem; line-height: 1.55; }
+.uv-callout p:last-child { margin-bottom: 0; }
 .uv-sub { margin-top: 1.3rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
 .uv-h3 { font-family: var(--font-display), serif; font-size: 1rem; margin-bottom: 0.3rem; }
 .uv-seg.dk-seg { max-width: 360px; }
