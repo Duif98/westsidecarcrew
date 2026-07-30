@@ -1862,6 +1862,31 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .daek-foot { margin-top: 1.6rem; }
 @media (max-width: 560px) { .dk-cmp { grid-template-columns: 1fr; } }
 
+/* ---------- Undervogn & geometri (/undervogn) ---------- */
+.uv-pre .uv-pre-list { margin: 0.4rem 0 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.uv-pre-list li { color: var(--muted); font-size: 0.86rem; line-height: 1.55; }
+.uv-pre-list b { color: var(--text); }
+.uv-diagram { display: flex; justify-content: center; background: var(--bg-1); border: 1px solid var(--line); border-radius: 12px; padding: 0.6rem; margin: 0.2rem 0 1rem; }
+.uv-svg { width: 100%; max-width: 320px; height: auto; }
+.uv-guide { background: var(--bg-1); border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: 12px; padding: 0.9rem 1rem; margin-bottom: 1.1rem; }
+.uv-g-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem 1.4rem; }
+.uv-g-block h4 { font-family: var(--font-mono), monospace; font-size: 0.66rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-bright); margin: 0.7rem 0 0.35rem; }
+.uv-g-block:first-child h4, .uv-g-grid .uv-g-block h4 { margin-top: 0; }
+.uv-g-block ul, .uv-g-block ol { margin: 0; padding-left: 1.15rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.uv-g-block li { color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+.uv-g-block b { color: var(--text); }
+.uv-g-steps ol { counter-reset: none; }
+.uv-g-inputs { background: rgba(201,168,119,0.06); border: 1px solid var(--gold-deep, rgba(201,168,119,0.25)); border-radius: 10px; padding: 0.6rem 0.8rem; margin-top: 0.8rem; }
+.uv-g-inputs h4 { margin-top: 0; }
+.uv-inputs { display: flex; flex-wrap: wrap; gap: 0.7rem 1rem; align-items: flex-end; }
+.uv-corner { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem 1rem; max-width: 420px; }
+.uv-cmp2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.uv-cmp2 .dk-lab { display: block; font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.5rem; }
+.uv-sub { margin-top: 1.3rem; padding-top: 1.1rem; border-top: 1px solid var(--line); }
+.uv-h3 { font-family: var(--font-display), serif; font-size: 1rem; margin-bottom: 0.3rem; }
+.uv-seg.dk-seg { max-width: 360px; }
+@media (max-width: 560px) { .uv-g-grid { grid-template-columns: 1fr; } .uv-cmp2 { grid-template-columns: 1fr; } }
+
 /* ---------- Car care & owner review ---------- */
 .care-form { gap: 0.7rem; }
 .care-divider { height: 1px; background: var(--line); margin: 0.3rem 0; }

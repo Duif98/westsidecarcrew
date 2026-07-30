@@ -78,6 +78,7 @@ export default function NavMenu() {
                 <Link href="/mine-meets" className="nav-m-link" onClick={close}>{t("nav.myMeets")}</Link>
                 <Link href="/reservedelskatalog" className="nav-m-link" onClick={close}>{t("nav.parts")}</Link>
                 <Link href="/daek" className="nav-m-link" onClick={close}>{t("nav.tyres")}</Link>
+                <Link href="/undervogn" className="nav-m-link" onClick={close}>{t("nav.suspension")}</Link>
                 <Link href="/manualer" className="nav-m-link" onClick={close}>{t("nav.manuals")}</Link>
                 <Link href="/dashboard" className="nav-m-link" onClick={close}>{t("nav.dashboard")}</Link>
                 <Link href="/leaderboard" className="nav-m-link" onClick={close}>{t("nav.leaderboard")}</Link>

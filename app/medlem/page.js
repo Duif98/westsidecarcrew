@@ -119,6 +119,15 @@ export default function MedlemHub() {
             <span className="hub-go">Åbn værktøj →</span>
           </Link>
 
+          <Link href="/undervogn" className="hub-card parts">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="6" cy="17" r="3" /><circle cx="18" cy="17" r="3" /><path d="M9 17h6M6 14V8l4 3h5l3 3M10 8V5" /></svg>
+            </span>
+            <span className="hub-card-title">Undervogn & geometri</span>
+            <span className="hub-card-sub">Mål og regn på camber, toe, caster, hjørnevægt og offset</span>
+            <span className="hub-go">Åbn værktøj →</span>
+          </Link>
+
           <Link href="/manualer" className="hub-card parts">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h10l6 6v10a0 0 0 0 1 0 0H4z" /><path d="M14 4v6h6" /><path d="M8 14h8M8 17h5" /></svg>
