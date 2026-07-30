@@ -1920,6 +1920,16 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .mm-input { background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 8px; color: var(--text); font-family: inherit; font-size: 0.9rem; padding: 0.35rem 0.55rem; }
 .mm-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
 
+/* ---------- Admin hub (card grid you click into) ---------- */
+.admin-hub { margin-top: 1.6rem; }
+button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; cursor: pointer; }
+.admin-hub .hub-card { min-height: clamp(150px, 26vh, 200px); padding: clamp(1.2rem, 4vw, 1.8rem); }
+.admin-hub .hub-card-title { font-size: clamp(1.3rem, 3vw, 1.7rem); }
+.admin-hub .hub-ico { width: 46px; height: 46px; }
+.admin-hub .hub-ico svg { width: 24px; height: 24px; }
+.admin-back { background: transparent; border: 1px solid var(--line-2); color: var(--gold-bright); border-radius: 999px; padding: 0.45rem 0.95rem; font-size: 0.85rem; cursor: pointer; margin-bottom: 1.3rem; }
+.admin-back:hover { border-color: var(--gold); }
+
 /* ---------- Profile completion ---------- */
 .pc-card { background: var(--bg-2); border: 1px solid var(--line); border-left: 3px solid var(--gold); border-radius: 12px; padding: 1rem 1.1rem; margin: 1.2rem 0; }
 .pc-head { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
@@ -2167,6 +2177,9 @@ button.md-dir { cursor: pointer; line-height: 1; }
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
 .notif-bell:hover { border-color: var(--gold); color: var(--gold-bright); }
+.search-fab { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--glass); backdrop-filter: blur(10px); color: var(--text); cursor: pointer; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+.search-fab:hover { border-color: var(--gold); color: var(--gold-bright); }
+.search-fab svg { color: var(--gold); flex: none; }
 .notif-bell-badge { top: -6px; right: -6px; box-shadow: 0 0 0 2px var(--bg); }
 .notif-pop { position: fixed; z-index: 1300; top: calc(0.9rem + 46px + 10px + env(safe-area-inset-top)); right: max(1.1rem, env(safe-area-inset-right)); width: min(340px, calc(100vw - 1.6rem)); background: var(--glass-menu); backdrop-filter: blur(16px); border: 1px solid var(--line-2); border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); overflow: hidden; animation: langMenuIn 0.16s var(--ease); }
 .notif-pop-head { font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); padding: 0.8rem 1rem 0.5rem; }

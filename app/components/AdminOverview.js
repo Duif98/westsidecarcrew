@@ -5,7 +5,7 @@ import { getAdminStats, getMembers } from "../lib/admin";
 
 const since = (t) => (t ? new Date(t).toLocaleDateString("da-DK", { day: "numeric", month: "short", year: "numeric" }) : "");
 
-export default function AdminOverview({ pendingCount = 0, liveCount = 0 }) {
+export default function AdminOverview({ pendingCount = 0, liveCount = 0, onPending }) {
   const [stats, setStats] = useState({ members: 0, events: 0, posts: 0 });
   const [recent, setRecent] = useState([]);
 
@@ -35,7 +35,9 @@ export default function AdminOverview({ pendingCount = 0, liveCount = 0 }) {
         ))}
       </div>
       {pendingCount > 0 && (
-        <a href="#godkendelser" className="ao-cta">→ {pendingCount} billede{pendingCount > 1 ? "r" : ""} afventer godkendelse</a>
+        onPending
+          ? <button type="button" className="ao-cta" onClick={onPending}>→ {pendingCount} billede{pendingCount > 1 ? "r" : ""} afventer godkendelse</button>
+          : <a href="#godkendelser" className="ao-cta">→ {pendingCount} billede{pendingCount > 1 ? "r" : ""} afventer godkendelse</a>
       )}
       {recent.length > 0 && (
         <div className="ao-recent">
