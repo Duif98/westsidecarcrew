@@ -3,7 +3,6 @@ import { asset } from "./lib/asset";
 import AuthProvider from "./lib/AuthProvider";
 import NavMenu from "./components/NavMenu";
 import LangSwitcher from "./components/LangSwitcher";
-import GlobalSearch from "./components/GlobalSearch";
 import { PwaProvider } from "./components/PwaProvider";
 import { PresenceProvider } from "./components/PresenceProvider";
 import PushPrompt from "./components/PushPrompt";
@@ -102,7 +101,6 @@ export default function RootLayout({ children }) {
                 {children}
                 <NavMenu />
                 <LangSwitcher />
-                <GlobalSearch />
                 <PushPrompt />
               </PwaProvider>
             </PresenceProvider>

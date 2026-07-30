@@ -1882,20 +1882,46 @@ button.md-dir { cursor: pointer; line-height: 1; }
 .uv-corner { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem 1rem; max-width: 420px; }
 .uv-pt-temps { margin-top: 0.9rem; }
 
-/* ---------- Global search ---------- */
-.gs-overlay { position: fixed; inset: 0; z-index: 4000; background: rgba(0,0,0,0.55); backdrop-filter: blur(3px); display: flex; align-items: flex-start; justify-content: center; padding: 12vh 1rem 1rem; }
-.gs-box { width: 100%; max-width: 560px; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); overflow: hidden; }
-.gs-input { width: 100%; border: none; border-bottom: 1px solid var(--line); background: transparent; color: var(--text); font-family: inherit; font-size: 1.05rem; padding: 1rem 1.1rem; }
-.gs-input:focus { outline: none; }
-.gs-hint { color: var(--faint); font-size: 0.82rem; padding: 0.9rem 1.1rem; margin: 0; }
-.gs-results { max-height: 56vh; overflow-y: auto; }
-.gs-item { display: flex; align-items: center; gap: 0.7rem; width: 100%; text-align: left; background: transparent; border: none; border-bottom: 1px solid var(--line); color: var(--text); padding: 0.7rem 1.1rem; cursor: pointer; }
-.gs-item:hover { background: var(--bg-1); }
-.gs-type { flex: none; font-family: var(--font-mono), monospace; font-size: 0.58rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-bright); border: 1px solid var(--line-2); border-radius: 999px; padding: 0.15rem 0.5rem; min-width: 58px; text-align: center; }
-.gs-label { font-weight: 500; }
-.gs-sub { color: var(--faint); font-size: 0.8rem; margin-left: auto; }
-.nav-m-search { display: flex; align-items: center; justify-content: space-between; width: 100%; background: transparent; border: none; cursor: pointer; text-align: left; }
-.nav-m-kbd { font-family: var(--font-mono), monospace; font-size: 0.62rem; color: var(--faint); border: 1px solid var(--line-2); border-radius: 6px; padding: 0.1rem 0.35rem; }
+/* ---------- Global search (inline expanding bar in the top-right cluster) ---------- */
+.gs { display: flex; }
+.gs-open .search-fab { opacity: 0; pointer-events: none; }
+.gs-bar {
+  position: fixed; z-index: 130;
+  top: calc(0.9rem + env(safe-area-inset-top));
+  right: calc(max(1.1rem, env(safe-area-inset-right)) + 46px + 0.55rem);
+  height: 46px; width: min(340px, calc(100vw - 5.2rem));
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0 0.35rem 0 0.75rem;
+  background: var(--glass-menu); backdrop-filter: blur(16px);
+  border: 1px solid var(--line-2); border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  opacity: 0; transform: scaleX(0.7); transform-origin: right center; pointer-events: none;
+  transition: opacity 0.2s var(--ease), transform 0.2s var(--ease);
+}
+.gs-open .gs-bar { opacity: 1; transform: scaleX(1); pointer-events: auto; }
+.gs-bar-ico { color: var(--gold); flex: none; }
+.gs-bar-input { flex: 1; min-width: 0; background: transparent; border: none; color: var(--text); font-family: inherit; font-size: 1rem; }
+.gs-bar-input:focus { outline: none; }
+.gs-bar-x { flex: none; background: transparent; border: none; color: var(--faint); font-size: 0.95rem; line-height: 1; cursor: pointer; padding: 0.4rem 0.45rem; }
+.gs-bar-x:hover { color: var(--gold-bright); }
+.gs-drop {
+  position: fixed; z-index: 130;
+  top: calc(0.9rem + 46px + 8px + env(safe-area-inset-top));
+  right: calc(max(1.1rem, env(safe-area-inset-right)) + 46px + 0.55rem);
+  width: min(340px, calc(100vw - 5.2rem));
+  max-height: min(60vh, 420px); overflow-y: auto;
+  background: var(--glass-menu); backdrop-filter: blur(16px);
+  border: 1px solid var(--line-2); border-radius: 14px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  animation: langMenuIn 0.16s var(--ease);
+}
+.gs-hint { color: var(--faint); font-size: 0.82rem; padding: 0.8rem 1rem; margin: 0; }
+.gs-item { display: flex; align-items: center; gap: 0.7rem; width: 100%; text-align: left; background: transparent; border: none; border-bottom: 1px solid var(--line); color: var(--text); padding: 0.7rem 1rem; cursor: pointer; }
+.gs-item:last-child { border-bottom: none; }
+.gs-item:hover { background: var(--bg-3); }
+.gs-type { flex: none; font-family: var(--font-mono), monospace; font-size: 0.56rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gold-bright); border: 1px solid var(--line-2); border-radius: 999px; padding: 0.15rem 0.45rem; min-width: 54px; text-align: center; }
+.gs-label { font-weight: 500; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gs-sub { color: var(--faint); font-size: 0.78rem; margin-left: auto; flex: none; }
 
 /* ---------- Admin overview ---------- */
 .ao-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 0.6rem; margin-top: 0.6rem; }
