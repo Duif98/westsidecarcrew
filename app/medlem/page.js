@@ -128,6 +128,15 @@ export default function MedlemHub() {
             <span className="hub-go">Åbn værktøj →</span>
           </Link>
 
+          <Link href="/daektryk" className="hub-card parts">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="13" r="8" /><path d="M12 13V7M12 7a2 2 0 0 1 2-2h1" /><path d="M9.5 13a2.5 2.5 0 1 0 5 0" /></svg>
+            </span>
+            <span className="hub-card-title">Dæktryk & temperatur</span>
+            <span className="hub-card-sub">Koldt↔varmt tryk — find dit kolde måltryk til banedagen</span>
+            <span className="hub-go">Åbn værktøj →</span>
+          </Link>
+
           <Link href="/manualer" className="hub-card parts">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h10l6 6v10a0 0 0 0 1 0 0H4z" /><path d="M14 4v6h6" /><path d="M8 14h8M8 17h5" /></svg>
