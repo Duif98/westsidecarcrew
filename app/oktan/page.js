@@ -30,6 +30,7 @@ const PRODUCTS = [
   { id: "sonax",     name: "SONAX Octane Power (250 ml)",              doseMl: 250, refTank: 50, ratedGain: 4 },
   { id: "putoline",  name: "Putoline Octan Booster (150 ml)",         doseMl: 150, refTank: 20, ratedGain: 5 },
   { id: "lindemann", name: "Lindemann Octan Boost Pro Racing (400 ml)", doseMl: 400, refTank: 60, ratedGain: 5 },
+  { id: "wurth",     name: "Würth Oktan Booster (300 ml)",             doseMl: 300, refTank: 55, ratedGain: 5 },
   // The rest are approximate typical values — verify against the bottle.
   { id: "liquimoly", name: "Liqui Moly Oktan Plus",       doseMl: 250, refTank: 70, ratedGain: 2 },
   { id: "bardahl",   name: "Bardahl Octane Booster",      doseMl: 300, refTank: 60, ratedGain: 3 },
