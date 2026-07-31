@@ -45,6 +45,24 @@ export default function MedlemHub() {
         )}
 
         <div className="hub-grid">
+          <Link href="/feed" className="hub-card chat">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M9 21V9" /></svg>
+            </span>
+            <span className="hub-card-title">Feed</span>
+            <span className="hub-card-sub">Alt det nye fra crewet — billeder, meets og medlemmer ét sted</span>
+            <span className="hub-go">Åbn feed →</span>
+          </Link>
+
+          <Link href="/beskeder" className="hub-card chat">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16v12H7l-3 3z" /></svg>
+            </span>
+            <span className="hub-card-title">Beskeder</span>
+            <span className="hub-card-sub">Skriv direkte 1:1 med de andre i crewet</span>
+            <span className="hub-go">Åbn beskeder →</span>
+          </Link>
+
           <Link href="/notifikationer" className="hub-card board">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>

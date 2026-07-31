@@ -25,11 +25,26 @@ export const localeOf = (lang) => LOCALES[lang] || LOCALES.da;
 const M = {
   da: {
     lang: { switch: "Skift sprog", current: "Sprog: {name}" },
+    feed: {
+      overline: "Feedet", title: "Nyt fra crewet", home: "Forside", member: "Medlem",
+      empty: "Ingen aktivitet endnu. Upload et billede eller opret et meet, så fylder feedet sig op.",
+      newMeet: "oprettede et meet", newPost: "Nyt opslag", newMember: "er nyt medlem i crewet",
+      pull: "Træk ned for at opdatere", release: "Slip for at opdatere", refreshing: "Opdaterer…",
+    },
+    dm: {
+      overline: "Beskeder", title: "Direkte beskeder", pick: "Vælg en samtale for at skrive.",
+      startNew: "Start en ny samtale", noMembers: "Ingen andre medlemmer endnu.",
+      placeholder: "Skriv en besked…", send: "Send", message: "Besked", sendPhoto: "Send billede",
+      photo: "Billede", sentPhoto: "sendte et billede", you: "Dig:", back: "Tilbage",
+      imgError: "Kunne ikke sende billedet:",
+    },
+    react: { add: "Reager" },
+    tag: { add: "Tag", remove: "Fjern tag", person: "Tag person", car: "Tag bil", done: "Færdig" },
     nav: {
       crew: "Crewet", garage: "Garagen", members: "Medlemmer", meets: "Meets",
       calendar: "Kalender", map: "Kort", instagram: "Instagram",
       myProfile: "Min profil", login: "Log ind", search: "Søg", inbox: "Notifikationer", crewChat: "Crew chat", wash: "Vask bil",
-      uploadPhotos: "Upload billeder", leaderboard: "Leaderboard", parts: "Reservedelskatalog", tyres: "Dæk & fælge", suspension: "Undervogn & geometri", tyrePressure: "Dæktryk & temperatur", manuals: "Manualer", dashboard: "Dashboard", myMeets: "Mine meets", admin: "Admin",
+      uploadPhotos: "Upload billeder", leaderboard: "Leaderboard", parts: "Reservedelskatalog", tyres: "Dæk & fælge", suspension: "Undervogn & geometri", tyrePressure: "Dæktryk & temperatur", manuals: "Manualer", dashboard: "Dashboard", myMeets: "Mine meets", feed: "Feed", messages: "Beskeder", admin: "Admin",
       logout: "Log ud", viewProfile: "Se din profil", joinCrew: "Bliv en del af crewet",
       openMenu: "Åbn menu", closeMenu: "Luk menu", toTop: "West Side Car Crew — til toppen",
       settings: "Indstillinger", themeLight: "Lyst tema", themeDark: "Mørkt tema",
@@ -209,7 +224,7 @@ const M = {
       sleet: "Slud", sleetshowers: "Sludbyger", snow: "Sne", snowshowers: "Snebyger",
       heavysnow: "Kraftig sne", thunder: "Torden", unknown: "—",
     },
-    common: { member: "Medlem", loginShort: "Log ind", back: "‹ Medlem", meetsList: "Meets-liste" },
+    common: { member: "Medlem", loginShort: "Log ind", back: "‹ Medlem", meetsList: "Meets-liste", loading: "Indlæser…" },
     mine: {
       overline: "Mine meets", title: "Meets jeg kommer til",
       intro: "De kommende meets du har sagt ja eller måske til.",
@@ -231,11 +246,26 @@ const M = {
 
   en: {
     lang: { switch: "Change language", current: "Language: {name}" },
+    feed: {
+      overline: "The feed", title: "Fresh from the crew", home: "Home", member: "Member",
+      empty: "No activity yet. Upload a photo or create a meet and the feed will fill up.",
+      newMeet: "created a meet", newPost: "New post", newMember: "is a new crew member",
+      pull: "Pull to refresh", release: "Release to refresh", refreshing: "Refreshing…",
+    },
+    dm: {
+      overline: "Messages", title: "Direct messages", pick: "Pick a conversation to start writing.",
+      startNew: "Start a new conversation", noMembers: "No other members yet.",
+      placeholder: "Write a message…", send: "Send", message: "Message", sendPhoto: "Send photo",
+      photo: "Photo", sentPhoto: "sent a photo", you: "You:", back: "Back",
+      imgError: "Couldn't send the photo:",
+    },
+    react: { add: "React" },
+    tag: { add: "Tag", remove: "Remove tag", person: "Tag person", car: "Tag car", done: "Done" },
     nav: {
       crew: "The Crew", garage: "The Garage", members: "Members", meets: "Meets",
       calendar: "Calendar", map: "Map", instagram: "Instagram",
       myProfile: "My profile", login: "Log in", search: "Search", inbox: "Notifications", crewChat: "Crew chat", wash: "Wash car",
-      uploadPhotos: "Upload photos", leaderboard: "Leaderboard", parts: "Parts catalog", tyres: "Tyres & wheels", suspension: "Suspension & geometry", tyrePressure: "Tyre pressure & temperature", manuals: "Manuals", dashboard: "Dashboard", myMeets: "My meets", admin: "Admin",
+      uploadPhotos: "Upload photos", leaderboard: "Leaderboard", parts: "Parts catalog", tyres: "Tyres & wheels", suspension: "Suspension & geometry", tyrePressure: "Tyre pressure & temperature", manuals: "Manuals", dashboard: "Dashboard", myMeets: "My meets", feed: "Feed", messages: "Messages", admin: "Admin",
       logout: "Log out", viewProfile: "View your profile", joinCrew: "Join the crew",
       openMenu: "Open menu", closeMenu: "Close menu", toTop: "West Side Car Crew — to top",
       settings: "Settings", themeLight: "Light theme", themeDark: "Dark theme",
@@ -414,7 +444,7 @@ const M = {
       sleet: "Sleet", sleetshowers: "Sleet showers", snow: "Snow", snowshowers: "Snow showers",
       heavysnow: "Heavy snow", thunder: "Thunder", unknown: "—",
     },
-    common: { member: "Member", loginShort: "Log in", back: "‹ Member", meetsList: "Meets list" },
+    common: { member: "Member", loginShort: "Log in", back: "‹ Member", meetsList: "Meets list", loading: "Loading…" },
     mine: {
       overline: "My meets", title: "Meets I'm attending",
       intro: "The upcoming meets you've said yes or maybe to.",
@@ -436,11 +466,26 @@ const M = {
 
   de: {
     lang: { switch: "Sprache ändern", current: "Sprache: {name}" },
+    feed: {
+      overline: "Der Feed", title: "Frisch aus der Crew", home: "Startseite", member: "Mitglied",
+      empty: "Noch keine Aktivität. Lade ein Foto hoch oder erstelle ein Meet, dann füllt sich der Feed.",
+      newMeet: "hat ein Meet erstellt", newPost: "Neuer Beitrag", newMember: "ist neu in der Crew",
+      pull: "Zum Aktualisieren ziehen", release: "Loslassen zum Aktualisieren", refreshing: "Wird aktualisiert…",
+    },
+    dm: {
+      overline: "Nachrichten", title: "Direktnachrichten", pick: "Wähle eine Unterhaltung zum Schreiben.",
+      startNew: "Neue Unterhaltung starten", noMembers: "Noch keine anderen Mitglieder.",
+      placeholder: "Nachricht schreiben…", send: "Senden", message: "Nachricht", sendPhoto: "Foto senden",
+      photo: "Foto", sentPhoto: "hat ein Foto gesendet", you: "Du:", back: "Zurück",
+      imgError: "Foto konnte nicht gesendet werden:",
+    },
+    react: { add: "Reagieren" },
+    tag: { add: "Markieren", remove: "Markierung entfernen", person: "Person markieren", car: "Auto markieren", done: "Fertig" },
     nav: {
       crew: "Die Crew", garage: "Die Garage", members: "Mitglieder", meets: "Meets",
       calendar: "Kalender", map: "Karte", instagram: "Instagram",
       myProfile: "Mein Profil", login: "Anmelden", search: "Suchen", inbox: "Benachrichtigungen", crewChat: "Crew-Chat", wash: "Auto waschen",
-      uploadPhotos: "Fotos hochladen", leaderboard: "Bestenliste", parts: "Ersatzteilkatalog", tyres: "Reifen & Felgen", suspension: "Fahrwerk & Geometrie", tyrePressure: "Reifendruck & Temperatur", manuals: "Handbücher", dashboard: "Dashboard", myMeets: "Meine Meets", admin: "Admin",
+      uploadPhotos: "Fotos hochladen", leaderboard: "Bestenliste", parts: "Ersatzteilkatalog", tyres: "Reifen & Felgen", suspension: "Fahrwerk & Geometrie", tyrePressure: "Reifendruck & Temperatur", manuals: "Handbücher", dashboard: "Dashboard", myMeets: "Meine Meets", feed: "Feed", messages: "Nachrichten", admin: "Admin",
       logout: "Abmelden", viewProfile: "Dein Profil ansehen", joinCrew: "Teil der Crew werden",
       openMenu: "Menü öffnen", closeMenu: "Menü schließen", toTop: "West Side Car Crew — nach oben",
       settings: "Einstellungen", themeLight: "Helles Design", themeDark: "Dunkles Design",
@@ -619,7 +664,7 @@ const M = {
       sleet: "Schneeregen", sleetshowers: "Schneeregenschauer", snow: "Schnee", snowshowers: "Schneeschauer",
       heavysnow: "Starker Schneefall", thunder: "Gewitter", unknown: "—",
     },
-    common: { member: "Mitglied", loginShort: "Anmelden", back: "‹ Mitglied", meetsList: "Meets-Liste" },
+    common: { member: "Mitglied", loginShort: "Anmelden", back: "‹ Mitglied", meetsList: "Meets-Liste", loading: "Wird geladen…" },
     mine: {
       overline: "Meine Meets", title: "Meets, zu denen ich komme",
       intro: "Die kommenden Meets, zu denen du ja oder vielleicht gesagt hast.",

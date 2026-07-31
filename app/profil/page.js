@@ -301,6 +301,12 @@ function ProfileInner() {
         </div>
       )}
 
+      {!me && session && (
+        <div className="profil-tools">
+          <Link href={`/beskeder?u=${encodeURIComponent(profile.username)}`} className="ptool">✉️ Send besked</Link>
+        </div>
+      )}
+
       <div className="profil-stats">
         <div className="pstat"><b>{stats?.photos ?? 0}</b><span>Billeder</span></div>
         <div className="pstat"><b>{stats?.likes_received ?? 0}</b><span>Likes</span></div>

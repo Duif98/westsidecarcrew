@@ -13,6 +13,7 @@ const IG = "https://www.instagram.com/westsidecarcrew/";
 const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
 const LINKS = [
+  { href: "/feed", key: "feed" },
   { href: "/#crewet", key: "crew" },
   { href: "/#garagen", key: "garage" },
   { href: "/medlemmer", key: "members" },
@@ -72,6 +73,7 @@ export default function NavMenu() {
               <>
                 <div className="nav-m-sep" />
                 <Link href="/notifikationer" className="nav-m-link" onClick={close}>{t("nav.inbox")}</Link>
+                <Link href="/beskeder" className="nav-m-link" onClick={close}>{t("nav.messages")}</Link>
                 <Link href="/chat" className="nav-m-link" onClick={close}>{t("nav.crewChat")}</Link>
                 <Link href="/vask" className="nav-m-link" onClick={close}>{t("nav.wash")}</Link>
                 <Link href="/upload" className="nav-m-link" onClick={close}>{t("nav.uploadPhotos")}</Link>
