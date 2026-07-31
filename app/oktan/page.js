@@ -26,6 +26,11 @@ function octaneGain({ ml, tank, doseMl, refTank, ratedGain }) {
 // or pick "Brugerdefineret" and type the exact numbers. doseMl treats refTank
 // litres for ratedGain octane (RON).
 const PRODUCTS = [
+  // These three have verified label dosing (thansen.dk product pages).
+  { id: "sonax",     name: "SONAX Octane Power (250 ml)",              doseMl: 250, refTank: 50, ratedGain: 4 },
+  { id: "putoline",  name: "Putoline Octan Booster (150 ml)",         doseMl: 150, refTank: 20, ratedGain: 5 },
+  { id: "lindemann", name: "Lindemann Octan Boost Pro Racing (400 ml)", doseMl: 400, refTank: 60, ratedGain: 5 },
+  // The rest are approximate typical values — verify against the bottle.
   { id: "liquimoly", name: "Liqui Moly Oktan Plus",       doseMl: 250, refTank: 70, ratedGain: 2 },
   { id: "bardahl",   name: "Bardahl Octane Booster",      doseMl: 300, refTank: 60, ratedGain: 3 },
   { id: "wynns",     name: "Wynn's Octane Booster",       doseMl: 325, refTank: 60, ratedGain: 3 },
@@ -62,7 +67,7 @@ export default function OktanPage() {
   const [base, setBase] = useState(95);          // base fuel octane (RON)
   const [tank, setTank] = useState("60");        // litres
   const [ml, setMl] = useState("300");           // ml booster added
-  const [productId, setProductId] = useState("bardahl");
+  const [productId, setProductId] = useState("sonax");
   const [spec, setSpec] = useState({ doseMl: "300", refTank: "60", ratedGain: "4" });
 
   // Active booster strength: the chosen product, or the custom label entry.
