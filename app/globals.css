@@ -2451,9 +2451,12 @@ button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; 
 .pm-hist-new { color: var(--text); }
 
 /* ---------- Octane booster calculator ---------- */
-.ob-preset, .ob-adv { margin-top: 0.5rem; }
-.ob-adv-toggle { margin-top: 0.7rem; background: none; border: none; color: var(--gold); font-size: 0.82rem; cursor: pointer; padding: 0; }
-.ob-adv-toggle:hover { text-decoration: underline; }
+.ob-adv { margin-top: 0.5rem; }
+.ob-select { margin-top: 0.5rem; width: 100%; max-width: 420px; font-family: var(--font-body), sans-serif; font-size: 1rem; color: var(--text); background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 12px; padding: 0.75rem 1rem; cursor: pointer; }
+.ob-select:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,119,0.16); }
+.ob-approx { color: var(--muted); }
+.ob-rec-btn { margin-top: 0.8rem; display: inline-flex; align-items: center; gap: 0.4rem; background: rgba(201,168,119,0.12); border: 1px solid var(--gold-deep); color: var(--gold-bright); border-radius: 100px; padding: 0.5rem 1rem; font-size: 0.85rem; cursor: pointer; transition: background 0.2s, border-color 0.2s; }
+.ob-rec-btn:hover { background: rgba(201,168,119,0.2); border-color: var(--gold); }
 .ob-result { margin-top: 1.6rem; display: grid; grid-template-columns: 1fr 1.2fr; gap: 1rem; }
 .ob-final { display: flex; flex-direction: column; gap: 0.3rem; justify-content: center; padding: 1.3rem 1.5rem; border-radius: 16px; background: radial-gradient(120% 120% at 20% 0%, rgba(201,168,119,0.16), transparent 70%), var(--bg-2); border: 1px solid var(--gold-deep); }
 .ob-final-lab { font-family: var(--font-mono), monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }

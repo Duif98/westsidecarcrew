@@ -21,12 +21,22 @@ function octaneGain({ ml, tank, doseMl, refTank, ratedGain }) {
   return ratedGain * (actualConc / ratedConc);
 }
 
-// Booster strength presets (from typical bottle labels — read yours to be exact).
-const PRESETS = {
-  mild:   { doseMl: 300, refTank: 60, ratedGain: 2, label: "Mild — ca. +2 oktan pr. 300 ml i 60 L" },
-  medium: { doseMl: 300, refTank: 60, ratedGain: 4, label: "Middel — ca. +4 oktan pr. 300 ml i 60 L" },
-  strong: { doseMl: 300, refTank: 60, ratedGain: 6, label: "Kraftig — ca. +6 oktan pr. 300 ml i 60 L" },
-};
+// Booster presets. Values are approximate label claims (manufacturers state
+// "up to X octane" and it varies with dose) — verify against your own bottle,
+// or pick "Brugerdefineret" and type the exact numbers. doseMl treats refTank
+// litres for ratedGain octane (RON).
+const PRODUCTS = [
+  { id: "liquimoly", name: "Liqui Moly Oktan Plus",       doseMl: 250, refTank: 70, ratedGain: 2 },
+  { id: "bardahl",   name: "Bardahl Octane Booster",      doseMl: 300, refTank: 60, ratedGain: 3 },
+  { id: "wynns",     name: "Wynn's Octane Booster",       doseMl: 325, refTank: 60, ratedGain: 3 },
+  { id: "stp",       name: "STP Octane Booster",          doseMl: 200, refTank: 55, ratedGain: 2 },
+  { id: "nos",       name: "NOS Racing Formula",          doseMl: 355, refTank: 60, ratedGain: 5 },
+  { id: "torco",     name: "Torco Accelerator (race)",    doseMl: 240, refTank: 60, ratedGain: 5 },
+  { id: "boostane",  name: "BOOSTane Professional",       doseMl: 473, refTank: 60, ratedGain: 7 },
+  { id: "mild",      name: "Generisk — mild",             doseMl: 300, refTank: 60, ratedGain: 2 },
+  { id: "medium",    name: "Generisk — middel",           doseMl: 300, refTank: 60, ratedGain: 4 },
+  { id: "strong",    name: "Generisk — kraftig",          doseMl: 300, refTank: 60, ratedGain: 6 },
+];
 
 function Stepper({ label, value, onChange, step = 1, min = 0, max = 9999, unit }) {
   const clamp = (n) => Math.min(max, Math.max(min, n));
@@ -52,14 +62,15 @@ export default function OktanPage() {
   const [base, setBase] = useState(95);          // base fuel octane (RON)
   const [tank, setTank] = useState("60");        // litres
   const [ml, setMl] = useState("300");           // ml booster added
-  const [preset, setPreset] = useState("medium");
-  const [advanced, setAdvanced] = useState(false);
+  const [productId, setProductId] = useState("bardahl");
   const [spec, setSpec] = useState({ doseMl: "300", refTank: "60", ratedGain: "4" });
 
-  // Active booster strength: preset unless the user overrides in advanced mode.
-  const strength = advanced
+  // Active booster strength: the chosen product, or the custom label entry.
+  const isCustom = productId === "custom";
+  const product = PRODUCTS.find((p) => p.id === productId) || PRODUCTS[0];
+  const strength = isCustom
     ? { doseMl: num(spec.doseMl), refTank: num(spec.refTank), ratedGain: num(spec.ratedGain) }
-    : PRESETS[preset];
+    : { doseMl: product.doseMl, refTank: product.refTank, ratedGain: product.ratedGain };
 
   const tankL = num(tank);
   const mlAdded = num(ml);
@@ -70,6 +81,8 @@ export default function OktanPage() {
   const pct = tankL > 0 ? (mlAdded / (tankL * 1000)) * 100 : 0;
   const ratedConc = strength.refTank > 0 ? strength.doseMl / strength.refTank : 0;
   const overdose = ratedConc > 0 && mlPerL > ratedConc * 2.5;
+  // Recommended dose for this booster scaled to the actual tank (same mix ratio).
+  const recMl = strength.refTank > 0 && tankL > 0 ? Math.round(strength.doseMl * (tankL / strength.refTank)) : 0;
 
   const setSpecK = (k) => (v) => setSpec({ ...spec, [k]: v });
 
@@ -105,27 +118,30 @@ export default function OktanPage() {
             <Stepper label="Booster tilføjet" unit="ml" value={ml} step={25} min={0} max={5000} onChange={setMl} />
           </div>
 
-          <span className="dk-lab" style={{ marginTop: "1.2rem", display: "block" }}>Boosterens styrke</span>
-          <p className="dk-sub" style={{ marginTop: "0.3rem" }}>Vælg en type — eller slå avanceret til og tast tallene direkte fra din flaskes etiket.</p>
-          {!advanced ? (
-            <div className="dk-seg ob-preset">
-              {Object.entries(PRESETS).map(([k, v]) => (
-                <button key={k} className={preset === k ? "on" : ""} onClick={() => setPreset(k)} title={v.label}>
-                  {k === "mild" ? "Mild" : k === "medium" ? "Middel" : "Kraftig"}
-                </button>
-              ))}
-            </div>
-          ) : (
+          <span className="dk-lab" style={{ marginTop: "1.2rem", display: "block" }}>Booster / produkt</span>
+          <p className="dk-sub" style={{ marginTop: "0.3rem" }}>Vælg din booster — så udfyldes styrken automatisk. Eller vælg <b>Brugerdefineret</b> og tast tallene fra din flaskes etiket.</p>
+          <select className="ob-select" value={productId} onChange={(e) => setProductId(e.target.value)} aria-label="Vælg booster">
+            {PRODUCTS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            <option value="custom">Brugerdefineret (tast fra etiket)…</option>
+          </select>
+
+          {isCustom ? (
             <div className="uv-inputs ob-adv">
               <Stepper label="Dosis fra etiket" unit="ml" value={spec.doseMl} step={25} min={1} max={2000} onChange={setSpecK("doseMl")} />
               <Stepper label="Til tank" unit="L" value={spec.refTank} step={5} min={1} max={200} onChange={setSpecK("refTank")} />
               <Stepper label="Hæver oktan" unit="RON" value={spec.ratedGain} step={1} min={1} max={20} onChange={setSpecK("ratedGain")} />
             </div>
+          ) : (
+            <p className="dk-sub" style={{ marginTop: "0.5rem" }}>
+              <b>{product.name}</b>: {f0Ml(product.doseMl)} ml hæver ca. <b>+{product.ratedGain} oktan</b> i {product.refTank} L. <span className="ob-approx">Vejledende tal — tjek din etiket.</span>
+            </p>
           )}
-          <button type="button" className="ob-adv-toggle" onClick={() => setAdvanced((a) => !a)}>
-            {advanced ? "‹ Brug forudindstillinger" : "Avanceret: tast fra etiketten ›"}
-          </button>
-          {!advanced && <p className="dk-sub" style={{ marginTop: "0.5rem" }}>{PRESETS[preset].label}.</p>}
+
+          {recMl > 0 && (
+            <button type="button" className="ob-rec-btn" onClick={() => setMl(String(recMl))}>
+              📏 Brug anbefalet dosis til {f2(tankL)} L: ~{f0Ml(recMl)} ml
+            </button>
+          )}
 
           <div className="ob-result">
             <div className="ob-final">
