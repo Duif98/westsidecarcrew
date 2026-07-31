@@ -155,6 +155,15 @@ export default function MedlemHub() {
             <span className="hub-go">Åbn værktøj →</span>
           </Link>
 
+          <Link href="/oktan" className="hub-card parts">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h6" /><path d="M10 2v4M6 10h6" /><path d="M18 8l-3 6h4l-3 6" /></svg>
+            </span>
+            <span className="hub-card-title">Oktan-booster</span>
+            <span className="hub-card-sub">Regn ud hvor mange oktan du ender på med booster i tanken</span>
+            <span className="hub-go">Åbn værktøj →</span>
+          </Link>
+
           <Link href="/manualer" className="hub-card parts">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h10l6 6v10a0 0 0 0 1 0 0H4z" /><path d="M14 4v6h6" /><path d="M8 14h8M8 17h5" /></svg>

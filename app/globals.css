@@ -2449,3 +2449,19 @@ button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; 
 .pm-hist-old { color: var(--muted); text-decoration: line-through; }
 .pm-hist-arrow { color: var(--muted); }
 .pm-hist-new { color: var(--text); }
+
+/* ---------- Octane booster calculator ---------- */
+.ob-preset, .ob-adv { margin-top: 0.5rem; }
+.ob-adv-toggle { margin-top: 0.7rem; background: none; border: none; color: var(--gold); font-size: 0.82rem; cursor: pointer; padding: 0; }
+.ob-adv-toggle:hover { text-decoration: underline; }
+.ob-result { margin-top: 1.6rem; display: grid; grid-template-columns: 1fr 1.2fr; gap: 1rem; }
+.ob-final { display: flex; flex-direction: column; gap: 0.3rem; justify-content: center; padding: 1.3rem 1.5rem; border-radius: 16px; background: radial-gradient(120% 120% at 20% 0%, rgba(201,168,119,0.16), transparent 70%), var(--bg-2); border: 1px solid var(--gold-deep); }
+.ob-final-lab { font-family: var(--font-mono), monospace; font-size: 0.66rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.ob-octane { font-family: var(--font-display), serif; font-weight: 400; font-size: clamp(2.6rem, 9vw, 3.6rem); line-height: 1; color: var(--gold-bright); letter-spacing: -0.02em; }
+.ob-octane small { font-size: 0.9rem; color: var(--muted); font-family: var(--font-mono), monospace; margin-left: 0.3rem; }
+.ob-gain { color: var(--muted); font-size: 0.9rem; }
+.ob-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+.ob-stats > div { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 0.9rem 0.5rem; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 14px; }
+.ob-stats b { font-family: var(--font-display), serif; font-weight: 400; font-size: clamp(1.3rem, 4vw, 1.7rem); color: var(--text); }
+.ob-stats span { color: var(--muted); font-size: 0.72rem; margin-top: 0.2rem; }
+@media (max-width: 560px) { .ob-result { grid-template-columns: 1fr; } }
