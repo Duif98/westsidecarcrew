@@ -11,6 +11,7 @@ import { timeAgo } from "../lib/time";
 import PullToRefresh from "../components/PullToRefresh";
 import PhotoReactions from "../components/PhotoReactions";
 import PhotoLightbox from "../components/PhotoLightbox";
+import PostMenu from "../components/PostMenu";
 import { markSeen } from "../lib/useUnread";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 
@@ -21,12 +22,14 @@ const avatar = (username, path) => path
 
 // One photo card in the feed, with double-tap-to-like and inline reactions.
 function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
-  const { profile } = useAuth();
-  const { lang } = useT();
+  const { profile, isAdmin } = useAuth();
+  const { t, lang } = useT();
   const p = item.photo;
   const [liked, setLiked] = useState(!!p.likedByMe);
   const [count, setCount] = useState(p.likeCount || 0);
   const [burst, setBurst] = useState(0);
+  const [caption, setCaption] = useState(p.caption || "");
+  const [editedAt, setEditedAt] = useState(p.edited_at || null);
   const lastTap = useRef(0);
   const busy = useRef(false);
 
@@ -62,7 +65,8 @@ function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
           <Link href={uname ? `/profil?u=${encodeURIComponent(uname)}` : "/feed"} className="fd-user">@{uname || "medlem"}</Link>
           {p.car && <span className="fd-sub">{p.car}</span>}
         </div>
-        <span className="fd-when">{timeAgo(p.created_at, lang)}</span>
+        <span className="fd-when">{timeAgo(p.created_at, lang)}{editedAt ? ` · ${t("post.edited")}` : ""}</span>
+        <PostMenu photo={{ ...p, caption }} userId={userId} isAdmin={isAdmin} onSaved={(cap, at) => { setCaption(cap || ""); setEditedAt(at); }} />
       </header>
 
       <div className="fd-media" onClick={tap} onDoubleClick={() => like(true)}>
@@ -82,7 +86,7 @@ function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
           {p.commentCount > 0 && <b>{p.commentCount}</b>}
         </button>
       </div>
-      {p.caption && <p className="fd-caption"><b>@{uname || "medlem"}</b> {p.caption}</p>}
+      {caption && <p className="fd-caption"><b>@{uname || "medlem"}</b> {caption}</p>}
       <div className="fd-react">
         <PhotoReactions photoId={p.id} initial={p.reactions || []} userId={userId} canReact={canLike} onNeedLogin={onNeedLogin} photoOwnerId={p.user_id} photoLabel={p.car} />
       </div>

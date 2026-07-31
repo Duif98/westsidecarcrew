@@ -2411,3 +2411,37 @@ button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; 
   .dm-convo.open { display: flex; }
   .dm-back { display: block; }
 }
+
+/* ---------- Post "•••" menu + edit/history modal ---------- */
+.pm-wrap { position: relative; flex: none; }
+.pm-menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 50%; background: none; border: none; color: var(--muted); cursor: pointer; transition: color 0.2s, background 0.2s; }
+.pm-menu-btn:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.pm-menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 30; min-width: 190px; background: var(--glass-menu); backdrop-filter: blur(12px); border: 1px solid var(--line-2); border-radius: 12px; padding: 0.35rem; box-shadow: 0 16px 40px rgba(0,0,0,0.45); }
+.pm-item { display: flex; align-items: center; gap: 0.5rem; width: 100%; text-align: left; background: none; border: none; color: var(--text); font-size: 0.9rem; padding: 0.6rem 0.7rem; border-radius: 8px; cursor: pointer; }
+.pm-item:hover { background: rgba(255,255,255,0.06); color: var(--gold); }
+
+.pm-overlay { position: fixed; inset: 0; z-index: 1100; background: rgba(6,7,9,0.72); backdrop-filter: blur(6px); display: grid; place-items: center; padding: 1rem; animation: plbIn 0.25s var(--ease); }
+.pm-card { width: min(520px, 100%); max-height: 88vh; overflow-y: auto; background: var(--bg-1); border: 1px solid var(--line-2); border-radius: 18px; }
+.pm-card-head { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.3rem; border-bottom: 1px solid var(--line); }
+.pm-card-head h3 { font-family: var(--font-display), serif; font-weight: 400; font-size: 1.3rem; }
+.pm-close { background: none; border: none; color: var(--muted); font-size: 1.1rem; cursor: pointer; }
+.pm-close:hover { color: var(--text); }
+.pm-edit, .pm-history { padding: 1.2rem 1.3rem 1.4rem; }
+.pm-label { display: block; font-family: var(--font-mono), monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
+.pm-textarea { width: 100%; font-family: var(--font-body), sans-serif; font-size: 1rem; color: var(--text); background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 12px; padding: 0.8rem 1rem; resize: vertical; }
+.pm-textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,119,0.16); }
+.pm-tags-block { margin-top: 1.1rem; }
+.pm-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.3rem; }
+.pm-btn { border-radius: 100px; padding: 0.6rem 1.3rem; font-size: 0.9rem; cursor: pointer; border: 1px solid var(--line-2); }
+.pm-btn.ghost { background: none; color: var(--text); }
+.pm-btn.ghost:hover { border-color: var(--text); }
+.pm-btn.gold { background: var(--gold); color: var(--on-gold); border-color: transparent; font-weight: 600; }
+.pm-btn.gold:hover { background: var(--gold-bright); }
+.pm-btn:disabled { opacity: 0.6; cursor: default; }
+.pm-hist-list { display: flex; flex-direction: column; gap: 0.8rem; }
+.pm-hist-item { border-left: 2px solid var(--line-2); padding-left: 0.8rem; }
+.pm-hist-meta { font-family: var(--font-mono), monospace; font-size: 0.7rem; color: var(--gold); margin-bottom: 0.3rem; }
+.pm-hist-diff { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; font-size: 0.9rem; }
+.pm-hist-old { color: var(--muted); text-decoration: line-through; }
+.pm-hist-arrow { color: var(--muted); }
+.pm-hist-new { color: var(--text); }

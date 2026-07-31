@@ -40,6 +40,13 @@ const M = {
     },
     react: { add: "Reager" },
     tag: { add: "Tag", remove: "Fjern tag", person: "Tag person", car: "Tag bil", done: "Færdig" },
+    post: {
+      menu: "Indstillinger for post", edit: "Rediger post", history: "Redigeringshistorik",
+      editTitle: "Rediger post", historyTitle: "Redigeringshistorik", caption: "Tekst",
+      captionPlaceholder: "Skriv noget om billedet…", tagPeopleCars: "Tag personer og biler",
+      cancel: "Annullér", save: "Gem", saving: "Gemmer…", saveError: "Kunne ikke gemme:",
+      noHistory: "Ingen redigeringer endnu.", emptyText: "(tom)", edited: "redigeret",
+    },
     nav: {
       crew: "Crewet", garage: "Garagen", members: "Medlemmer", meets: "Meets",
       calendar: "Kalender", map: "Kort", instagram: "Instagram",
@@ -261,6 +268,13 @@ const M = {
     },
     react: { add: "React" },
     tag: { add: "Tag", remove: "Remove tag", person: "Tag person", car: "Tag car", done: "Done" },
+    post: {
+      menu: "Post options", edit: "Edit post", history: "Edit history",
+      editTitle: "Edit post", historyTitle: "Edit history", caption: "Text",
+      captionPlaceholder: "Write something about the photo…", tagPeopleCars: "Tag people and cars",
+      cancel: "Cancel", save: "Save", saving: "Saving…", saveError: "Couldn't save:",
+      noHistory: "No edits yet.", emptyText: "(empty)", edited: "edited",
+    },
     nav: {
       crew: "The Crew", garage: "The Garage", members: "Members", meets: "Meets",
       calendar: "Calendar", map: "Map", instagram: "Instagram",
@@ -481,6 +495,13 @@ const M = {
     },
     react: { add: "Reagieren" },
     tag: { add: "Markieren", remove: "Markierung entfernen", person: "Person markieren", car: "Auto markieren", done: "Fertig" },
+    post: {
+      menu: "Beitragsoptionen", edit: "Beitrag bearbeiten", history: "Bearbeitungsverlauf",
+      editTitle: "Beitrag bearbeiten", historyTitle: "Bearbeitungsverlauf", caption: "Text",
+      captionPlaceholder: "Schreib etwas zum Foto…", tagPeopleCars: "Personen und Autos markieren",
+      cancel: "Abbrechen", save: "Speichern", saving: "Wird gespeichert…", saveError: "Konnte nicht gespeichert werden:",
+      noHistory: "Noch keine Bearbeitungen.", emptyText: "(leer)", edited: "bearbeitet",
+    },
     nav: {
       crew: "Die Crew", garage: "Die Garage", members: "Mitglieder", meets: "Meets",
       calendar: "Kalender", map: "Karte", instagram: "Instagram",
