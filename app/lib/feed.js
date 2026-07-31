@@ -1,6 +1,7 @@
 import { supabase } from "./supabaseClient";
 import { enrichPhotos } from "./photos";
 import { withReactions } from "./reactions";
+import { withTags } from "./tags";
 
 // Builds one unified, chronological feed from data that already exists — public
 // photos, new meets, news posts and new members — so the home feed feels like a
@@ -18,7 +19,7 @@ export async function buildFeed(userId) {
     .order("created_at", { ascending: false })
     .limit(40)) || {};
   if (photos?.length) {
-    const enriched = await withReactions(await enrichPhotos(photos, userId), userId);
+    const enriched = await withTags(await withReactions(await enrichPhotos(photos, userId), userId));
     enriched.forEach((p) => items.push({ kind: "photo", key: `photo-${p.id}`, when: p.created_at, photo: p }));
   }
 

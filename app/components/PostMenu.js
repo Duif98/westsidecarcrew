@@ -10,7 +10,7 @@ import { useT } from "../lib/i18n";
 // Facebook-style "•••" menu on a post. The owner can edit (change the text + tag
 // people/cars); the owner and admins can view the edit history. Editing is
 // owner-only — admins never get "edit" on someone else's post here.
-export default function PostMenu({ photo, userId, isAdmin, onSaved }) {
+export default function PostMenu({ photo, userId, isAdmin, onSaved, onClosed }) {
   const { t, lang } = useT();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState(null); // "edit" | "history"
@@ -43,12 +43,13 @@ export default function PostMenu({ photo, userId, isAdmin, onSaved }) {
       const res = await updateCaption({ photoId: photo.id, oldCaption: photo.caption, newCaption: caption, editorId: userId });
       onSaved?.(res.caption, res.edited_at);
       setMode(null);
+      onClosed?.();
     } catch (e) {
       alert(t("post.saveError") + " " + (e.message || e));
     } finally { setSaving(false); }
   };
 
-  const close = () => setMode(null);
+  const close = () => { const wasEdit = mode === "edit"; setMode(null); if (wasEdit) onClosed?.(); };
 
   const modal = mode && createPortal(
     <div className="pm-overlay" onClick={(e) => e.target === e.currentTarget && close()}>

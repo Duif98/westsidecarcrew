@@ -2358,6 +2358,10 @@ button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; 
 .fd-actions .like-btn, .fd-actions .plb-cbtn { font-size: 0.9rem; }
 .fd-caption { padding: 0.2rem 1rem 0; font-size: 0.9rem; color: var(--text); }
 .fd-caption b { color: var(--text); }
+.fd-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; padding: 0.4rem 1rem 0; }
+.fd-tags-lead { color: var(--muted); font-size: 0.82rem; }
+.fd-tag { display: inline-flex; align-items: center; gap: 0.25rem; background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 100px; padding: 0.2rem 0.6rem; font-size: 0.8rem; color: var(--gold); text-decoration: none; transition: border-color 0.2s; }
+.fd-tag:hover { border-color: var(--gold); }
 .fd-react { padding: 0.5rem 1rem 0.9rem; }
 .fd-mini { display: flex; align-items: center; gap: 0.8rem; padding: 0.9rem 1.1rem; background: var(--bg-1); border: 1px solid var(--line); border-radius: 14px; text-decoration: none; color: var(--text); transition: border-color 0.2s, transform 0.15s; }
 .fd-mini:hover { border-color: var(--gold); transform: translateY(-2px); }

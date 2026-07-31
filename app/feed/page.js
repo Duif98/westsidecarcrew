@@ -12,6 +12,7 @@ import PullToRefresh from "../components/PullToRefresh";
 import PhotoReactions from "../components/PhotoReactions";
 import PhotoLightbox from "../components/PhotoLightbox";
 import PostMenu from "../components/PostMenu";
+import { fetchPhotoTags } from "../lib/tags";
 import { markSeen } from "../lib/useUnread";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 
@@ -30,6 +31,8 @@ function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
   const [burst, setBurst] = useState(0);
   const [caption, setCaption] = useState(p.caption || "");
   const [editedAt, setEditedAt] = useState(p.edited_at || null);
+  const [tags, setTags] = useState(p.tags || []);
+  const refreshTags = useCallback(async () => { try { setTags(await fetchPhotoTags(p.id)); } catch {} }, [p.id]);
   const lastTap = useRef(0);
   const busy = useRef(false);
 
@@ -66,7 +69,7 @@ function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
           {p.car && <span className="fd-sub">{p.car}</span>}
         </div>
         <span className="fd-when">{timeAgo(p.created_at, lang)}{editedAt ? ` · ${t("post.edited")}` : ""}</span>
-        <PostMenu photo={{ ...p, caption }} userId={userId} isAdmin={isAdmin} onSaved={(cap, at) => { setCaption(cap || ""); setEditedAt(at); }} />
+        <PostMenu photo={{ ...p, caption }} userId={userId} isAdmin={isAdmin} onSaved={(cap, at) => { setCaption(cap || ""); setEditedAt(at); }} onClosed={refreshTags} />
       </header>
 
       <div className="fd-media" onClick={tap} onDoubleClick={() => like(true)}>
@@ -87,6 +90,16 @@ function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
         </button>
       </div>
       {caption && <p className="fd-caption"><b>@{uname || "medlem"}</b> {caption}</p>}
+      {tags.length > 0 && (
+        <div className="fd-tags">
+          <span className="fd-tags-lead">{t("post.taggedWith")}</span>
+          {tags.map((tag) => (
+            <Link key={tag.id} href={tag.href || "#"} className="fd-tag">
+              <span aria-hidden="true">{tag.kind === "user" ? "👤" : "🚗"}</span> {tag.kind === "user" ? "@" : ""}{tag.label}
+            </Link>
+          ))}
+        </div>
+      )}
       <div className="fd-react">
         <PhotoReactions photoId={p.id} initial={p.reactions || []} userId={userId} canReact={canLike} onNeedLogin={onNeedLogin} photoOwnerId={p.user_id} photoLabel={p.car} />
       </div>

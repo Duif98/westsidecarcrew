@@ -46,6 +46,7 @@ const M = {
       captionPlaceholder: "Skriv noget om billedet…", tagPeopleCars: "Tag personer og biler",
       cancel: "Annullér", save: "Gem", saving: "Gemmer…", saveError: "Kunne ikke gemme:",
       noHistory: "Ingen redigeringer endnu.", emptyText: "(tom)", edited: "redigeret",
+      taggedWith: "Sammen med",
     },
     nav: {
       crew: "Crewet", garage: "Garagen", members: "Medlemmer", meets: "Meets",
@@ -274,6 +275,7 @@ const M = {
       captionPlaceholder: "Write something about the photo…", tagPeopleCars: "Tag people and cars",
       cancel: "Cancel", save: "Save", saving: "Saving…", saveError: "Couldn't save:",
       noHistory: "No edits yet.", emptyText: "(empty)", edited: "edited",
+      taggedWith: "With",
     },
     nav: {
       crew: "The Crew", garage: "The Garage", members: "Members", meets: "Meets",
@@ -501,6 +503,7 @@ const M = {
       captionPlaceholder: "Schreib etwas zum Foto…", tagPeopleCars: "Personen und Autos markieren",
       cancel: "Abbrechen", save: "Speichern", saving: "Wird gespeichert…", saveError: "Konnte nicht gespeichert werden:",
       noHistory: "Noch keine Bearbeitungen.", emptyText: "(leer)", edited: "bearbeitet",
+      taggedWith: "Mit",
     },
     nav: {
       crew: "Die Crew", garage: "Die Garage", members: "Mitglieder", meets: "Meets",
