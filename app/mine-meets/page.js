@@ -7,6 +7,8 @@ import { supabase } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
 import MeetDetail from "../components/MeetDetail";
+import EmptyState from "../components/EmptyState";
+import Skeleton from "../components/Skeleton";
 
 // Members-only: the meets this member has said yes/maybe to, upcoming first.
 export default function MineMeets() {
@@ -56,9 +58,15 @@ export default function MineMeets() {
         <p className="mm-intro">{t("mine.intro")}</p>
 
         {rows == null ? (
-          <p className="muted">{t("mine.loading")}</p>
+          <Skeleton count={3} />
         ) : rows.length === 0 ? (
-          <p className="mm-empty">{t("mine.empty")} <Link href="/events" className="c-link">{t("mine.emptyLink")}</Link></p>
+          <EmptyState
+            icon={<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3" /><path d="m9 14 2 2 4-4" /></svg>}
+            title={t("mine.emptyTitle")}
+            sub={t("mine.empty")}
+            actionHref="/events"
+            actionLabel={t("mine.emptyLink").replace(" →", "")}
+          />
         ) : (
           <div className="mm-list">
             {rows.map(({ event, status }) => (

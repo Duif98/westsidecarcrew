@@ -13,6 +13,7 @@ import PullToRefresh from "../components/PullToRefresh";
 import PhotoReactions from "../components/PhotoReactions";
 import PhotoLightbox from "../components/PhotoLightbox";
 import PostMenu from "../components/PostMenu";
+import EmptyState from "../components/EmptyState";
 import { fetchPhotoTags } from "../lib/tags";
 import { markSeen } from "../lib/useUnread";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
@@ -153,7 +154,13 @@ export default function FeedPage() {
               {[0, 1, 2].map((k) => <div key={k} className="fd-skel" />)}
             </div>
           ) : items.length === 0 ? (
-            <p className="inbox-empty">{t("feed.empty")}</p>
+            <EmptyState
+              icon={<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="2" /><path d="m4 18 5-4 4 3 3-2 4 3" /></svg>}
+              title={t("feed.emptyTitle")}
+              sub={t("feed.empty")}
+              actionHref={session ? "/upload" : "/login"}
+              actionLabel={session ? t("nav.uploadPhotos") : t("nav.login")}
+            />
           ) : (
             <div className="feed-list">
               {items.map((it) => {

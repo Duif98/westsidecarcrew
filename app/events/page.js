@@ -12,6 +12,8 @@ import Linkify from "../components/Linkify";
 import { useT } from "../lib/i18n";
 import MeetForm from "../components/MeetForm";
 import MeetWeather from "../components/MeetWeather";
+import EmptyState from "../components/EmptyState";
+import Skeleton from "../components/Skeleton";
 
 const STATUS = [
   { key: "yes", emoji: "✅" },
@@ -134,14 +136,18 @@ export default function EventsPage() {
           )}
         </div>
 
-        {ready && events.length === 0 && (
-          <div className="events-empty">
-            <p>{t("events.emptyTitle")}</p>
-            {session ? <p className="muted">{t("events.emptyMember")}</p>
-              : <p className="muted"><Link href="/login" className="c-link">{t("events.emptyGuestLogin")}</Link>{t("events.emptyGuestB")}</p>}
-          </div>
-        )}
-
+        {!ready ? (
+          <Skeleton count={3} />
+        ) : events.length === 0 ? (
+          <EmptyState
+            icon={<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3M12 12v5M9.5 14.5h5" /></svg>}
+            title={t("events.emptyTitle")}
+            sub={session ? t("events.emptyMember") : undefined}
+            actionHref={session ? undefined : "/login"}
+            actionLabel={session ? t("events.newMeet").replace("+ ", "") : t("nav.login")}
+            onAction={session ? () => setFormOpen({}) : undefined}
+          />
+        ) : (
         <div className="events-list">
           {events.map((ev) => {
             const rs = rsvps[ev.id] || [];
@@ -250,6 +256,7 @@ export default function EventsPage() {
             );
           })}
         </div>
+        )}
       </div>
 
       {formOpen && (

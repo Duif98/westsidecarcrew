@@ -1565,6 +1565,22 @@ a.btn-gold { text-decoration: none; }
 main { animation: pageIn 0.42s var(--ease-out) both; }
 @keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
 
+/* ---------- Designed empty states ---------- */
+.empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding: clamp(2.5rem, 8vw, 4.5rem) 1.2rem; max-width: 44ch; margin-inline: auto; }
+.empty-ico { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 20px; background: rgba(201,168,119,0.10); border: 1px solid var(--gold-deep); color: var(--gold); margin-bottom: 0.4rem; }
+.empty-ico svg { width: 30px; height: 30px; }
+.empty-title { font-family: var(--font-display), serif; font-weight: 400; font-size: clamp(1.35rem, 3.5vw, 1.8rem); letter-spacing: -0.01em; color: var(--text); }
+.empty-sub { color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
+.empty-action { margin-top: 0.7rem; display: inline-flex; font-family: var(--font-mono), monospace; font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-gold); background: var(--gold); padding: 0.72rem 1.25rem; border-radius: 100px; border: none; cursor: pointer; transition: background 0.2s var(--ease); }
+.empty-action:hover { background: var(--gold-bright); }
+
+/* ---------- List skeletons ---------- */
+.skel-list { display: flex; flex-direction: column; gap: 0.8rem; }
+.skel { background: linear-gradient(100deg, var(--bg-1) 30%, var(--bg-2) 50%, var(--bg-1) 70%); background-size: 200% 100%; animation: shimmer 1.3s ease-in-out infinite; border: 1px solid var(--line); }
+.skel-row { height: 92px; border-radius: 16px; }
+.skel-card { height: 190px; border-radius: 18px; }
+.skel-line { height: 18px; border-radius: 8px; }
+
 /* ============ Light theme ============ */
 /* Opt-in via the toggle (data-theme="light"); dark stays the brand default.
    Everything themable is driven by these variables, so the whole site flips

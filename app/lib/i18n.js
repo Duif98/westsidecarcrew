@@ -27,6 +27,7 @@ const M = {
     lang: { switch: "Skift sprog", current: "Sprog: {name}" },
     feed: {
       overline: "Feedet", title: "Nyt fra crewet", home: "Forside", member: "Medlem",
+      emptyTitle: "Feedet er tomt endnu",
       empty: "Ingen aktivitet endnu. Upload et billede eller opret et meet, så fylder feedet sig op.",
       newMeet: "oprettede et meet", newPost: "Nyt opslag", newMember: "er nyt medlem i crewet",
       pull: "Træk ned for at opdatere", release: "Slip for at opdatere", refreshing: "Opdaterer…",
@@ -238,7 +239,7 @@ const M = {
     mine: {
       overline: "Mine meets", title: "Meets jeg kommer til",
       intro: "De kommende meets du har sagt ja eller måske til.",
-      loading: "Indlæser…", empty: "Du har ikke tilmeldt dig nogen kommende meets endnu.",
+      loading: "Indlæser…", emptyTitle: "Ingen kommende meets", empty: "Du har ikke tilmeldt dig nogen kommende meets endnu.",
       emptyLink: "Se alle meets →",
     },
     settings: {
@@ -258,6 +259,7 @@ const M = {
     lang: { switch: "Change language", current: "Language: {name}" },
     feed: {
       overline: "The feed", title: "Fresh from the crew", home: "Home", member: "Member",
+      emptyTitle: "The feed is empty",
       empty: "No activity yet. Upload a photo or create a meet and the feed will fill up.",
       newMeet: "created a meet", newPost: "New post", newMember: "is a new crew member",
       pull: "Pull to refresh", release: "Release to refresh", refreshing: "Refreshing…",
@@ -468,7 +470,7 @@ const M = {
     mine: {
       overline: "My meets", title: "Meets I'm attending",
       intro: "The upcoming meets you've said yes or maybe to.",
-      loading: "Loading…", empty: "You haven't RSVP'd to any upcoming meets yet.",
+      loading: "Loading…", emptyTitle: "No upcoming meets", empty: "You haven't RSVP'd to any upcoming meets yet.",
       emptyLink: "See all meets →",
     },
     settings: {
@@ -488,6 +490,7 @@ const M = {
     lang: { switch: "Sprache ändern", current: "Sprache: {name}" },
     feed: {
       overline: "Der Feed", title: "Frisch aus der Crew", home: "Startseite", member: "Mitglied",
+      emptyTitle: "Der Feed ist noch leer",
       empty: "Noch keine Aktivität. Lade ein Foto hoch oder erstelle ein Meet, dann füllt sich der Feed.",
       newMeet: "hat ein Meet erstellt", newPost: "Neuer Beitrag", newMember: "ist neu in der Crew",
       pull: "Zum Aktualisieren ziehen", release: "Loslassen zum Aktualisieren", refreshing: "Wird aktualisiert…",
@@ -698,7 +701,7 @@ const M = {
     mine: {
       overline: "Meine Meets", title: "Meets, zu denen ich komme",
       intro: "Die kommenden Meets, zu denen du ja oder vielleicht gesagt hast.",
-      loading: "Wird geladen…", empty: "Du hast noch für kein kommendes Meet zugesagt.",
+      loading: "Wird geladen…", emptyTitle: "Keine kommenden Meets", empty: "Du hast noch für kein kommendes Meet zugesagt.",
       emptyLink: "Alle Meets ansehen →",
     },
     settings: {
