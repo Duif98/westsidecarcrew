@@ -12,18 +12,22 @@ import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 const IG = "https://www.instagram.com/westsidecarcrew/";
 const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
-const LINKS = [
-  { href: "/feed", key: "feed" },
-  { href: "/#crewet", key: "crew" },
-  { href: "/#garagen", key: "garage" },
-  { href: "/medlemmer", key: "members" },
-  { href: "/events", key: "meets" },
-  { href: "/calendar", key: "calendar" },
-  { href: "/kort", key: "map" },
+// Grouped navigation so the drawer reads as a structured menu, not a flat wall of
+// links. On mobile the bottom TabBar owns the primary destinations, so this is
+// the full "everything" menu; on desktop it's the complete nav behind the ☰.
+const GUEST_SECTIONS = [
+  { heading: null, links: [{ href: "/feed", key: "feed" }, { href: "/events", key: "meets" }, { href: "/medlemmer", key: "members" }, { href: "/calendar", key: "calendar" }, { href: "/kort", key: "map" }] },
+  { heading: "sectionCrew", links: [{ href: "/#crewet", key: "crew" }, { href: "/#garagen", key: "garage" }] },
+];
+
+const MEMBER_SECTIONS = [
+  { heading: "sectionSocial", links: [{ href: "/feed", key: "feed" }, { href: "/beskeder", key: "messages" }, { href: "/chat", key: "crewChat" }, { href: "/notifikationer", key: "inbox" }] },
+  { heading: "sectionCrew", links: [{ href: "/medlemmer", key: "members" }, { href: "/events", key: "meets" }, { href: "/calendar", key: "calendar" }, { href: "/kort", key: "map" }, { href: "/leaderboard", key: "leaderboard" }, { href: "/dashboard", key: "dashboard" }, { href: "/mine-meets", key: "myMeets" }, { href: "/#crewet", key: "crew" }, { href: "/#garagen", key: "garage" }] },
+  { heading: "sectionTools", links: [{ href: "/upload", key: "uploadPhotos" }, { href: "/vask", key: "wash" }, { href: "/reservedelskatalog", key: "parts" }, { href: "/daek", key: "tyres" }, { href: "/undervogn", key: "suspension" }, { href: "/daektryk", key: "tyrePressure" }, { href: "/oktan", key: "octane" }, { href: "/manualer", key: "manuals" }] },
 ];
 
 // Global mobile menu — a fixed hamburger + slide-over drawer, rendered on every
-// page via the root layout so navigation is reachable everywhere on mobile.
+// page via the root layout so navigation is reachable everywhere.
 export default function NavMenu() {
   const router = useRouter();
   const { session, user, profile, isAdmin, signOut } = useAuth();
@@ -38,9 +42,18 @@ export default function NavMenu() {
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
+  // Close on Escape for keyboard users.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
+
   const profileHref = session && profile?.username ? `/profil?u=${encodeURIComponent(profile.username)}` : "/login";
   const close = () => setOpen(false);
   const logout = () => { close(); signOut(); router.replace("/"); };
+  const sections = session ? MEMBER_SECTIONS : GUEST_SECTIONS;
 
   return (
     <>
@@ -65,45 +78,24 @@ export default function NavMenu() {
               {session && total > 0 && <span className="nav-badge" style={{ position: "static" }}>{total > 9 ? "9+" : total}</span>}
             </Link>
 
-            {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} className="nav-m-link" onClick={close}>{t(`nav.${l.key}`)}</Link>
+            {sections.map((sec, i) => (
+              <div key={sec.heading || `s${i}`} className="nav-m-group">
+                {sec.heading && <div className="nav-m-heading">{t(`nav.${sec.heading}`)}</div>}
+                {sec.links.map((l) => (
+                  <Link key={l.href} href={l.href} className="nav-m-link" onClick={close}>{t(`nav.${l.key}`)}</Link>
+                ))}
+              </div>
             ))}
 
-            {session && (
-              <>
-                <div className="nav-m-sep" />
-                <Link href="/notifikationer" className="nav-m-link" onClick={close}>{t("nav.inbox")}</Link>
-                <Link href="/beskeder" className="nav-m-link" onClick={close}>{t("nav.messages")}</Link>
-                <Link href="/chat" className="nav-m-link" onClick={close}>{t("nav.crewChat")}</Link>
-                <Link href="/vask" className="nav-m-link" onClick={close}>{t("nav.wash")}</Link>
-                <Link href="/upload" className="nav-m-link" onClick={close}>{t("nav.uploadPhotos")}</Link>
-                <Link href="/mine-meets" className="nav-m-link" onClick={close}>{t("nav.myMeets")}</Link>
-                <Link href="/reservedelskatalog" className="nav-m-link" onClick={close}>{t("nav.parts")}</Link>
-                <Link href="/daek" className="nav-m-link" onClick={close}>{t("nav.tyres")}</Link>
-                <Link href="/undervogn" className="nav-m-link" onClick={close}>{t("nav.suspension")}</Link>
-                <Link href="/daektryk" className="nav-m-link" onClick={close}>{t("nav.tyrePressure")}</Link>
-                <Link href="/oktan" className="nav-m-link" onClick={close}>{t("nav.octane")}</Link>
-                <Link href="/manualer" className="nav-m-link" onClick={close}>{t("nav.manuals")}</Link>
-                <Link href="/dashboard" className="nav-m-link" onClick={close}>{t("nav.dashboard")}</Link>
-                <Link href="/leaderboard" className="nav-m-link" onClick={close}>{t("nav.leaderboard")}</Link>
-                {isAdmin && <Link href="/admin" className="nav-m-link" onClick={close}>{t("nav.admin")}</Link>}
-              </>
-            )}
-
-            <a href={IG} target="_blank" rel="noopener noreferrer" className="nav-m-link" onClick={close}>{t("nav.instagram")} ↗</a>
-
-            {session && (
-              <>
-                <div className="nav-m-sep" />
-                <Link href="/indstillinger" className="nav-m-link" onClick={close}>⚙︎ {t("nav.settings")}</Link>
-              </>
-            )}
-
-            <div className="nav-m-sep" />
-
-            {session
-              ? <button className="nav-m-link nav-m-logout" onClick={logout}>{t("nav.logout")}</button>
-              : <Link href="/login" className="nav-m-link" onClick={close}>{t("nav.login")}</Link>}
+            <div className="nav-m-group">
+              <div className="nav-m-heading">{t("nav.sectionAccount")}</div>
+              {session && <Link href="/indstillinger" className="nav-m-link" onClick={close}>⚙︎ {t("nav.settings")}</Link>}
+              <a href={IG} target="_blank" rel="noopener noreferrer" className="nav-m-link" onClick={close}>{t("nav.instagram")} ↗</a>
+              {session && isAdmin && <Link href="/admin" className="nav-m-link" onClick={close}>{t("nav.admin")}</Link>}
+              {session
+                ? <button className="nav-m-link nav-m-logout" onClick={logout}>{t("nav.logout")}</button>
+                : <Link href="/login" className="nav-m-link" onClick={close}>{t("nav.login")}</Link>}
+            </div>
           </div>
         </div>,
         document.body

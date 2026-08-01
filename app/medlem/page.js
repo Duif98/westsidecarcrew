@@ -44,8 +44,9 @@ export default function MedlemHub() {
           </div>
         )}
 
-        <div className="hub-grid">
-          <Link href="/feed" className="hub-card chat">
+        {/* Primary — the three things members reach for most, given visual weight. */}
+        <div className="hub-grid hub-primary">
+          <Link href="/feed" className="hub-card primary chat">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M9 21V9" /></svg>
             </span>
@@ -54,6 +55,29 @@ export default function MedlemHub() {
             <span className="hub-go">Åbn feed →</span>
           </Link>
 
+          <Link href="/events" className="hub-card primary events">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3" /><path d="M8 13h3v3H8z" /></svg>
+            </span>
+            {unread.events > 0 && <span className="hub-badge">{unread.events > 9 ? "9+" : unread.events} ny{unread.events > 1 ? "e" : ""}</span>}
+            <span className="hub-card-title">Meets</span>
+            <span className="hub-card-sub">Planlæg cruises og se hvem der kommer</span>
+            <span className="hub-go">Til meets →</span>
+          </Link>
+
+          <Link href="/upload" className="hub-card primary garage">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5 12 4l9 5.5" /><path d="M5 10v9h14v-9" /><path d="M8 19v-5h8v5" /><circle cx="12" cy="12" r="1" /></svg>
+            </span>
+            <span className="hub-card-title">Min garage</span>
+            <span className="hub-card-sub">Upload billeder af bilerne og se crewets galleri</span>
+            <span className="hub-go">Til upload →</span>
+          </Link>
+        </div>
+
+        {/* Socialt */}
+        <h2 className="hub-section">Socialt</h2>
+        <div className="hub-grid">
           <Link href="/beskeder" className="hub-card chat">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16v12H7l-3 3z" /></svg>
@@ -61,15 +85,6 @@ export default function MedlemHub() {
             <span className="hub-card-title">Beskeder</span>
             <span className="hub-card-sub">Skriv direkte 1:1 med de andre i crewet</span>
             <span className="hub-go">Åbn beskeder →</span>
-          </Link>
-
-          <Link href="/notifikationer" className="hub-card board">
-            <span className="hub-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
-            </span>
-            <span className="hub-card-title">Notifikationer</span>
-            <span className="hub-card-sub">Likes, kommentarer, nye meets og opslag — samlet</span>
-            <span className="hub-go">Åbn inbox →</span>
           </Link>
 
           <Link href="/chat" className="hub-card chat">
@@ -82,34 +97,19 @@ export default function MedlemHub() {
             <span className="hub-go">Åbn chat →</span>
           </Link>
 
-          <Link href="/vask" className="hub-card garage">
+          <Link href="/notifikationer" className="hub-card board">
             <span className="hub-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 20V10l2-5h6l2 5v10" /><path d="M7 15h10" /><circle cx="9.5" cy="17.5" r="1" /><circle cx="14.5" cy="17.5" r="1" /><path d="M6 6c0 1-1 1.5-1 2.5M9.5 5c0 1-1 1.5-1 2.5M13 6c0 1-1 1.5-1 2.5" /></svg>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" /></svg>
             </span>
-            <span className="hub-card-title">Vask bil 🧽</span>
-            <span className="hub-card-sub">Sig til når du vasker — så kan de andre komme og vaske med</span>
-            <span className="hub-go">Til vask →</span>
+            <span className="hub-card-title">Notifikationer</span>
+            <span className="hub-card-sub">Likes, kommentarer, nye meets og opslag — samlet</span>
+            <span className="hub-go">Åbn inbox →</span>
           </Link>
+        </div>
 
-          <Link href="/upload" className="hub-card garage">
-            <span className="hub-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9.5 12 4l9 5.5" /><path d="M5 10v9h14v-9" /><path d="M8 19v-5h8v5" /><circle cx="12" cy="12" r="1" /></svg>
-            </span>
-            <span className="hub-card-title">Min garage</span>
-            <span className="hub-card-sub">Upload billeder af bilerne og se crewets galleri</span>
-            <span className="hub-go">Til upload →</span>
-          </Link>
-
-          <Link href="/events" className="hub-card events">
-            <span className="hub-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3" /><path d="M8 13h3v3H8z" /></svg>
-            </span>
-            {unread.events > 0 && <span className="hub-badge">{unread.events > 9 ? "9+" : unread.events} ny{unread.events > 1 ? "e" : ""}</span>}
-            <span className="hub-card-title">Meets</span>
-            <span className="hub-card-sub">Planlæg cruises og se hvem der kommer</span>
-            <span className="hub-go">Til meets →</span>
-          </Link>
-
+        {/* Crew */}
+        <h2 className="hub-section">Crew</h2>
+        <div className="hub-grid">
           <Link href="/leaderboard" className="hub-card board">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M8 21h8M12 17v4" /><path d="M7 4h10v4a5 5 0 0 1-10 0z" /><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" /></svg>
@@ -119,6 +119,37 @@ export default function MedlemHub() {
             <span className="hub-go">Se ranglisten →</span>
           </Link>
 
+          <Link href="/dashboard" className="hub-card dash">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></svg>
+            </span>
+            <span className="hub-card-title">Dashboard</span>
+            <span className="hub-card-sub">Crewet i tal — biler, hestekræfter, mærker og meets</span>
+            <span className="hub-go">Se tallene →</span>
+          </Link>
+
+          <Link href="/mine-meets" className="hub-card events">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3" /><path d="m9 14 2 2 4-4" /></svg>
+            </span>
+            <span className="hub-card-title">Mine meets</span>
+            <span className="hub-card-sub">De meets du har sagt ja til, samlet ét sted</span>
+            <span className="hub-go">Se dine meets →</span>
+          </Link>
+
+          <Link href="/vask" className="hub-card garage">
+            <span className="hub-ico" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 20V10l2-5h6l2 5v10" /><path d="M7 15h10" /><circle cx="9.5" cy="17.5" r="1" /><circle cx="14.5" cy="17.5" r="1" /><path d="M6 6c0 1-1 1.5-1 2.5M9.5 5c0 1-1 1.5-1 2.5M13 6c0 1-1 1.5-1 2.5" /></svg>
+            </span>
+            <span className="hub-card-title">Vask bil 🧽</span>
+            <span className="hub-card-sub">Sig til når du vasker — så kan de andre komme og vaske med</span>
+            <span className="hub-go">Til vask →</span>
+          </Link>
+        </div>
+
+        {/* Værktøj */}
+        <h2 className="hub-section">Værktøj</h2>
+        <div className="hub-grid">
           <Link href="/reservedelskatalog" className="hub-card parts">
             <span className="hub-ico" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4l-6 6a1.5 1.5 0 0 0 2.1 2.1l6-6a4 4 0 0 0 5.4-5.4l-2.3 2.3-2.1-2.1z" /></svg>
@@ -171,24 +202,6 @@ export default function MedlemHub() {
             <span className="hub-card-title">Manualer</span>
             <span className="hub-card-sub">Service- og ejermanualer pr. bil til download</span>
             <span className="hub-go">Åbn manualer →</span>
-          </Link>
-
-          <Link href="/dashboard" className="hub-card dash">
-            <span className="hub-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5" /><rect x="14" y="3" width="7" height="5" rx="1.5" /><rect x="14" y="12" width="7" height="9" rx="1.5" /><rect x="3" y="16" width="7" height="5" rx="1.5" /></svg>
-            </span>
-            <span className="hub-card-title">Dashboard</span>
-            <span className="hub-card-sub">Crewet i tal — biler, hestekræfter, mærker og meets</span>
-            <span className="hub-go">Se tallene →</span>
-          </Link>
-
-          <Link href="/mine-meets" className="hub-card events">
-            <span className="hub-ico" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4.5" width="18" height="16" rx="2" /><path d="M3 9h18M8 3v3M16 3v3" /><path d="m9 14 2 2 4-4" /></svg>
-            </span>
-            <span className="hub-card-title">Mine meets</span>
-            <span className="hub-card-sub">De meets du har sagt ja til, samlet ét sted</span>
-            <span className="hub-go">Se dine meets →</span>
           </Link>
         </div>
       </div>

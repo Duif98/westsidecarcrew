@@ -2,6 +2,7 @@ import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
 import { asset } from "./lib/asset";
 import AuthProvider from "./lib/AuthProvider";
 import NavMenu from "./components/NavMenu";
+import TabBar from "./components/TabBar";
 import LangSwitcher from "./components/LangSwitcher";
 import { PwaProvider } from "./components/PwaProvider";
 import { PresenceProvider } from "./components/PresenceProvider";
@@ -100,6 +101,7 @@ export default function RootLayout({ children }) {
               <PwaProvider>
                 {children}
                 <NavMenu />
+                <TabBar />
                 <LangSwitcher />
                 <PushPrompt />
               </PwaProvider>

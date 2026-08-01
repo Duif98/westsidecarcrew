@@ -1114,6 +1114,13 @@ a.btn-gold { text-decoration: none; }
 .hub-card-title { font-family: var(--font-display), serif; font-weight: 400; font-size: clamp(1.5rem, 3.5vw, 2rem); letter-spacing: -0.02em; }
 .hub-card-sub { color: var(--muted); font-size: 0.95rem; max-width: 30ch; }
 .hub-go { font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-top: 0.6rem; }
+/* Grouped hub: section headings + weighted primary cards */
+.hub-section { font-family: var(--font-mono), monospace; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--faint); margin: clamp(2.2rem, 5vw, 3.2rem) 0 clamp(1rem, 2.5vw, 1.4rem); }
+.hub-card.primary { border-color: var(--gold-deep); background: linear-gradient(160deg, rgba(201,168,119,0.12), var(--bg-2) 62%); }
+.hub-card.primary::after { opacity: 0.9; }
+.hub-card.primary .hub-ico { background: var(--gold); color: var(--on-gold); border-color: var(--gold); box-shadow: 0 6px 18px rgba(201,168,119,0.3); }
+.hub-primary .hub-card.primary:first-child { grid-column: 1 / -1; min-height: clamp(170px, 26vh, 220px); }
+@media (max-width: 680px) { .hub-primary .hub-card.primary:first-child { grid-column: auto; } }
 
 /* ============ Chat layout + member roster ============ */
 .chat-body { flex: 1; display: flex; gap: 1.2rem; min-height: 0; max-width: 1100px; padding-block: 1.4rem calc(1rem + env(safe-area-inset-bottom)); }
@@ -1458,7 +1465,9 @@ a.btn-gold { text-decoration: none; }
 .nav-m-sep { height: 1px; background: var(--line); margin: 0.5rem 0.4rem; }
 .nav-m-logout { text-align: left; width: 100%; background: none; border: none; cursor: pointer; color: #d98a7a; }
 .nav-m-logout:hover, .nav-m-logout:active { background: rgba(217,138,122,0.12); color: #e6a496; }
-.nav-m-heading { font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); padding: 0.2rem 0.9rem 0.3rem; }
+.nav-m-group { display: flex; flex-direction: column; gap: 0.1rem; }
+.nav-m-group + .nav-m-group { margin-top: 0.5rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
+.nav-m-heading { font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); padding: 0.35rem 0.9rem 0.35rem; }
 .nav-m-tool { display: flex; align-items: center; justify-content: space-between; text-align: left; width: 100%; background: none; border: none; cursor: pointer; font: inherit; }
 .nav-m-tool:disabled { opacity: 0.55; cursor: default; }
 .nav-m-tool:disabled:hover { background: none; color: var(--text); }
@@ -1480,6 +1489,58 @@ a.btn-gold { text-decoration: none; }
 .push-prompt-later { font-family: var(--font-mono), monospace; font-size: 0.68rem; letter-spacing: 0.04em; text-transform: uppercase; background: none; border: none; color: var(--faint); cursor: pointer; padding: 0.2rem; transition: color 0.2s; }
 .push-prompt-later:hover { color: var(--muted); }
 @media (max-width: 460px) { .push-prompt { align-items: stretch; flex-wrap: wrap; } .push-prompt-actions { flex-direction: row; width: 100%; justify-content: flex-end; margin-top: 0.2rem; } }
+
+/* ---------- Mobile bottom tab bar ---------- */
+/* Five fixed anchors so the core of the app is always one tap away — the native
+   app feel the site was missing. Mobile only; desktop restores the top nav. */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 115;
+  display: grid; grid-template-columns: repeat(5, 1fr); align-items: stretch;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--glass); backdrop-filter: blur(18px) saturate(1.2);
+  border-top: 1px solid var(--line);
+}
+.tb-item {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  padding: 0.5rem 0.2rem 0.45rem; background: none; border: none; cursor: pointer;
+  color: var(--faint); text-decoration: none; min-height: 56px;
+  transition: color 0.2s var(--ease); -webkit-tap-highlight-color: transparent;
+}
+.tb-item.active { color: var(--gold); }
+.tb-ico { position: relative; display: grid; place-items: center; }
+.tb-ico svg { display: block; }
+.tb-label { font-family: var(--font-mono), monospace; font-size: 0.56rem; letter-spacing: 0.07em; text-transform: uppercase; }
+.tb-avatar { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid var(--line-2); }
+.tb-item.active .tb-avatar { border-color: var(--gold); }
+.tb-badge { position: absolute; top: -5px; right: -9px; min-width: 15px; height: 15px; padding: 0 3px; border-radius: 100px; background: #d9534f; color: #fff; font-family: var(--font-mono), monospace; font-size: 0.54rem; font-weight: 700; line-height: 15px; text-align: center; box-shadow: 0 0 0 2px var(--bg); }
+
+/* Raised centre "create" button */
+.tb-create { position: relative; }
+.tb-plus { display: grid; place-items: center; width: 46px; height: 46px; margin-top: -12px; border-radius: 50%; background: var(--gold); color: var(--on-gold); box-shadow: 0 6px 18px rgba(201,168,119,0.42); transition: transform 0.25s var(--ease), background 0.2s; }
+.tb-create:active .tb-plus { transform: scale(0.92); }
+.tb-plus.open { transform: rotate(45deg); background: var(--gold-bright); }
+
+/* Create action sheet */
+.tb-sheet-overlay { position: fixed; inset: 0; z-index: 116; background: rgba(6,7,9,0.55); backdrop-filter: blur(4px); animation: plbIn 0.18s var(--ease); }
+.tb-sheet { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(74px + env(safe-area-inset-bottom)); width: min(360px, calc(100vw - 1.6rem)); background: var(--glass-menu); backdrop-filter: blur(16px); border: 1px solid var(--line-2); border-radius: 16px; padding: 0.4rem; box-shadow: 0 20px 50px rgba(0,0,0,0.45); animation: pushPromptIn 0.25s var(--ease); display: flex; flex-direction: column; gap: 0.15rem; }
+.tb-sheet-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.85rem 0.9rem; border-radius: 12px; background: none; border: none; cursor: pointer; color: var(--text); text-align: left; width: 100%; transition: background 0.15s; }
+.tb-sheet-item:hover, .tb-sheet-item:active { background: var(--bg-2); }
+.tb-sheet-ico { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; background: rgba(201,168,119,0.14); border: 1px solid var(--gold-deep); color: var(--gold-bright); }
+.tb-sheet-item b { font-family: var(--font-mono), monospace; font-size: 0.85rem; letter-spacing: 0.04em; font-weight: 500; }
+
+/* Keep page content and the push nudge clear of the bar (mobile only) */
+@media (max-width: 899px) {
+  body.has-tabbar { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+  body.has-tabbar .push-prompt { bottom: calc(76px + env(safe-area-inset-bottom)); }
+}
+/* Desktop: drop the bottom bar and bring back the horizontal top nav that the
+   hamburger-only model had hidden — so PC no longer feels stripped down. */
+@media (min-width: 900px) {
+  .tabbar, .tb-sheet, .tb-sheet-overlay { display: none !important; }
+  body.has-tabbar { padding-bottom: 0; }
+  .nav-links { display: flex; }
+  .member-actions { display: flex; }
+}
 
 /* ============ Light theme ============ */
 /* Opt-in via the toggle (data-theme="light"); dark stays the brand default.
@@ -2006,7 +2067,7 @@ button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; 
 /* Printable PDF report — hidden on screen, only shown when printing */
 .uv-print { display: none; }
 @media print {
-  .uv-noprint, .member-bar, .menu-fab, .lang-switch, .notif-bell, .push-prompt { display: none !important; }
+  .uv-noprint, .member-bar, .menu-fab, .lang-switch, .notif-bell, .push-prompt, .tabbar { display: none !important; }
   body { background: #fff !important; }
   .uv-print { display: block; color: #111; font-family: Georgia, "Times New Roman", serif; }
   .uv-print h1 { font-size: 20px; margin: 0 0 4px; color: #111; }
