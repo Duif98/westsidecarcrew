@@ -8,6 +8,7 @@ import { buildFeed } from "../lib/feed";
 import { toggleLike } from "../lib/photos";
 import { notifyUser } from "../lib/pwa";
 import { timeAgo } from "../lib/time";
+import { tap } from "../lib/haptics";
 import PullToRefresh from "../components/PullToRefresh";
 import PhotoReactions from "../components/PhotoReactions";
 import PhotoLightbox from "../components/PhotoLightbox";
@@ -43,7 +44,7 @@ function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
     const next = force ? true : !liked;
     busy.current = true;
     setLiked(next); setCount((c) => c + (next ? 1 : -1));
-    if (next) setBurst((b) => b + 1);
+    if (next) { setBurst((b) => b + 1); tap(); }
     try {
       await toggleLike(p.id, userId, liked);
       if (next && p.user_id && p.user_id !== userId) {

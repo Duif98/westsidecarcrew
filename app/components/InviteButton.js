@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { getCrewCode } from "../lib/photos";
 import { BASE_PATH } from "../lib/asset";
+import { toastSuccess, toastError } from "../lib/toast";
+import { success } from "../lib/haptics";
 
 export default function InviteButton() {
   const [state, setState] = useState("idle"); // idle | busy | copied | error
@@ -19,10 +21,13 @@ export default function InviteButton() {
       } else {
         await navigator.clipboard.writeText(text);
         setState("copied");
+        success();
+        toastSuccess("Invitationslink kopieret ✓");
         setTimeout(() => setState("idle"), 2500);
       }
     } catch {
       setState("error");
+      toastError("Kunne ikke lave invitationen — prøv igen");
       setTimeout(() => setState("idle"), 3000);
     }
   };

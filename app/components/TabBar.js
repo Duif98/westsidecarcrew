@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "../lib/AuthProvider";
 import { useUnread } from "../lib/useUnread";
 import { useT } from "../lib/i18n";
+import { tap } from "../lib/haptics";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 
 const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
@@ -73,7 +74,7 @@ export default function TabBar() {
     },
   ];
 
-  const go = (href) => { setCreateOpen(false); router.push(href); };
+  const go = (href) => { tap(); setCreateOpen(false); router.push(href); };
 
   return (
     <>
@@ -87,7 +88,7 @@ export default function TabBar() {
                 className="tb-item tb-create"
                 aria-label={tab.label}
                 aria-expanded={createOpen}
-                onClick={() => (session ? setCreateOpen((o) => !o) : router.push("/login"))}
+                onClick={() => { tap(); session ? setCreateOpen((o) => !o) : router.push("/login"); }}
               >
                 <span className={`tb-plus${createOpen ? " open" : ""}`} aria-hidden="true">
                   <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
@@ -101,6 +102,7 @@ export default function TabBar() {
               href={tab.href}
               className={`tb-item${tab.active ? " active" : ""}`}
               aria-current={tab.active ? "page" : undefined}
+              onClick={tap}
             >
               <span className="tb-ico">
                 {tab.icon}

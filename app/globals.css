@@ -31,6 +31,11 @@
   --pad: clamp(1.25rem, 4vw, 4rem);
   --radius: 14px;
 
+  /* Elevation scale — one vocabulary for depth across cards, sheets & toasts */
+  --shadow-1: 0 2px 10px rgba(0, 0, 0, 0.28);
+  --shadow-2: 0 14px 34px rgba(0, 0, 0, 0.38);
+  --shadow-3: 0 22px 55px rgba(0, 0, 0, 0.48);
+
   /* Motion */
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -1542,6 +1547,24 @@ a.btn-gold { text-decoration: none; }
   .member-actions { display: flex; }
 }
 
+/* ---------- Toasts ---------- */
+.toaster { position: fixed; z-index: 1260; left: 50%; transform: translateX(-50%); bottom: calc(1.3rem + env(safe-area-inset-bottom)); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; width: max-content; max-width: calc(100vw - 1.6rem); pointer-events: none; }
+.toast { pointer-events: auto; display: flex; align-items: center; gap: 0.6rem; max-width: 100%; padding: 0.72rem 1.05rem; border-radius: 100px; background: var(--glass-menu); backdrop-filter: blur(16px); border: 1px solid var(--line-2); box-shadow: var(--shadow-3); color: var(--text); font-size: 0.9rem; text-align: left; cursor: pointer; animation: toastIn 0.32s var(--ease-out); }
+.toast-ico { flex: none; display: grid; place-items: center; }
+.toast-msg { min-width: 0; }
+.toast-success .toast-ico { color: #7bd39b; }
+.toast-error .toast-ico { color: #f0a99f; }
+.toast-info .toast-ico { color: var(--gold-bright); }
+@keyframes toastIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 899px) { body.has-tabbar .toaster { bottom: calc(80px + env(safe-area-inset-bottom)); } }
+
+/* ---------- Page transition ---------- */
+/* Each route renders its own <main>, so a real navigation replays this fade —
+   a soft cross-page settle instead of a hard swap. Hash links don't remount, so
+   in-page anchors stay instant. Neutralised under prefers-reduced-motion above. */
+main { animation: pageIn 0.42s var(--ease-out) both; }
+@keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
+
 /* ============ Light theme ============ */
 /* Opt-in via the toggle (data-theme="light"); dark stays the brand default.
    Everything themable is driven by these variables, so the whole site flips
@@ -1563,6 +1586,10 @@ a.btn-gold { text-decoration: none; }
   --glass: rgba(255, 255, 255, 0.82);
   --glass-menu: rgba(255, 255, 255, 0.96);
   --vignette: rgba(0, 0, 0, 0.05);
+  /* Softer elevation on a light canvas */
+  --shadow-1: 0 2px 8px rgba(20, 22, 26, 0.10);
+  --shadow-2: 0 12px 28px rgba(20, 22, 26, 0.14);
+  --shadow-3: 0 20px 46px rgba(20, 22, 26, 0.18);
   /* --on-gold stays #100c04: gold buttons keep dark text in both themes. */
 }
 .hub-badge { position: absolute; top: clamp(1rem, 3vw, 1.6rem); right: clamp(1rem, 3vw, 1.6rem); z-index: 2; display: inline-flex; align-items: center; background: #d9534f; color: #fff; font-family: var(--font-mono), monospace; font-size: 0.64rem; font-weight: 700; letter-spacing: 0.03em; padding: 0.25rem 0.6rem; border-radius: 100px; box-shadow: 0 4px 14px rgba(217,83,79,0.4); }
