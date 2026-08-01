@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
+import { shrinkImage } from "../lib/imageResize";
 
 const when = (t) => new Date(t).toLocaleString("da-DK", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 const imgUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
@@ -38,9 +39,10 @@ export default function ProfileWall({ ownerId, ownerName }) {
     try {
       let image_path = null;
       if (file) {
-        const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+        const small = await shrinkImage(file);
+        const ext = (small.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
         image_path = `${user.id}/wall/${crypto.randomUUID()}.${ext}`;
-        const up = await supabase.storage.from(PUBLIC_BUCKET).upload(image_path, file, { cacheControl: "3600", contentType: file.type });
+        const up = await supabase.storage.from(PUBLIC_BUCKET).upload(image_path, small, { cacheControl: "3600", contentType: small.type });
         if (up.error) throw up.error;
       }
       const { error } = await supabase.from("wall_posts").insert({

@@ -31,6 +31,7 @@ function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
   const [liked, setLiked] = useState(!!p.likedByMe);
   const [count, setCount] = useState(p.likeCount || 0);
   const [burst, setBurst] = useState(0);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const [caption, setCaption] = useState(p.caption || "");
   const [editedAt, setEditedAt] = useState(p.edited_at || null);
   const [tags, setTags] = useState(p.tags || []);
@@ -74,8 +75,16 @@ function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
         <PostMenu photo={{ ...p, caption }} userId={userId} isAdmin={isAdmin} onSaved={(cap, at) => { setCaption(cap || ""); setEditedAt(at); }} onClosed={refreshTags} />
       </header>
 
-      <div className="fd-media" onClick={tap} onDoubleClick={() => like(true)}>
-        <img src={p.url} alt={p.car || "Bil"} loading="lazy" onClick={(e) => { e.stopPropagation(); onOpen(); }} />
+      <div className={`fd-media${imgLoaded ? " loaded" : ""}`} onClick={tap} onDoubleClick={() => like(true)}>
+        <img
+          src={p.url}
+          alt={p.car || "Bil"}
+          loading="lazy"
+          decoding="async"
+          onLoad={() => setImgLoaded(true)}
+          ref={(el) => { if (el && el.complete) setImgLoaded(true); }}
+          onClick={(e) => { e.stopPropagation(); onOpen(); }}
+        />
         <span key={burst} className={`plb-burst${burst ? " go" : ""}`} aria-hidden="true">
           <svg width="110" height="110" viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.6-9.5-9C1 8.5 2.2 5.5 5.2 5.1 7 4.9 8.6 5.9 12 9c3.4-3.1 5-4.1 6.8-3.9 3 .4 4.2 3.4 2.7 5.9C19 15.4 12 20 12 20z" /></svg>
         </span>

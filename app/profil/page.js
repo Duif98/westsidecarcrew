@@ -6,6 +6,7 @@ import Link from "next/link";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { enrichPhotos, withUrls } from "../lib/photos";
+import { shrinkImage } from "../lib/imageResize";
 import { cars } from "../data/cars";
 import { asset } from "../lib/asset";
 import Lightbox from "../components/Lightbox";
@@ -93,9 +94,10 @@ function ProfileInner() {
       }
       let cover_path = profile.cover_path || null;
       if (coverFile) {
-        const ext = (coverFile.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+        const cover = await shrinkImage(coverFile, { maxDim: 1800 });
+        const ext = (cover.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
         cover_path = `${user.id}/cover/${crypto.randomUUID()}.${ext}`;
-        const up = await supabase.storage.from(PUBLIC_BUCKET).upload(cover_path, coverFile, { cacheControl: "3600", contentType: coverFile.type });
+        const up = await supabase.storage.from(PUBLIC_BUCKET).upload(cover_path, cover, { cacheControl: "3600", contentType: cover.type });
         if (up.error) throw up.error;
       }
       const accent = edit.accent || null;

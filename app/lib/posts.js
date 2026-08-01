@@ -1,4 +1,5 @@
 import { supabase, PUBLIC_BUCKET } from "./supabaseClient";
+import { shrinkImage } from "./imageResize";
 
 export async function getPosts() {
   const { data } = await supabase
@@ -14,6 +15,7 @@ export async function getPosts() {
 }
 
 async function uploadPostImage(file, userId) {
+  file = await shrinkImage(file);
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
   const path = `${userId}/post-${crypto.randomUUID()}.${ext}`;
   const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, {

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
+import { shrinkImage } from "../lib/imageResize";
 
 const time = (t) => new Date(t).toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
 const EMOJIS = ["👍", "❤️", "🔥", "😂", "😮", "🙌"];
@@ -121,9 +122,10 @@ export default function ChatPage() {
     if (!file.type.startsWith("image/")) return;
     setUploading(true);
     try {
-      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const small = await shrinkImage(file);
+      const ext = (small.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
       const path = `${user.id}/chat/${crypto.randomUUID()}.${ext}`;
-      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, { cacheControl: "3600", contentType: file.type });
+      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, small, { cacheControl: "3600", contentType: small.type });
       if (up.error) throw up.error;
       const { error } = await supabase.from("messages").insert({ user_id: user.id, content: "", image_path: path });
       if (error) { await supabase.storage.from(PUBLIC_BUCKET).remove([path]); throw error; }

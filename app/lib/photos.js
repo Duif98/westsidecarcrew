@@ -1,4 +1,5 @@
 import { supabase, PUBLIC_BUCKET, PRIVATE_BUCKET } from "./supabaseClient";
+import { shrinkImage } from "./imageResize";
 
 // Upload a file to the right bucket and record it in the photos table.
 // `userId` is always the actual uploader (used for the storage folder, which RLS
@@ -6,6 +7,7 @@ import { supabase, PUBLIC_BUCKET, PRIVATE_BUCKET } from "./supabaseClient";
 // member (their car showcase); it defaults to the uploader. `approved` lets an
 // admin publish straight away.
 export async function uploadPhoto({ file, isPublic, car, caption, userId, albumId, eventId, ownerId, approved = false }) {
+  file = await shrinkImage(file); // downscale full-res originals before upload
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
   const bucket = isPublic ? PUBLIC_BUCKET : PRIVATE_BUCKET;
   const path = `${userId}/${crypto.randomUUID()}.${ext}`;

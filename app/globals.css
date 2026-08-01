@@ -1224,7 +1224,7 @@ a.btn-gold { text-decoration: none; }
 .rchip.on { border-color: var(--gold); background: rgba(201,168,119,0.16); }
 .rchip.on b { color: var(--gold-bright); }
 .msg-imgbtn { display: block; padding: 0; border: none; background: none; cursor: zoom-in; }
-.msg-imgbtn img { max-width: min(260px, 60vw); max-height: 300px; border-radius: 10px; display: block; }
+.msg-imgbtn img { max-width: min(260px, 60vw); max-height: 300px; border-radius: 10px; display: block; background: var(--bg-2); min-height: 60px; }
 .msg.mine .msg-bubble:has(.msg-imgbtn) { background: var(--bg-3); border-color: var(--line); padding: 0.35rem; }
 .msg-bubble:has(.msg-imgbtn) { padding: 0.35rem; }
 .chat-img-btn { flex: none; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--muted); display: grid; place-items: center; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
@@ -2455,8 +2455,14 @@ button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; 
 .fd-user:hover { color: var(--gold); }
 .fd-sub { color: var(--muted); font-size: 0.78rem; }
 .fd-when { color: var(--muted); font-family: var(--font-mono), monospace; font-size: 0.68rem; letter-spacing: 0.03em; flex: none; }
-.fd-media { position: relative; background: #000; cursor: pointer; -webkit-user-select: none; user-select: none; }
-.fd-media img { display: block; width: 100%; max-height: 70vh; object-fit: contain; }
+.fd-media { position: relative; background: #000; cursor: pointer; -webkit-user-select: none; user-select: none; min-height: 200px; }
+/* Shimmer placeholder behind the photo — the image fades in on top once decoded,
+   so a slow (older, un-shrunk) photo shows motion instead of a blank rectangle. */
+.fd-media::before { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, var(--bg-1) 30%, var(--bg-2) 50%, var(--bg-1) 70%); background-size: 200% 100%; animation: shimmer 1.3s ease-in-out infinite; opacity: 1; transition: opacity 0.4s var(--ease); pointer-events: none; }
+.fd-media.loaded::before { opacity: 0; }
+.fd-media.loaded { min-height: 0; }
+.fd-media img { display: block; width: 100%; max-height: 70vh; object-fit: contain; opacity: 0; transition: opacity 0.5s var(--ease); }
+.fd-media.loaded img { opacity: 1; }
 .fd-media .plb-burst svg { width: 96px; height: 96px; }
 .fd-actions { display: flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1rem 0.2rem; }
 .fd-actions .like-btn, .fd-actions .plb-cbtn { font-size: 0.9rem; }
@@ -2506,7 +2512,7 @@ button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; 
 .dm-msg.mine { align-self: flex-end; align-items: flex-end; }
 .dm-bubble { background: var(--bg-3); border: 1px solid var(--line); padding: 0.5rem 0.8rem; border-radius: 14px; border-bottom-left-radius: 4px; font-size: 0.92rem; word-break: break-word; }
 .dm-msg.mine .dm-bubble { background: var(--gold); color: var(--on-gold); border-color: transparent; border-radius: 14px; border-bottom-right-radius: 4px; }
-.dm-img { display: block; max-width: 220px; max-height: 260px; border-radius: 10px; cursor: pointer; }
+.dm-img { display: block; max-width: 220px; max-height: 260px; border-radius: 10px; cursor: pointer; background: var(--bg-2); min-height: 60px; }
 .dm-time { color: var(--muted); font-family: var(--font-mono), monospace; font-size: 0.62rem; margin: 0.1rem 0.2rem 0.35rem; }
 .dm-input { display: flex; gap: 0.6rem; padding: 0.8rem; border-top: 1px solid var(--line); }
 .dm-input input { flex: 1; font-family: var(--font-body), sans-serif; font-size: 1rem; color: var(--text); background: var(--bg-2); border: 1px solid var(--line-2); border-radius: 100px; padding: 0.7rem 1.1rem; }
