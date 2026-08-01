@@ -77,12 +77,13 @@ function PhotoCard({ item, userId, canLike, onOpen, onNeedLogin }) {
 
       <div className={`fd-media${imgLoaded ? " loaded" : ""}`} onClick={tap} onDoubleClick={() => like(true)}>
         <img
-          src={p.url}
+          src={p.thumbUrl || p.url}
           alt={p.car || "Bil"}
           loading="lazy"
           decoding="async"
           onLoad={() => setImgLoaded(true)}
           ref={(el) => { if (el && el.complete) setImgLoaded(true); }}
+          onError={(e) => { if (p.thumbUrl && e.currentTarget.src !== p.url) e.currentTarget.src = p.url; }}
           onClick={(e) => { e.stopPropagation(); onOpen(); }}
         />
         <span key={burst} className={`plb-burst${burst ? " go" : ""}`} aria-hidden="true">

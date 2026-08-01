@@ -6,7 +6,7 @@ import Link from "next/link";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
-import { shrinkImage } from "../lib/imageResize";
+import { thumbPathFor, uploadThumb } from "../lib/photos";
 
 const time = (t) => new Date(t).toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
 const EMOJIS = ["👍", "❤️", "🔥", "😂", "😮", "🙌"];
@@ -122,11 +122,11 @@ export default function ChatPage() {
     if (!file.type.startsWith("image/")) return;
     setUploading(true);
     try {
-      const small = await shrinkImage(file);
-      const ext = (small.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
       const path = `${user.id}/chat/${crypto.randomUUID()}.${ext}`;
-      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, small, { cacheControl: "3600", contentType: small.type });
+      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, { cacheControl: "3600", contentType: file.type });
       if (up.error) throw up.error;
+      await uploadThumb(PUBLIC_BUCKET, path, file); // fast preview beside the full image
       const { error } = await supabase.from("messages").insert({ user_id: user.id, content: "", image_path: path });
       if (error) { await supabase.storage.from(PUBLIC_BUCKET).remove([path]); throw error; }
     } catch (err) {
@@ -207,7 +207,7 @@ export default function ChatPage() {
                   <div className="msg-row">
                     <div className="msg-bubble">
                       {m.image_path
-                        ? <button className="msg-imgbtn" onClick={() => setImgView(imgUrl(m.image_path))} aria-label="Åbn billede"><img src={imgUrl(m.image_path)} alt="Delt billede" loading="lazy" /></button>
+                        ? <button className="msg-imgbtn" onClick={() => setImgView(imgUrl(m.image_path))} aria-label="Åbn billede"><img src={imgUrl(thumbPathFor(m.image_path))} alt="Delt billede" loading="lazy" decoding="async" onError={(e) => { if (e.currentTarget.src !== imgUrl(m.image_path)) e.currentTarget.src = imgUrl(m.image_path); }} /></button>
                         : <span className="msg-text">{m.content}</span>}
                       {!m.image_path && <span className="msg-time">{time(m.created_at)}</span>}
                     </div>

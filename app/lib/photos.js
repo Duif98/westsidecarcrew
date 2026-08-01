@@ -1,23 +1,44 @@
 import { supabase, PUBLIC_BUCKET, PRIVATE_BUCKET } from "./supabaseClient";
 import { shrinkImage } from "./imageResize";
 
+// A small preview lives next to every original at a derived path (no DB column
+// needed): `uid/uuid.jpg` → `uid/uuid_thumb.jpg`. Feeds/grids load the thumb for
+// speed; tapping in loads the full-quality original. Older photos have no thumb
+// yet, so the UI falls back to the original on a 404 (see onError handlers).
+export const thumbPathFor = (path) => (path || "").replace(/\.[^.]+$/, "") + "_thumb.jpg";
+
+// Best-effort: generate + upload a ~1000px preview beside an original. Never
+// throws — if it fails, rendering just falls back to the full image.
+export async function uploadThumb(bucket, path, file) {
+  try {
+    const thumb = await shrinkImage(file, { maxDim: 1000, quality: 0.72 });
+    if (thumb && thumb !== file) {
+      await supabase.storage.from(bucket).upload(thumbPathFor(path), thumb, {
+        cacheControl: "3600", upsert: true, contentType: "image/jpeg",
+      });
+    }
+  } catch {}
+}
+
 // Upload a file to the right bucket and record it in the photos table.
 // `userId` is always the actual uploader (used for the storage folder, which RLS
 // ties to auth.uid()). `ownerId` lets an admin attribute the row to another
 // member (their car showcase); it defaults to the uploader. `approved` lets an
 // admin publish straight away.
 export async function uploadPhoto({ file, isPublic, car, caption, userId, albumId, eventId, ownerId, approved = false }) {
-  file = await shrinkImage(file); // downscale full-res originals before upload
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
   const bucket = isPublic ? PUBLIC_BUCKET : PRIVATE_BUCKET;
   const path = `${userId}/${crypto.randomUUID()}.${ext}`;
 
+  // Store the full-quality original untouched…
   const up = await supabase.storage.from(bucket).upload(path, file, {
     cacheControl: "3600",
     upsert: false,
     contentType: file.type || "image/jpeg",
   });
   if (up.error) throw new Error("Upload fejlede: " + up.error.message);
+  // …and a small preview beside it for fast feeds/grids.
+  await uploadThumb(bucket, path, file);
 
   const { data, error } = await supabase.from("photos").insert({
     user_id: ownerId || userId,
@@ -43,10 +64,16 @@ export async function withUrls(rows) {
   return Promise.all(
     rows.map(async (r) => {
       if (r.bucket === PUBLIC_BUCKET) {
-        return { ...r, url: supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(r.path).data.publicUrl };
+        const pub = (p) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(p).data.publicUrl;
+        return { ...r, url: pub(r.path), thumbUrl: pub(thumbPathFor(r.path)) };
       }
       const { data } = await supabase.storage.from(PRIVATE_BUCKET).createSignedUrl(r.path, 3600);
-      return { ...r, url: data?.signedUrl || null };
+      let thumbUrl = null;
+      try {
+        const { data: td } = await supabase.storage.from(PRIVATE_BUCKET).createSignedUrl(thumbPathFor(r.path), 3600);
+        thumbUrl = td?.signedUrl || null;
+      } catch {}
+      return { ...r, url: data?.signedUrl || null, thumbUrl };
     })
   );
 }

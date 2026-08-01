@@ -9,7 +9,7 @@ import { useT } from "../lib/i18n";
 import { timeAgo, clockTime } from "../lib/time";
 import { fetchThreads, fetchConversation, sendDM, markConversationRead, dmImageUrl } from "../lib/dm";
 import { notifyUser } from "../lib/pwa";
-import { shrinkImage } from "../lib/imageResize";
+import { thumbPathFor, uploadThumb } from "../lib/photos";
 
 const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
@@ -115,11 +115,11 @@ function Messages() {
     if (!file || uploading || !openId || !file.type.startsWith("image/")) return;
     setUploading(true);
     try {
-      const small = await shrinkImage(file);
-      const ext = (small.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+      const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
       const path = `${user.id}/dm/${crypto.randomUUID()}.${ext}`;
-      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, small, { cacheControl: "3600", contentType: small.type });
+      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, { cacheControl: "3600", contentType: file.type });
       if (up.error) throw up.error;
+      await uploadThumb(PUBLIC_BUCKET, path, file); // fast preview beside the full image
       const saved = await sendDM({ senderId: user.id, recipientId: openId, content: "", imagePath: path });
       setConvo((prev) => [...prev, saved]);
       refreshThreads();
@@ -212,7 +212,7 @@ function Messages() {
                     <div key={m.id} className={`dm-msg${mine ? " mine" : ""}`}>
                       <div className="dm-bubble">
                         {m.image_path
-                          ? <img className="dm-img" src={dmImageUrl(m.image_path)} alt="" loading="lazy" />
+                          ? <img className="dm-img" src={dmImageUrl(thumbPathFor(m.image_path))} alt="" loading="lazy" decoding="async" onError={(e) => { if (e.currentTarget.src !== dmImageUrl(m.image_path)) e.currentTarget.src = dmImageUrl(m.image_path); }} />
                           : <span>{m.content}</span>}
                       </div>
                       {showTime && <span className="dm-time">{clockTime(m.created_at, lang)}</span>}
