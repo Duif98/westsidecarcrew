@@ -34,7 +34,7 @@ export default function Hero() {
     <section className="hero" id="top">
       <div className="hero-media" ref={mediaRef}>
         <img
-          src={asset("/hero-gtr.webp")}
+          src={asset("/hero-gtr-hd.webp")}
           alt={t("hero.imgAlt")}
           fetchPriority="high"
         />

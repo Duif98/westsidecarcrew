@@ -10,7 +10,7 @@ export default function About() {
   const figure = cars.find((c) => c.slug === "mark-gtr");
   const figSrc = figure?.cover
     ? asset(`/cars/${figure.slug}/${figure.cover}`)
-    : asset("/hero-gtr.webp");
+    : asset("/hero-gtr-hd.webp");
 
   return (
     <section className="section about" id="crewet">
