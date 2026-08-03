@@ -9,15 +9,21 @@ import { useEffect, useRef } from "react";
 //
 // A shared stack lets nested overlays (e.g. a photo lightbox opened from inside
 // a meet dialog) close one layer per Back press, top-most first.
+//
+// IMPORTANT: we NEVER call history.back() ourselves. An overlay often closes at
+// the same moment it triggers a navigation (a drawer link, the create sheet's
+// "Upload" button). Popping history during that teardown races the router and
+// can throw the user back to the front page. So opening only ever PUSHES a
+// marker entry; hardware Back pops it and closes the top overlay. Closing via
+// the UI simply leaves the marker — a later Back harmlessly consumes it.
 
-let stack = [];            // { close, byBack } for every open overlay, in order
+let stack = [];        // { close } for every open overlay, in order opened
 let listening = false;
-let suppressNext = false;  // skip the popstate we cause when unwinding ourselves
 
 function onPop() {
-  if (suppressNext) { suppressNext = false; return; }
+  // The browser already popped our marker entry; close the top-most overlay.
   const top = stack[stack.length - 1];
-  if (top) { top.byBack = true; top.close(); }
+  if (top) top.close();
 }
 
 function ensureListener() {
@@ -34,7 +40,7 @@ export function useBackClose(open, onClose) {
   useEffect(() => {
     if (!open || typeof window === "undefined") return;
 
-    const entry = { close: () => onCloseRef.current?.(), byBack: false };
+    const entry = { close: () => onCloseRef.current?.() };
     ensureListener();
     stack.push(entry);
     window.history.pushState({ __wsccOverlay: true }, "");
@@ -42,13 +48,6 @@ export function useBackClose(open, onClose) {
     return () => {
       const idx = stack.indexOf(entry);
       if (idx !== -1) stack.splice(idx, 1);
-      // Only unwind our history entry when the overlay was closed by the UI (a ✕
-      // / backdrop tap) AND our marker is still the current entry — so we never
-      // fight a Back press (byBack) or an in-overlay navigation (marker gone).
-      if (!entry.byBack && window.history.state && window.history.state.__wsccOverlay) {
-        suppressNext = true;
-        window.history.back();
-      }
     };
   }, [open]);
 }
