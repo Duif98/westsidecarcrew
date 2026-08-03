@@ -70,7 +70,7 @@ const M = {
       overline: "Est. 2022 — Esbjerg × Fredericia",
       sub: "En flok venner fra vestkysten. Ni biler, én garage — forenet af benzin, saltluft og respekt for hinandens projekter.",
       cars: "Biler i garagen", founded: "Grundlagt", photos: "Billeder", scroll: "Scroll",
-      imgAlt: "Mineralgrå BMW M4 på guldfælge foran Lillebæltsbroen ved solnedgang",
+      imgAlt: "Sølvgrå Nissan GT-R foran Lillebæltsbroen",
       scrollAria: "Scroll ned til crewet",
     },
     about: {
@@ -302,7 +302,7 @@ const M = {
       overline: "Est. 2022 — Esbjerg × Fredericia",
       sub: "A group of friends from the west coast. Nine cars, one garage — united by fuel, salt air and respect for each other’s builds.",
       cars: "Cars in the garage", founded: "Founded", photos: "Photos", scroll: "Scroll",
-      imgAlt: "Mineral grey BMW M4 on gold wheels in front of the Little Belt Bridge at sunset",
+      imgAlt: "Silver Nissan GT-R in front of the Little Belt Bridge",
       scrollAria: "Scroll to the crew",
     },
     about: {
@@ -533,7 +533,7 @@ const M = {
       overline: "Gegr. 2022 — Esbjerg × Fredericia",
       sub: "Eine Gruppe Freunde von der Westküste. Neun Autos, eine Garage — vereint durch Benzin, Salzluft und Respekt für die Projekte der anderen.",
       cars: "Autos in der Garage", founded: "Gegründet", photos: "Fotos", scroll: "Scrollen",
-      imgAlt: "Mineralgrauer BMW M4 auf goldenen Felgen vor der Kleinen-Belt-Brücke bei Sonnenuntergang",
+      imgAlt: "Silbergrauer Nissan GT-R vor der Kleinen-Belt-Brücke",
       scrollAria: "Zur Crew scrollen",
     },
     about: {

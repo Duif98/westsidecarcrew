@@ -50,7 +50,7 @@ const CARS = [
     spec: "Mineral Grey · Gold",
     tags: ["Gold wheels", "Lowered", "Angel Eyes"],
     blurb:
-      "Mineral grey on gold in front of the Little Belt Bridge at golden hour. The crew's cover car, no debate.",
+      "Mineral grey on gold in front of the Little Belt Bridge at golden hour.",
   },
   {
     slug: "hausmann-lincoln",
