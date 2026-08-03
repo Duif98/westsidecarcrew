@@ -2315,11 +2315,13 @@ button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; 
 .gear-fab svg { color: var(--gold); flex: none; }
 
 /* ---------- Emoji picker (desktop-friendly emoji insert) ---------- */
-.emoji-picker { position: relative; display: inline-flex; flex: none; }
+/* The grid is portalled to <body> with fixed positioning (see EmojiPicker.js),
+   so it can't be clipped by a parent's overflow — position comes from inline
+   styles; this rule only handles the look. */
+.emoji-picker { display: inline-flex; flex: none; }
 .emoji-btn { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line-2); border-radius: 10px; background: var(--bg-2); color: var(--muted); cursor: pointer; transition: color 0.2s, border-color 0.2s; }
 .emoji-btn:hover { color: var(--gold-bright); border-color: var(--gold); }
-.emoji-pop { position: absolute; top: calc(100% + 8px); right: 0; z-index: 200; width: min(300px, 78vw); max-height: 210px; overflow-y: auto; display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; padding: 8px; background: var(--glass-menu); backdrop-filter: blur(16px); border: 1px solid var(--line-2); border-radius: 14px; box-shadow: 0 16px 40px rgba(0,0,0,0.4); }
-.emoji-picker.up .emoji-pop { top: auto; bottom: calc(100% + 8px); }
+.emoji-pop { z-index: 4000; max-height: 240px; overflow-y: auto; display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; padding: 8px; background: var(--glass-menu); backdrop-filter: blur(16px); border: 1px solid var(--line-2); border-radius: 14px; box-shadow: 0 16px 40px rgba(0,0,0,0.45); }
 .emoji-cell { font-size: 20px; line-height: 1; padding: 5px 0; background: none; border: none; border-radius: 8px; cursor: pointer; transition: background 0.12s; }
 .emoji-cell:hover { background: var(--bg-3); }
 .pe-emoji-row { display: flex; justify-content: flex-end; margin-top: 6px; }
