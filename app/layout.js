@@ -43,7 +43,7 @@ export const metadata = {
     title: "West Side Car Crew",
     description:
       "A group of friends and car enthusiasts from the west coast. See the garage.",
-    images: [{ url: asset("/og.jpg"), width: 1200, height: 630 }],
+    images: [{ url: asset("/og-gtr.jpg"), width: 1200, height: 630 }],
     type: "website",
   },
   icons: {
@@ -82,7 +82,7 @@ const orgJsonLd = {
     width: 512,
     height: 512,
   },
-  image: `${SITE_URL}/og.jpg`,
+  image: `${SITE_URL}/og-gtr.jpg`,
   foundingDate: "2022",
   areaServed: "Esbjerg, Fredericia, Denmark",
   sameAs: ["https://www.instagram.com/westsidecarcrew/"],
