@@ -11,6 +11,7 @@ import { fetchThreads, fetchConversation, sendDM, markConversationRead, dmImageU
 import { notifyUser } from "../lib/pwa";
 import { thumbPathFor, uploadThumb } from "../lib/photos";
 import { uuid } from "../lib/uuid";
+import EmojiPicker from "../components/EmojiPicker";
 
 const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
@@ -31,6 +32,7 @@ function Messages() {
   const openRef = useRef(null);
   const endRef = useRef(null);
   const fileRef = useRef(null);
+  const textRef = useRef(null);
 
   useEffect(() => { if (!loading && !session) router.replace("/login"); }, [loading, session, router]);
   useEffect(() => { openRef.current = openId; }, [openId]);
@@ -117,7 +119,7 @@ function Messages() {
     try {
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
       const path = `${user.id}/dm/${uuid()}.${ext}`;
-      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, { cacheControl: "3600", contentType: file.type });
+      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, { cacheControl: "31536000", contentType: file.type });
       if (up.error) throw up.error;
       await uploadThumb(PUBLIC_BUCKET, path, file); // fast preview beside the full image
       const saved = await sendDM({ senderId: user.id, recipientId: openId, content: "", imagePath: path });
@@ -239,7 +241,8 @@ function Messages() {
                 <button type="button" className="chat-img-btn" onClick={() => fileRef.current?.click()} disabled={uploading} aria-label={t("dm.sendPhoto")}>
                   {uploading ? <span className="mini-spin" /> : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>}
                 </button>
-                <input value={text} onChange={(e) => setText(e.target.value)} onPaste={onPaste} placeholder={t("dm.placeholder")} maxLength={2000} aria-label={t("dm.message")} />
+                <input ref={textRef} value={text} onChange={(e) => setText(e.target.value)} onPaste={onPaste} placeholder={t("dm.placeholder")} maxLength={2000} aria-label={t("dm.message")} />
+                <EmojiPicker targetRef={textRef} value={text} onChange={setText} className="up" />
                 <button className="btn-gold" type="submit" disabled={!text.trim()}>{t("dm.send")}</button>
               </form>
             </>

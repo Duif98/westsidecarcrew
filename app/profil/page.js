@@ -12,6 +12,7 @@ import { asset } from "../lib/asset";
 import Lightbox from "../components/Lightbox";
 import PhotoLightbox from "../components/PhotoLightbox";
 import ProfileWall from "../components/ProfileWall";
+import EmojiPicker from "../components/EmojiPicker";
 import AvatarCropper from "../components/AvatarCropper";
 import CarInfoEditor from "../components/CarInfoEditor";
 import ProfileCompletion from "../components/ProfileCompletion";
@@ -59,6 +60,7 @@ function ProfileInner() {
   const [showWelcome, setShowWelcome] = useState(false);
   const avatarRef = useRef(null);
   const coverRef = useRef(null);
+  const bioRef = useRef(null);
   const welcomedRef = useRef(false);
 
   const me = !!user && profile?.id === user.id;
@@ -284,7 +286,8 @@ function ProfileInner() {
             </div>
           </div>
           <label className="post-field"><span>Om mig</span>
-            <textarea rows={3} value={edit.bio} onChange={(e) => setEdit({ ...edit, bio: e.target.value })} placeholder="Fortæl lidt om dig selv og dine biler…" maxLength={600} /></label>
+            <textarea ref={bioRef} rows={3} value={edit.bio} onChange={(e) => setEdit({ ...edit, bio: e.target.value })} placeholder="Fortæl lidt om dig selv og dine biler…" maxLength={600} />
+            <div className="pe-emoji-row"><EmojiPicker targetRef={bioRef} value={edit.bio} onChange={(v) => setEdit({ ...edit, bio: v })} /></div></label>
           <label className="post-field"><span>Hvor hører du til</span>
             <input value={edit.location} onChange={(e) => setEdit({ ...edit, location: e.target.value })} placeholder="fx Esbjerg" maxLength={80} /></label>
           <div className="post-actions">

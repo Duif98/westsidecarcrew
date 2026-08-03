@@ -15,7 +15,7 @@ export async function uploadThumb(bucket, path, file) {
     const thumb = await shrinkImage(file, { maxDim: 1000, quality: 0.72 });
     if (thumb && thumb !== file) {
       await supabase.storage.from(bucket).upload(thumbPathFor(path), thumb, {
-        cacheControl: "3600", upsert: true, contentType: "image/jpeg",
+        cacheControl: "31536000", upsert: true, contentType: "image/jpeg",
       });
     }
   } catch {}
@@ -33,7 +33,7 @@ export async function uploadPhoto({ file, isPublic, car, caption, userId, albumI
 
   // Store the full-quality original untouched…
   const up = await supabase.storage.from(bucket).upload(path, file, {
-    cacheControl: "3600",
+    cacheControl: "31536000",
     upsert: false,
     contentType: file.type || "image/jpeg",
   });

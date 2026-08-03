@@ -9,6 +9,7 @@ import { markSeen } from "../lib/useUnread";
 import { thumbPathFor, uploadThumb } from "../lib/photos";
 import { uuid } from "../lib/uuid";
 import { useBackClose } from "../lib/useBackClose";
+import EmojiPicker from "../components/EmojiPicker";
 
 const time = (t) => new Date(t).toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
 const EMOJIS = ["👍", "❤️", "🔥", "😂", "😮", "🙌"];
@@ -30,6 +31,7 @@ export default function ChatPage() {
   const mapRef = useRef({});
   const endRef = useRef(null);
   const fileRef = useRef(null);
+  const textRef = useRef(null);
 
   useEffect(() => { if (!loading && !session) router.replace("/login"); }, [loading, session, router]);
 
@@ -127,7 +129,7 @@ export default function ChatPage() {
     try {
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
       const path = `${user.id}/chat/${uuid()}.${ext}`;
-      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, { cacheControl: "3600", contentType: file.type });
+      const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, { cacheControl: "31536000", contentType: file.type });
       if (up.error) throw up.error;
       await uploadThumb(PUBLIC_BUCKET, path, file); // fast preview beside the full image
       const { error } = await supabase.from("messages").insert({ user_id: user.id, content: "", image_path: path });
@@ -259,7 +261,8 @@ export default function ChatPage() {
                 ? <span className="mini-spin" />
                 : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>}
             </button>
-            <input value={text} onChange={(e) => setText(e.target.value)} onPaste={onPaste} placeholder="Skriv en besked…" maxLength={1000} aria-label="Besked" />
+            <input ref={textRef} value={text} onChange={(e) => setText(e.target.value)} onPaste={onPaste} placeholder="Skriv en besked…" maxLength={1000} aria-label="Besked" />
+            <EmojiPicker targetRef={textRef} value={text} onChange={setText} className="up" />
             <button className="btn-gold" type="submit" disabled={!text.trim()}>Send</button>
           </form>
         </div>
