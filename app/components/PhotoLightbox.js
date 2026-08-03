@@ -9,6 +9,7 @@ import { toggleLike } from "../lib/photos";
 import { notifyUser } from "../lib/pwa";
 import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
+import { useBackClose } from "../lib/useBackClose";
 
 export default function PhotoLightbox({ photos, index, onClose, userId, canLike, onNeedLogin }) {
   const { t } = useT();
@@ -31,6 +32,9 @@ export default function PhotoLightbox({ photos, index, onClose, userId, canLike,
   const likeState = p ? (likes[p.id] || { liked: !!p.likedByMe, count: p.likeCount || 0 }) : { liked: false, count: 0 };
 
   const go = useCallback((d) => { setI((v) => (v + d + n) % n); setShowComments(false); }, [n]);
+
+  // Hardware Back closes the photo viewer instead of navigating the page.
+  useBackClose(true, onClose);
 
   useEffect(() => setMounted(true), []);
 

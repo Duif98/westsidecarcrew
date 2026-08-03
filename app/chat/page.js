@@ -7,6 +7,8 @@ import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { markSeen } from "../lib/useUnread";
 import { thumbPathFor, uploadThumb } from "../lib/photos";
+import { uuid } from "../lib/uuid";
+import { useBackClose } from "../lib/useBackClose";
 
 const time = (t) => new Date(t).toLocaleTimeString("da-DK", { hour: "2-digit", minute: "2-digit" });
 const EMOJIS = ["👍", "❤️", "🔥", "😂", "😮", "🙌"];
@@ -30,6 +32,9 @@ export default function ChatPage() {
   const fileRef = useRef(null);
 
   useEffect(() => { if (!loading && !session) router.replace("/login"); }, [loading, session, router]);
+
+  // Hardware Back closes the fullscreen image viewer instead of leaving chat.
+  useBackClose(!!imgView, () => setImgView(null));
 
   useEffect(() => {
     const uid = user?.id, uname = profile?.username;
@@ -115,15 +120,13 @@ export default function ChatPage() {
 
   const pickImage = () => fileRef.current?.click();
 
-  const onImage = async (e) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
+  const sendImageFile = async (file) => {
     if (!file || uploading) return;
     if (!file.type.startsWith("image/")) return;
     setUploading(true);
     try {
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-      const path = `${user.id}/chat/${crypto.randomUUID()}.${ext}`;
+      const path = `${user.id}/chat/${uuid()}.${ext}`;
       const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, { cacheControl: "3600", contentType: file.type });
       if (up.error) throw up.error;
       await uploadThumb(PUBLIC_BUCKET, path, file); // fast preview beside the full image
@@ -134,6 +137,18 @@ export default function ChatPage() {
     } finally {
       setUploading(false);
     }
+  };
+
+  const onImage = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    sendImageFile(file);
+  };
+
+  // Paste an image straight from the clipboard (e.g. Windows Snipping Tool).
+  const onPaste = (e) => {
+    const item = [...(e.clipboardData?.items || [])].find((it) => it.type.startsWith("image/"));
+    if (item) { e.preventDefault(); sendImageFile(item.getAsFile()); }
   };
 
   const toggleReaction = async (messageId, emoji) => {
@@ -244,7 +259,7 @@ export default function ChatPage() {
                 ? <span className="mini-spin" />
                 : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>}
             </button>
-            <input value={text} onChange={(e) => setText(e.target.value)} placeholder="Skriv en besked…" maxLength={1000} aria-label="Besked" />
+            <input value={text} onChange={(e) => setText(e.target.value)} onPaste={onPaste} placeholder="Skriv en besked…" maxLength={1000} aria-label="Besked" />
             <button className="btn-gold" type="submit" disabled={!text.trim()}>Send</button>
           </form>
         </div>

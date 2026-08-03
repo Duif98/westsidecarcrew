@@ -74,7 +74,15 @@ const orgJsonLd = {
   name: "West Side Car Crew",
   alternateName: "WestSideCarCrew",
   url: SITE_URL,
-  logo: `${SITE_URL}/og.jpg`,
+  // Google wants a square, crawlable logo (min 112×112) for the brand result —
+  // the wide og.jpg photo doesn't qualify, so point at the square PWA icon.
+  logo: {
+    "@type": "ImageObject",
+    url: `${SITE_URL}/icon-512.png`,
+    width: 512,
+    height: 512,
+  },
+  image: `${SITE_URL}/og.jpg`,
   foundingDate: "2022",
   areaServed: "Esbjerg, Fredericia, Denmark",
   sameAs: ["https://www.instagram.com/westsidecarcrew/"],

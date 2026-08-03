@@ -16,6 +16,7 @@ import { downloadICS } from "../lib/ics";
 import MeetComments from "./MeetComments";
 import Linkify from "./Linkify";
 import { useT } from "../lib/i18n";
+import { useBackClose } from "../lib/useBackClose";
 
 const STATUS = [
   { key: "yes", emoji: "✅" },
@@ -41,6 +42,11 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
   const fileRef = useRef(null);
   const isAdmin = !!profile?.is_admin;
   const canManage = !!user && (event.created_by === user.id || isAdmin);
+
+  // Hardware Back closes this dialog — and the edit form first when it's open —
+  // instead of navigating the page away.
+  useBackClose(true, onClose);
+  useBackClose(editing, () => setEditing(false));
 
   const removeMeet = async () => {
     if (!confirm(t("meet.confirmDelete"))) return;

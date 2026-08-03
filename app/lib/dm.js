@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase, PUBLIC_BUCKET } from "./supabaseClient";
 
 // 1:1 direct messages. One flat table (dm_messages); threads are derived
@@ -72,4 +73,44 @@ export async function unreadDMCount(myId) {
   } catch {
     return 0;
   }
+}
+
+// Fire this after marking a conversation read so any DM badge refreshes at once.
+export function signalDMRead() {
+  if (typeof window !== "undefined") window.dispatchEvent(new Event("wscc-dm-read"));
+}
+
+// Live unread-DM count for the bottom tab badge. Refreshes on realtime inserts,
+// on window focus, and whenever a conversation is marked read (custom event).
+export function useDMUnread(session, userId) {
+  const [count, setCount] = useState(0);
+  const channelName = useRef(`dm-badge-${Math.random().toString(36).slice(2)}`);
+
+  const refresh = useCallback(async () => {
+    if (!userId) { setCount(0); return; }
+    setCount(await unreadDMCount(userId));
+  }, [userId]);
+
+  useEffect(() => {
+    if (!session || !userId) { setCount(0); return; }
+    refresh();
+
+    const channel = supabase
+      .channel(channelName.current)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "dm_messages" }, refresh)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "dm_messages" }, refresh)
+      .subscribe();
+
+    const onRead = () => refresh();
+    const onFocus = () => refresh();
+    window.addEventListener("wscc-dm-read", onRead);
+    window.addEventListener("focus", onFocus);
+    return () => {
+      supabase.removeChannel(channel);
+      window.removeEventListener("wscc-dm-read", onRead);
+      window.removeEventListener("focus", onFocus);
+    };
+  }, [session, userId, refresh]);
+
+  return count;
 }

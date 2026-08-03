@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { LANGS, useT } from "../lib/i18n";
 import NotifBell from "./NotifBell";
 import GlobalSearch from "./GlobalSearch";
+import SettingsGear from "./SettingsGear";
 
 // Globe pill that sits just left of the global menu hamburger — visible on every
 // page at every size. Click to open a small popover and switch DA / EN / DE.
@@ -43,6 +44,8 @@ export default function LangSwitcher() {
         </svg>
         <span className="lang-code">{current.label}</span>
       </button>
+
+      <SettingsGear />
 
       {open && (
         <ul className="lang-menu" role="listbox" aria-label={t("lang.switch")}>

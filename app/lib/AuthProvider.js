@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { supabase } from "./supabaseClient";
+import { BASE_PATH } from "./asset";
 
 const AuthCtx = createContext(null);
 export const useAuth = () => useContext(AuthCtx);
@@ -25,9 +26,16 @@ export default function AuthProvider({ children }) {
       await loadProfile(data.session?.user?.id);
       setLoading(false);
     });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+    const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
       setSession(s);
       loadProfile(s?.user?.id);
+      // A password-recovery link signs the user in on whatever page it lands on
+      // (often the site root), which just looks like "I'm logged in" and never
+      // shows the change-password form. Send them to /reset/ wherever they land.
+      if (event === "PASSWORD_RECOVERY" && typeof window !== "undefined"
+          && !window.location.pathname.includes("/reset")) {
+        window.location.assign(`${BASE_PATH}/reset/`);
+      }
     });
     return () => { active = false; sub.subscription.unsubscribe(); };
   }, [loadProfile]);

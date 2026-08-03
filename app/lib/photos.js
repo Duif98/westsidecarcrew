@@ -1,5 +1,6 @@
 import { supabase, PUBLIC_BUCKET, PRIVATE_BUCKET } from "./supabaseClient";
 import { shrinkImage } from "./imageResize";
+import { uuid } from "./uuid";
 
 // A small preview lives next to every original at a derived path (no DB column
 // needed): `uid/uuid.jpg` → `uid/uuid_thumb.jpg`. Feeds/grids load the thumb for
@@ -28,7 +29,7 @@ export async function uploadThumb(bucket, path, file) {
 export async function uploadPhoto({ file, isPublic, car, caption, userId, albumId, eventId, ownerId, approved = false }) {
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
   const bucket = isPublic ? PUBLIC_BUCKET : PRIVATE_BUCKET;
-  const path = `${userId}/${crypto.randomUUID()}.${ext}`;
+  const path = `${userId}/${uuid()}.${ext}`;
 
   // Store the full-quality original untouched…
   const up = await supabase.storage.from(bucket).upload(path, file, {

@@ -4,7 +4,7 @@
  * dynamic Supabase/Google calls always go straight to the network.
  */
 
-const VERSION = "wscc-v1";
+const VERSION = "wscc-v2";
 const STATIC_CACHE = `${VERSION}-static`;
 
 // The scope the SW controls (e.g. "/" on the custom domain). Used to build the
@@ -50,7 +50,27 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Static assets (_next, images, fonts, icons): cache-first, then fill cache.
+  // Scripts + styles: network-first. A new deploy ships new hashed chunk names,
+  // and serving a stale cached chunk against a fresh page throws runtime errors
+  // like "x.aA is not a function". Network-first keeps online users correct; the
+  // cache is only a last-resort offline fallback.
+  if (req.destination === "script" || req.destination === "style") {
+    event.respondWith(
+      fetch(req)
+        .then((res) => {
+          if (res && res.status === 200 && res.type === "basic") {
+            const copy = res.clone();
+            caches.open(STATIC_CACHE).then((c) => c.put(req, copy)).catch(() => {});
+          }
+          return res;
+        })
+        .catch(() => caches.match(req))
+    );
+    return;
+  }
+
+  // Other static media (images, fonts, icons): cache-first, then fill cache —
+  // these are immutable and safe to serve from cache.
   event.respondWith(
     caches.match(req).then(
       (cached) =>

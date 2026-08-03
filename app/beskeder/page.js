@@ -7,9 +7,10 @@ import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
 import { useT } from "../lib/i18n";
 import { timeAgo, clockTime } from "../lib/time";
-import { fetchThreads, fetchConversation, sendDM, markConversationRead, dmImageUrl } from "../lib/dm";
+import { fetchThreads, fetchConversation, sendDM, markConversationRead, dmImageUrl, signalDMRead } from "../lib/dm";
 import { notifyUser } from "../lib/pwa";
 import { thumbPathFor, uploadThumb } from "../lib/photos";
+import { uuid } from "../lib/uuid";
 
 const avatarUrl = (path) => supabase.storage.from(PUBLIC_BUCKET).getPublicUrl(path).data.publicUrl;
 
@@ -46,6 +47,7 @@ function Messages() {
       const msgs = await fetchConversation(user.id, otherId);
       setConvo(msgs);
       await markConversationRead(user.id, otherId);
+      signalDMRead();
       refreshThreads();
     } catch {}
   }, [user?.id, refreshThreads]);
@@ -76,7 +78,7 @@ function Messages() {
         const other = m.sender_id === user.id ? m.recipient_id : m.sender_id;
         if (other === openRef.current) {
           setConvo((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m]));
-          if (m.recipient_id === user.id) markConversationRead(user.id, other);
+          if (m.recipient_id === user.id) markConversationRead(user.id, other).then(signalDMRead);
         }
         refreshThreads();
       });
@@ -109,14 +111,12 @@ function Messages() {
     }
   };
 
-  const onImage = async (e) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
+  const sendImageFile = useCallback(async (file) => {
     if (!file || uploading || !openId || !file.type.startsWith("image/")) return;
     setUploading(true);
     try {
       const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-      const path = `${user.id}/dm/${crypto.randomUUID()}.${ext}`;
+      const path = `${user.id}/dm/${uuid()}.${ext}`;
       const up = await supabase.storage.from(PUBLIC_BUCKET).upload(path, file, { cacheControl: "3600", contentType: file.type });
       if (up.error) throw up.error;
       await uploadThumb(PUBLIC_BUCKET, path, file); // fast preview beside the full image
@@ -127,6 +127,19 @@ function Messages() {
     } catch (err) {
       alert(t("dm.imgError") + " " + (err.message || err));
     } finally { setUploading(false); }
+  }, [uploading, openId, user?.id, profile?.username, refreshThreads, t]);
+
+  const onImage = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    sendImageFile(file);
+  };
+
+  // Paste an image straight from the clipboard (e.g. Windows Snipping Tool).
+  const onPaste = (e) => {
+    if (!openId) return;
+    const item = [...(e.clipboardData?.items || [])].find((it) => it.type.startsWith("image/"));
+    if (item) { e.preventDefault(); sendImageFile(item.getAsFile()); }
   };
 
   if (loading || !session) return <main className="member"><div className="wrap" style={{ paddingTop: 120 }}>{t("common.loading")}</div></main>;
@@ -226,7 +239,7 @@ function Messages() {
                 <button type="button" className="chat-img-btn" onClick={() => fileRef.current?.click()} disabled={uploading} aria-label={t("dm.sendPhoto")}>
                   {uploading ? <span className="mini-spin" /> : <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><path d="m21 15-5-5L5 21" /></svg>}
                 </button>
-                <input value={text} onChange={(e) => setText(e.target.value)} placeholder={t("dm.placeholder")} maxLength={2000} aria-label={t("dm.message")} />
+                <input value={text} onChange={(e) => setText(e.target.value)} onPaste={onPaste} placeholder={t("dm.placeholder")} maxLength={2000} aria-label={t("dm.message")} />
                 <button className="btn-gold" type="submit" disabled={!text.trim()}>{t("dm.send")}</button>
               </form>
             </>

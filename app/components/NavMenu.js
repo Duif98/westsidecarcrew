@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../lib/AuthProvider";
 import { useUnread } from "../lib/useUnread";
+import { useBackClose } from "../lib/useBackClose";
 import { useT } from "../lib/i18n";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 
@@ -35,6 +36,9 @@ export default function NavMenu() {
   const { t } = useT();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+
+  // Hardware Back closes the drawer instead of leaving the page.
+  useBackClose(open, () => setOpen(false));
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {

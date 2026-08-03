@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useT } from "../lib/i18n";
+import { useBackClose } from "../lib/useBackClose";
 
 // Generic gallery lightbox. `items` is [{ full, thumb, alt }] with URLs already
 // resolved by the caller, so it works for both repo and uploaded photos.
@@ -18,6 +19,9 @@ export default function Lightbox({ items, title, subtitle, startIndex = 0, onClo
   const n = items.length;
 
   const go = useCallback((dir) => setI((p) => (p + dir + n) % n), [n]);
+
+  // Hardware Back closes the lightbox instead of navigating the page.
+  useBackClose(true, onClose);
 
   useEffect(() => setMounted(true), []);
 
