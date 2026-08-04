@@ -3,6 +3,7 @@ import { asset } from "./lib/asset";
 import AuthProvider from "./lib/AuthProvider";
 import NavMenu from "./components/NavMenu";
 import TabBar from "./components/TabBar";
+import SwipeBack from "./components/SwipeBack";
 import Toaster from "./components/Toaster";
 import LangSwitcher from "./components/LangSwitcher";
 import { PwaProvider } from "./components/PwaProvider";
@@ -104,6 +105,7 @@ export default function RootLayout({ children }) {
                 {children}
                 <NavMenu />
                 <TabBar />
+                <SwipeBack />
                 <Toaster />
                 <LangSwitcher />
                 <PushPrompt />
