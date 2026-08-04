@@ -1,4 +1,4 @@
-import { Fraunces, Inter, JetBrains_Mono } from "next/font/google";
+import { Fraunces, Hanken_Grotesk } from "next/font/google";
 import { asset } from "./lib/asset";
 import AuthProvider from "./lib/AuthProvider";
 import NavMenu from "./components/NavMenu";
@@ -20,17 +20,10 @@ const display = Fraunces({
   display: "swap",
 });
 
-const body = Inter({
+const body = Hanken_Grotesk({
   subsets: ["latin"],
-  weight: ["400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-body",
-  display: "swap",
-});
-
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
   display: "swap",
 });
 
@@ -90,7 +83,7 @@ const orgJsonLd = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="da" suppressHydrationWarning className={`${display.variable} ${body.variable} ${mono.variable}`}>
+    <html lang="da" suppressHydrationWarning className={`${display.variable} ${body.variable}`}>
       <body>
         <AppleSplash />
         {/* Apply the saved light/dark theme before paint to avoid a flash. */}

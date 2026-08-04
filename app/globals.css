@@ -42,6 +42,10 @@
 
   --z-nav: 100;
   --z-lightbox: 1000;
+
+  /* Labels/overlines/nav used to be monospace (read as "techy/AI"). Route the
+     old --font-mono role to the grotesk so everything shares one refined sans. */
+  --font-mono: var(--font-body);
 }
 
 * {
@@ -111,9 +115,10 @@ a {
 }
 
 .overline {
-  font-family: var(--font-mono), monospace;
+  font-family: var(--font-body), sans-serif;
   font-size: 0.72rem;
-  letter-spacing: 0.32em;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--gold);
 }
