@@ -298,6 +298,18 @@ a {
 .hero-overline {
   overflow: hidden;
 }
+.hero-overline .overline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.hero-overline .overline::before {
+  content: "";
+  width: 30px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--gold), transparent);
+  flex: none;
+}
 .hero h1 {
   font-family: var(--font-display), Georgia, serif;
   font-weight: 300;
@@ -310,6 +322,18 @@ a {
   font-style: italic;
   color: var(--gold-bright);
 }
+/* Masked line reveal — each line slides up from behind its own edge */
+.hero h1 .line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.04em;
+}
+.hero h1 .line-i {
+  display: block;
+  transform: translateY(112%);
+  animation: rise 1.05s var(--ease-out) both;
+  animation-delay: var(--d, 0s);
+}
 .hero-sub {
   margin-top: 1.6rem;
   max-width: 40ch;
@@ -321,19 +345,24 @@ a {
   margin-top: 2.4rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 1.4rem 2.4rem;
+  gap: 1.1rem 2rem;
   align-items: center;
 }
 .hero-meta .stat {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.3rem;
+}
+.hero-meta .stat:not(:first-child) {
+  padding-left: 2rem;
+  border-left: 1px solid var(--line-2);
 }
 .hero-meta .stat b {
   font-family: var(--font-display), serif;
   font-weight: 400;
-  font-size: 1.7rem;
+  font-size: 1.9rem;
   line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
 .hero-meta .stat span {
   font-family: var(--font-mono), monospace;
@@ -640,13 +669,17 @@ a {
 /* ---------- Reveal on scroll ---------- */
 .reveal {
   opacity: 0;
-  transform: translateY(34px);
-  transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+  transform: translateY(42px) scale(0.985);
+  filter: blur(6px);
+  transition: opacity 0.85s var(--ease-out), transform 0.95s var(--ease-out),
+    filter 0.85s var(--ease-out);
   transition-delay: var(--delay, 0ms);
+  will-change: transform, opacity, filter;
 }
 .reveal.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+  filter: blur(0);
 }
 
 /* ---------- Lightbox ---------- */
@@ -904,9 +937,13 @@ a {
   .reveal {
     opacity: 1;
     transform: none;
+    filter: none;
   }
   .rise {
     opacity: 1;
+    transform: none;
+  }
+  .hero h1 .line-i {
     transform: none;
   }
   .hero-media img {

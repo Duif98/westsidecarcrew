@@ -1,13 +1,46 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { asset } from "../lib/asset";
 import { totalPhotos, cars } from "../data/cars";
 import { useT } from "../lib/i18n";
 
+// Count from 0 up to `target` once, on mount. Honours reduced-motion.
+function useCountUp(target, ms = 1400, delay = 500) {
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      setVal(target);
+      return;
+    }
+    let raf = 0;
+    let start = 0;
+    const ease = (t) => 1 - Math.pow(1 - t, 3);
+    const tick = (now) => {
+      if (!start) start = now;
+      const p = Math.min((now - start) / ms, 1);
+      setVal(Math.round(ease(p) * target));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    const to = setTimeout(() => {
+      raf = requestAnimationFrame(tick);
+    }, delay);
+    return () => {
+      clearTimeout(to);
+      cancelAnimationFrame(raf);
+    };
+  }, [target, ms, delay]);
+  return val;
+}
+
 export default function Hero() {
   const mediaRef = useRef(null);
   const { t } = useT();
+  const carsN = useCountUp(cars.length, 1200, 620);
+  const photosN = useCountUp(totalPhotos, 1600, 700);
 
   useEffect(() => {
     const el = mediaRef.current;
@@ -48,20 +81,24 @@ export default function Hero() {
           </p>
         </div>
         <h1>
-          <span className="rise" style={{ display: "block", animationDelay: "0.18s" }}>
-            West Side
+          <span className="line">
+            <span className="line-i" style={{ "--d": "0.16s" }}>
+              West Side
+            </span>
           </span>
-          <span className="rise" style={{ display: "block", animationDelay: "0.28s" }}>
-            <em>Car Crew</em>
+          <span className="line">
+            <span className="line-i" style={{ "--d": "0.28s" }}>
+              <em>Car Crew</em>
+            </span>
           </span>
         </h1>
-        <p className="hero-sub rise" style={{ animationDelay: "0.42s" }}>
+        <p className="hero-sub rise" style={{ animationDelay: "0.46s" }}>
           {t("hero.sub")}
         </p>
 
-        <div className="hero-meta rise" style={{ animationDelay: "0.54s" }}>
+        <div className="hero-meta rise" style={{ animationDelay: "0.58s" }}>
           <div className="stat">
-            <b>{cars.length}</b>
+            <b>{carsN}</b>
             <span>{t("hero.cars")}</span>
           </div>
           <div className="stat">
@@ -69,7 +106,7 @@ export default function Hero() {
             <span>{t("hero.founded")}</span>
           </div>
           <div className="stat">
-            <b>{totalPhotos}</b>
+            <b>{photosN}</b>
             <span>{t("hero.photos")}</span>
           </div>
         </div>
