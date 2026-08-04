@@ -67,7 +67,9 @@ export default function Hero() {
     <section className="hero" id="top">
       <div className="hero-media" ref={mediaRef}>
         <img
-          src={asset("/hero-gtr-hd.webp")}
+          src={asset("/hero-gtr-1280.webp")}
+          srcSet={`${asset("/hero-gtr-1280.webp")} 1280w, ${asset("/hero-gtr-1920.webp")} 1920w, ${asset("/hero-gtr-hd.webp")} 2560w`}
+          sizes="100vw"
           alt={t("hero.imgAlt")}
           fetchPriority="high"
         />
