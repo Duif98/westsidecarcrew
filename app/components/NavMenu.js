@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "../lib/AuthProvider";
 import { useUnread } from "../lib/useUnread";
 import { useBackClose } from "../lib/useBackClose";
-import { useT } from "../lib/i18n";
+import { LANGS, useT } from "../lib/i18n";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 
 const IG = "https://www.instagram.com/westsidecarcrew/";
@@ -33,7 +33,7 @@ export default function NavMenu() {
   const router = useRouter();
   const { session, user, profile, isAdmin, signOut } = useAuth();
   const { total } = useUnread(session, user?.id);
-  const { t } = useT();
+  const { t, lang, setLang } = useT();
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -93,6 +93,18 @@ export default function NavMenu() {
 
             <div className="nav-m-group">
               <div className="nav-m-heading">{t("nav.sectionAccount")}</div>
+              <div className="nav-m-lang" role="group" aria-label={t("lang.switch")}>
+                {LANGS.map((l) => (
+                  <button
+                    key={l.code}
+                    className={`nav-m-langbtn ${l.code === lang ? "on" : ""}`}
+                    onClick={() => setLang(l.code)}
+                    aria-pressed={l.code === lang}
+                  >
+                    {l.label}
+                  </button>
+                ))}
+              </div>
               {session && <Link href="/indstillinger" className="nav-m-link" onClick={close}>⚙︎ {t("nav.settings")}</Link>}
               <a href={IG} target="_blank" rel="noopener noreferrer" className="nav-m-link" onClick={close}>{t("nav.instagram")} ↗</a>
               {session && isAdmin && <Link href="/admin" className="nav-m-link" onClick={close}>{t("nav.admin")}</Link>}

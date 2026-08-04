@@ -409,6 +409,43 @@ a {
   }
 }
 
+/* Hero — mobile: keep the numbers tidy, drop the scroll hint (the tab bar owns the bottom) */
+@media (max-width: 620px) {
+  .hero-overline .overline {
+    font-size: 0.62rem;
+    letter-spacing: 0.22em;
+  }
+  .hero-sub {
+    margin-top: 1.2rem;
+  }
+  .hero-inner {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 5.25rem);
+  }
+  .hero-meta {
+    margin-top: 1.9rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+  }
+  .hero-meta .stat {
+    gap: 0.4rem;
+  }
+  .hero-meta .stat:not(:first-child) {
+    padding-left: 0.95rem;
+  }
+  .hero-meta .stat b {
+    font-size: 1.55rem;
+  }
+  .hero-meta .stat span {
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    line-height: 1.3;
+  }
+  .hero-scroll {
+    display: none;
+  }
+}
+
 /* Entrance animation for hero lines */
 .rise {
   opacity: 0;
@@ -1510,6 +1547,10 @@ a.btn-gold { text-decoration: none; }
 .nav-m-group { display: flex; flex-direction: column; gap: 0.1rem; }
 .nav-m-group + .nav-m-group { margin-top: 0.5rem; padding-top: 0.4rem; border-top: 1px solid var(--line); }
 .nav-m-heading { font-family: var(--font-mono), monospace; font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--faint); padding: 0.35rem 0.9rem 0.35rem; }
+.nav-m-lang { display: flex; gap: 0.4rem; padding: 0.35rem 0.9rem 0.55rem; }
+.nav-m-langbtn { flex: 1; font-family: var(--font-mono), monospace; font-size: 0.72rem; letter-spacing: 0.08em; color: var(--muted); background: var(--bg-2); border: 1px solid var(--line); padding: 0.5rem 0; border-radius: 9px; cursor: pointer; transition: color 0.15s, border-color 0.15s, background 0.15s; }
+.nav-m-langbtn:hover { color: var(--text); }
+.nav-m-langbtn.on { color: var(--on-gold); background: var(--gold); border-color: var(--gold); }
 .nav-m-tool { display: flex; align-items: center; justify-content: space-between; text-align: left; width: 100%; background: none; border: none; cursor: pointer; font: inherit; }
 .nav-m-tool:disabled { opacity: 0.55; cursor: default; }
 .nav-m-tool:disabled:hover { background: none; color: var(--text); }
