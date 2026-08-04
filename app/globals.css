@@ -627,8 +627,22 @@ a {
   );
   transition: opacity 0.5s var(--ease);
 }
-.card:hover img {
-  transform: scale(1.06);
+.card {
+  transition: transform 0.55s var(--ease), border-color 0.4s var(--ease),
+    box-shadow 0.55s var(--ease);
+}
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-6px);
+    border-color: var(--line-2);
+    box-shadow: var(--shadow-2);
+  }
+  .card:hover img {
+    transform: scale(1.06);
+  }
+  .card:hover .card-body {
+    transform: translateY(-4px);
+  }
 }
 .card-body {
   position: absolute;
@@ -639,6 +653,7 @@ a {
   flex-direction: column;
   gap: 0.35rem;
   transform: translateY(0);
+  transition: transform 0.55s var(--ease);
 }
 .card-tag {
   align-self: flex-start;
