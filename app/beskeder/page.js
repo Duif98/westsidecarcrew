@@ -40,7 +40,9 @@ function Messages() {
 
   // Treat an open conversation as a back-layer: hardware Back / swipe-back closes
   // the conversation (returns to the thread list) instead of leaving the page.
-  useBackClose(!!openId, () => setOpenId(null));
+  // slide:true → the swipe glides the page like a real navigation (it's in-shell),
+  // instead of the instant close used for portalled overlays.
+  useBackClose(!!openId, () => setOpenId(null), { slide: true });
 
   const refreshThreads = useCallback(async () => {
     if (!user?.id) return;

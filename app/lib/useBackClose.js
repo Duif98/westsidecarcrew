@@ -26,6 +26,13 @@ export function overlayCount() {
   return stack.length;
 }
 
+// The top-most open overlay (or null). `slide: true` marks an in-shell sub-view
+// (e.g. an open DM conversation) that should get the same gliding page-slide as a
+// real navigation, rather than the instant close used for portalled overlays.
+export function overlayTop() {
+  return stack[stack.length - 1] || null;
+}
+
 function onPop() {
   // The browser already popped our marker entry; close the top-most overlay.
   const top = stack[stack.length - 1];
@@ -39,14 +46,15 @@ function ensureListener() {
   }
 }
 
-export function useBackClose(open, onClose) {
+export function useBackClose(open, onClose, opts = {}) {
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
+  const slide = !!opts.slide;
 
   useEffect(() => {
     if (!open || typeof window === "undefined") return;
 
-    const entry = { close: () => onCloseRef.current?.() };
+    const entry = { close: () => onCloseRef.current?.(), slide };
     ensureListener();
     stack.push(entry);
     window.history.pushState({ __wsccOverlay: true }, "");

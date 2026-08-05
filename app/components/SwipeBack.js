@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { overlayCount } from "../lib/useBackClose";
+import { overlayCount, overlayTop } from "../lib/useBackClose";
 
 // Facebook/iOS-style interactive "swipe to go back": the whole page content
 // follows your finger to the right, and on release past the threshold it slides
@@ -115,7 +115,10 @@ export default function SwipeBack() {
       const t = e.touches[0];
       sx = t.clientX; sy = t.clientY;
       ignore = inIgnoreZone(e.target) || (!standalone && sx < 24);
-      mode = overlayCount() > 0 ? "close" : "slide";
+      // No overlay → page slide. An in-shell sub-view (slide:true, e.g. an open DM
+      // conversation) also slides. A portalled overlay (drawer/lightbox) just closes.
+      const oc = overlayCount();
+      mode = oc === 0 ? "slide" : (overlayTop()?.slide ? "slide" : "close");
       tracking = true; decided = false; dragging = false;
     };
 
