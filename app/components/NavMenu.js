@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,10 +35,19 @@ export default function NavMenu() {
   const { total } = useUnread(session, user?.id);
   const { t, lang, setLang } = useT();
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const closeTimer = useRef(null);
 
-  // Hardware Back closes the drawer instead of leaving the page.
-  useBackClose(open, () => setOpen(false));
+  // Animate the drawer out before unmounting so it glides shut instead of popping.
+  const close = () => {
+    setClosing(true);
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => { setOpen(false); setClosing(false); }, 280);
+  };
+
+  // Hardware Back / swipe-back closes the drawer instead of leaving the page.
+  useBackClose(open, close);
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
@@ -49,25 +58,24 @@ export default function NavMenu() {
   // Close on Escape for keyboard users.
   useEffect(() => {
     if (!open) return;
-    const onKey = (e) => { if (e.key === "Escape") setOpen(false); };
+    const onKey = (e) => { if (e.key === "Escape") close(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
   const profileHref = session && profile?.username ? `/profil?u=${encodeURIComponent(profile.username)}` : "/login";
-  const close = () => setOpen(false);
   const logout = () => { close(); signOut(); router.replace("/"); };
   const sections = session ? MEMBER_SECTIONS : GUEST_SECTIONS;
 
   return (
     <>
-      <button className="menu-fab" aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
+      <button className="menu-fab" aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")} aria-expanded={open} onClick={() => (open ? close() : setOpen(true))}>
         <span /><span /><span />
         {session && total > 0 && !open && <span className="nav-badge menu-fab-badge">{total > 9 ? "9+" : total}</span>}
       </button>
 
       {mounted && open && createPortal(
-        <div className="nav-mobile" onClick={(e) => { if (e.target === e.currentTarget) close(); }}>
+        <div className={`nav-mobile${closing ? " closing" : ""}`} onClick={(e) => { if (e.target === e.currentTarget) close(); }}>
           <div className="nav-mobile-panel">
             <Link href={profileHref} className="nav-m-profile" onClick={close}>
               <span className="nav-m-avatar">
