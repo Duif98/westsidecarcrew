@@ -49,6 +49,19 @@ export default function NavMenu() {
   // Hardware Back / swipe-back closes the drawer instead of leaving the page.
   useBackClose(open, close);
 
+  // Warm every menu route the moment the drawer opens, so tapping an item
+  // navigates instantly and the page transition plays smoothly even coming from
+  // the (cold) homepage — where these burger-only routes aren't prefetched yet.
+  useEffect(() => {
+    if (!open) return;
+    const secs = session ? MEMBER_SECTIONS : GUEST_SECTIONS;
+    secs.forEach((s) => s.links.forEach((l) => {
+      if (l.href.startsWith("/") && !l.href.includes("#")) {
+        try { router.prefetch(l.href); } catch {}
+      }
+    }));
+  }, [open, session, router]);
+
   useEffect(() => setMounted(true), []);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
