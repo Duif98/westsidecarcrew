@@ -14,7 +14,12 @@ export function PwaProvider({ children }) {
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    registerSW();
+    // Register the service worker off the critical hydration path — it's not
+    // needed for first paint, so let the main thread finish rendering first.
+    const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 300));
+    const runReg = () => idle(() => registerSW());
+    if (document.readyState === "complete") runReg();
+    else window.addEventListener("load", runReg, { once: true });
 
     const onPrompt = (e) => { e.preventDefault(); setDeferred(e); };
     const onInstalled = () => { setInstalled(true); setDeferred(null); };

@@ -121,6 +121,11 @@ export default function Garage() {
     let active = true;
     showcases.forEach((s) => {
       if (!s.coverUrl) return;
+      // Curated cars already know their cover dimensions (from the repo), so isWide()
+      // resolves without measuring — don't eager-fetch those images on the home page
+      // (that defeated the cards' loading="lazy"). Only member uploads (cw/ch null)
+      // need a measure, and those covers lazy-load as the grid scrolls into view.
+      if (s.cw && s.ch) return;
       const img = new Image();
       img.onload = () => {
         if (active) setOrient((o) => ({ ...o, [s.key]: img.naturalWidth > img.naturalHeight ? "wide" : "tall" }));

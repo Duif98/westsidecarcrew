@@ -86,6 +86,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="da" suppressHydrationWarning className={`${display.variable} ${body.variable}`}>
       <body>
+        {/* Warm the connection to Supabase so the first auth/data/image request
+            (especially on member pages) doesn't pay DNS+TLS cost cold. */}
+        <link rel="preconnect" href="https://neezyfqzxhpxhjrefuam.supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://neezyfqzxhpxhjrefuam.supabase.co" />
         <AppleSplash />
         {/* Apply the saved light/dark theme before paint to avoid a flash. */}
         <script
