@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { overlayCount, overlayTop } from "../lib/useBackClose";
+import { markBack } from "../lib/navDirection";
 
 // Facebook/iOS-style interactive "swipe to go back": the whole page content
 // follows your finger to the right, and on release past the threshold it slides
@@ -83,6 +84,7 @@ export default function SwipeBack() {
       const el = shell();
       if (mode === "close" || reduce || !el) {
         clearStyles();
+        markBack();
         window.history.back();
         return;
       }
@@ -91,6 +93,7 @@ export default function SwipeBack() {
       el.style.transform = `translateX(${window.innerWidth}px)`;
       onceTransitionEnd(el, () => {
         el.style.transition = "none";
+        markBack();
         window.history.back();
         // Let the previous route paint before dropping the transform, so the new
         // page doesn't flash in at the wrong position.

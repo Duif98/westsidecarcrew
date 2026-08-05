@@ -1673,8 +1673,13 @@ a.btn-gold { text-decoration: none; }
 /* Each route renders its own <main>, so a real navigation replays this fade —
    a soft cross-page settle instead of a hard swap. Hash links don't remount, so
    in-page anchors stay instant. Neutralised under prefers-reduced-motion above. */
-main { animation: pageIn 0.42s var(--ease-out) both; }
-@keyframes pageIn { from { opacity: 0; } to { opacity: 1; } }
+/* Directional route transitions (app/template.js) — forward navigations slide the
+   incoming page in from the right, back navigations from the left, so entering and
+   leaving mirror each other. Re-mounts every navigation, so it always replays. */
+.route-tx { animation: routeFwd 0.36s var(--ease-out) both; }
+.route-tx-back { animation-name: routeBack; }
+@keyframes routeFwd { from { opacity: 0; transform: translateX(38px); } to { opacity: 1; transform: none; } }
+@keyframes routeBack { from { opacity: 0; transform: translateX(-30px); } to { opacity: 1; transform: none; } }
 
 /* ---------- Designed empty states ---------- */
 .empty { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 0.5rem; padding: clamp(2.5rem, 8vw, 4.5rem) 1.2rem; max-width: 44ch; margin-inline: auto; }
