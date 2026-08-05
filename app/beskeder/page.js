@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase, PUBLIC_BUCKET } from "../lib/supabaseClient";
 import { useAuth } from "../lib/AuthProvider";
+import { useBackClose } from "../lib/useBackClose";
 import { useT } from "../lib/i18n";
 import { timeAgo, clockTime } from "../lib/time";
 import { fetchThreads, fetchConversation, sendDM, markConversationRead, dmImageUrl, signalDMRead } from "../lib/dm";
@@ -36,6 +37,10 @@ function Messages() {
 
   useEffect(() => { if (!loading && !session) router.replace("/login"); }, [loading, session, router]);
   useEffect(() => { openRef.current = openId; }, [openId]);
+
+  // Treat an open conversation as a back-layer: hardware Back / swipe-back closes
+  // the conversation (returns to the thread list) instead of leaving the page.
+  useBackClose(!!openId, () => setOpenId(null));
 
   const refreshThreads = useCallback(async () => {
     if (!user?.id) return;
