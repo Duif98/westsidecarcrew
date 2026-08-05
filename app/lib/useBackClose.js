@@ -20,6 +20,12 @@ import { useEffect, useRef } from "react";
 let stack = [];        // { close } for every open overlay, in order opened
 let listening = false;
 
+// How many overlays are currently open. SwipeBack uses this to decide whether a
+// back-gesture should slide the page (no overlay) or just close the top overlay.
+export function overlayCount() {
+  return stack.length;
+}
+
 function onPop() {
   // The browser already popped our marker entry; close the top-most overlay.
   const top = stack[stack.length - 1];

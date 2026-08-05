@@ -283,14 +283,17 @@ a {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(
+  background:
+    /* legibility: darken top (nav) + bottom (headline) */
+    linear-gradient(
       180deg,
-      rgba(10, 11, 13, 0.55) 0%,
-      rgba(10, 11, 13, 0.05) 26%,
-      rgba(10, 11, 13, 0.35) 62%,
-      rgba(10, 11, 13, 0.96) 100%
+      rgba(8, 9, 11, 0.5) 0%,
+      rgba(8, 9, 11, 0.02) 22%,
+      rgba(8, 9, 11, 0.32) 60%,
+      rgba(8, 9, 11, 0.97) 100%
     ),
-    radial-gradient(90% 60% at 20% 90%, rgba(10, 11, 13, 0.6), transparent 60%);
+    /* cinematic vignette: focus the eye on the car */
+    radial-gradient(125% 90% at 50% 40%, transparent 52%, rgba(5, 6, 8, 0.55) 100%);
 }
 .hero-inner {
   position: relative;
@@ -739,34 +742,10 @@ a {
   filter: blur(0);
 }
 
-/* Swipe-to-go-back affordance — a chevron that follows the finger and turns
-   gold once the swipe passes the trigger threshold. */
-.swipe-back-ind {
-  position: fixed;
-  left: 8px;
-  top: 50%;
-  z-index: 3500;
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--glass-menu);
-  border: 1px solid var(--line-2);
-  color: var(--muted);
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-50%) scale(0.7);
-  box-shadow: var(--shadow-2);
-  backdrop-filter: blur(10px);
-  transition: background 0.15s var(--ease), color 0.15s var(--ease),
-    border-color 0.15s var(--ease);
-}
-.swipe-back-ind.armed {
-  color: var(--on-gold);
-  background: var(--gold);
-  border-color: var(--gold);
+/* The page-content wrapper that the swipe-back gesture slides. Kept transform-free
+   at rest (only SwipeBack sets an inline transform mid-gesture). */
+#app-shell {
+  min-height: 100svh;
 }
 
 /* ---------- Lightbox ---------- */

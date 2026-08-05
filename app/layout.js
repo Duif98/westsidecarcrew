@@ -102,7 +102,7 @@ export default function RootLayout({ children }) {
           <AuthProvider>
             <PresenceProvider>
               <PwaProvider>
-                {children}
+                <div id="app-shell">{children}</div>
                 <NavMenu />
                 <TabBar />
                 <SwipeBack />
