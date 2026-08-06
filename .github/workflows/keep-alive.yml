@@ -8,14 +8,26 @@ on:
 jobs:
   ping:
     runs-on: ubuntu-latest
-    
+
     steps:
+      - uses: actions/checkout@v4
+
       - name: Ping Supabase
         run: |
+          # The Supabase URL + anon key are PUBLIC by design (shipped in the browser,
+          # guarded by row-level security). Read them straight from the committed
+          # client so this ping can never drift out of sync with a stale GitHub secret.
+          URL=$(grep -oE 'https://[a-z0-9]+\.supabase\.co' app/lib/supabaseClient.js | head -1)
+          KEY=$(grep -oE 'eyJ[A-Za-z0-9._-]+' app/lib/supabaseClient.js | head -1)
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then
+            echo "Could not read Supabase URL/key from app/lib/supabaseClient.js"; exit 1
+          fi
+          echo "Pinging $URL"
           # Query a real table so it counts as genuine database activity.
           curl -fsS -X GET \
-            -H "apikey: ${{ secrets.SUPABASE_ANON_KEY }}" \
-            -H "Authorization: Bearer ${{ secrets.SUPABASE_ANON_KEY }}" \
-            "${{ secrets.SUPABASE_URL }}/rest/v1/profiles?select=id&limit=1" \
+            -H "apikey: $KEY" \
+            -H "Authorization: Bearer $KEY" \
+            "$URL/rest/v1/profiles?select=id&limit=1" \
             --connect-timeout 10 \
-            --max-time 20
+            --max-time 20 > /dev/null
+          echo "Supabase ping OK"
