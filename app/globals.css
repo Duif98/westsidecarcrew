@@ -1121,16 +1121,22 @@ a {
 
 /* ============ Members / auth ============ */
 .btn-gold {
-  display: inline-flex; align-items: center; justify-content: center;
-  font-family: var(--font-mono), monospace; font-size: 0.8rem; font-weight: 500;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  background: var(--gold); color: #100c04; border: none;
-  padding: 0.95rem 1.4rem; border-radius: 100px; cursor: pointer;
-  transition: background 0.25s var(--ease), transform 0.12s var(--ease), opacity 0.2s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  font-family: var(--font-body), sans-serif; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.01em; text-transform: none;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold)); color: var(--on-gold); border: none;
+  padding: 0.9rem 1.5rem; border-radius: 100px; cursor: pointer;
+  box-shadow: 0 8px 22px -10px rgba(201, 168, 119, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), background 0.25s var(--ease), opacity 0.2s;
 }
-.btn-gold:hover { background: var(--gold-bright); }
-.btn-gold:active { transform: scale(0.98); }
-.btn-gold:disabled { opacity: 0.55; cursor: default; }
+@media (hover: hover) {
+  .btn-gold:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 13px 30px -10px rgba(201, 168, 119, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  }
+}
+.btn-gold:active { transform: translateY(0) scale(0.98); }
+.btn-gold:disabled { opacity: 0.55; cursor: default; box-shadow: none; transform: none; }
 
 .auth-wrap { min-height: 100svh; display: grid; place-items: center; padding: 5rem 1.25rem; position: relative; z-index: 2; }
 .auth-card {
@@ -1789,8 +1795,9 @@ a.btn-gold { text-decoration: none; }
 .empty-ico svg { width: 30px; height: 30px; }
 .empty-title { font-family: var(--font-display), serif; font-weight: 400; font-size: clamp(1.35rem, 3.5vw, 1.8rem); letter-spacing: -0.01em; color: var(--text); }
 .empty-sub { color: var(--muted); font-size: 0.95rem; line-height: 1.55; }
-.empty-action { margin-top: 0.7rem; display: inline-flex; font-family: var(--font-mono), monospace; font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--on-gold); background: var(--gold); padding: 0.72rem 1.25rem; border-radius: 100px; border: none; cursor: pointer; transition: background 0.2s var(--ease); }
-.empty-action:hover { background: var(--gold-bright); }
+.empty-action { margin-top: 0.7rem; display: inline-flex; align-items: center; gap: 0.4rem; font-family: var(--font-body), sans-serif; font-size: 0.86rem; font-weight: 600; letter-spacing: 0.01em; text-transform: none; color: var(--on-gold); background: linear-gradient(180deg, var(--gold-bright), var(--gold)); padding: 0.72rem 1.3rem; border-radius: 100px; border: none; cursor: pointer; box-shadow: 0 8px 22px -10px rgba(201, 168, 119, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35); transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease); }
+@media (hover: hover) { .empty-action:hover { transform: translateY(-1px); box-shadow: 0 13px 30px -10px rgba(201, 168, 119, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.42); } }
+.empty-action:active { transform: translateY(0) scale(0.98); }
 
 /* ---------- List skeletons ---------- */
 .skel-list { display: flex; flex-direction: column; gap: 0.8rem; }
