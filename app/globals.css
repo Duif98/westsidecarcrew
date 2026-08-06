@@ -1374,6 +1374,11 @@ a.btn-gold { text-decoration: none; }
 .news-card.featured .news-title { font-size: clamp(1.7rem, 4vw, 2.6rem); }
 .news-text { color: var(--muted); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
 .news-meta { font-family: var(--font-mono), monospace; font-size: 0.66rem; letter-spacing: 0.06em; color: var(--faint); margin-top: 0.3rem; }
+/* Long post bodies clamp to a teaser and expand in place (no post detail page). */
+.news-text.clamp { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent); mask-image: linear-gradient(180deg, #000 62%, transparent); }
+.news-more { align-self: flex-start; display: inline-flex; align-items: center; gap: 0.35rem; margin-top: 0.1rem; padding: 0; background: none; border: none; cursor: pointer; color: var(--gold); font-family: var(--font-body), sans-serif; font-size: 0.82rem; font-weight: 600; letter-spacing: 0.01em; transition: color 0.2s var(--ease), gap 0.25s var(--ease); }
+.news-more:hover { color: var(--gold-bright); gap: 0.55rem; }
+.news-more-i { font-size: 0.9em; }
 
 /* ============ Post manager (admin) ============ */
 .post-field { display: flex; flex-direction: column; gap: 0.4rem; font-family: var(--font-mono), monospace; font-size: 0.66rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }

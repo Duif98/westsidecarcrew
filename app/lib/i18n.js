@@ -93,7 +93,7 @@ const M = {
       untitled: "Uden titel", member: "medlem", car: "Bil",
       openAria: "Åbn {name}", commentsTitle: "{n} kommentarer",
     },
-    news: { overline: "Opslagstavle", title: "Nyt fra crewet", pinned: "Fastgjort" },
+    news: { overline: "Opslagstavle", title: "Nyt fra crewet", pinned: "Fastgjort", more: "Læs mere", less: "Vis mindre" },
     footer: { followAlong: "Følg med", builtForCrew: "Bygget til crewet" },
     teaser: { overline: "Næste meet", coming: "{n} kommer", cta: "Se & tilmeld →" },
     members: {
@@ -326,7 +326,7 @@ const M = {
       untitled: "Untitled", member: "member", car: "Car",
       openAria: "Open {name}", commentsTitle: "{n} comments",
     },
-    news: { overline: "Notice board", title: "News from the crew", pinned: "Pinned" },
+    news: { overline: "Notice board", title: "News from the crew", pinned: "Pinned", more: "Read more", less: "Show less" },
     footer: { followAlong: "Follow along", builtForCrew: "Built for the crew" },
     teaser: { overline: "Next meet", coming: "{n} coming", cta: "See & RSVP →" },
     members: {
@@ -558,7 +558,7 @@ const M = {
       untitled: "Ohne Titel", member: "Mitglied", car: "Auto",
       openAria: "{name} öffnen", commentsTitle: "{n} Kommentare",
     },
-    news: { overline: "Pinnwand", title: "Neues von der Crew", pinned: "Angeheftet" },
+    news: { overline: "Pinnwand", title: "Neues von der Crew", pinned: "Angeheftet", more: "Mehr lesen", less: "Weniger" },
     footer: { followAlong: "Folge uns", builtForCrew: "Für die Crew gebaut" },
     teaser: { overline: "Nächstes Meet", coming: "{n} kommen", cta: "Ansehen & zusagen →" },
     members: {

@@ -7,6 +7,42 @@ import { markSeen } from "../lib/useUnread";
 import { useT } from "../lib/i18n";
 import Reveal from "./Reveal";
 
+// A long post body is a wall of text on the front page. Show a teaser that
+// expands in place (there is no post detail page, so nothing may be hidden
+// permanently). Short posts render in full with no toggle.
+const CLAMP_AT = 240;
+
+function NewsCard({ post, index, fmtDate, t }) {
+  const [open, setOpen] = useState(false);
+  const long = (post.body || "").length > CLAMP_AT;
+
+  return (
+    <Reveal as="article" className={`news-card ${index === 0 ? "featured" : ""}`} delay={(index % 3) * 80}>
+      {post.imageUrl && (
+        <div className="news-img">
+          <img src={post.imageUrl} alt={post.title} loading="lazy" />
+        </div>
+      )}
+      <div className="news-body">
+        {post.pinned && <span className="news-pin">{t("news.pinned")}</span>}
+        <h3 className="news-title">{post.title}</h3>
+        {post.body && (
+          <p className={`news-text ${long && !open ? "clamp" : ""}`}>{post.body}</p>
+        )}
+        {long && (
+          <button type="button" className="news-more" onClick={() => setOpen((v) => !v)}>
+            {open ? t("news.less") : t("news.more")}
+            <span className="news-more-i" aria-hidden="true">{open ? "↑" : "↓"}</span>
+          </button>
+        )}
+        <div className="news-meta">
+          {post.author ? `@${post.author} · ` : ""}{fmtDate(post.created_at)}
+        </div>
+      </div>
+    </Reveal>
+  );
+}
+
 export default function NewsBoard() {
   const { session } = useAuth();
   const { t, locale } = useT();
@@ -35,26 +71,7 @@ export default function NewsBoard() {
 
         <div className="news-grid">
           {posts.map((p, i) => (
-            <Reveal
-              as="article"
-              key={p.id}
-              className={`news-card ${i === 0 ? "featured" : ""}`}
-              delay={(i % 3) * 80}
-            >
-              {p.imageUrl && (
-                <div className="news-img">
-                  <img src={p.imageUrl} alt={p.title} loading="lazy" />
-                </div>
-              )}
-              <div className="news-body">
-                {p.pinned && <span className="news-pin">{t("news.pinned")}</span>}
-                <h3 className="news-title">{p.title}</h3>
-                {p.body && <p className="news-text">{p.body}</p>}
-                <div className="news-meta">
-                  {p.author ? `@${p.author} · ` : ""}{fmtDate(p.created_at)}
-                </div>
-              </div>
-            </Reveal>
+            <NewsCard key={p.id} post={p} index={i} fmtDate={fmtDate} t={t} />
           ))}
         </div>
       </div>
