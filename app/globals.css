@@ -754,6 +754,13 @@ a {
     transform: translateY(-4px);
   }
 }
+/* Touch devices have no hover — give the tap a satisfying press instead. */
+@media (hover: none) {
+  .card:active {
+    transform: scale(0.978);
+    transition: transform 0.18s var(--ease);
+  }
+}
 .card-body {
   position: absolute;
   inset: auto 0 0 0;
@@ -1240,6 +1247,16 @@ a.btn-gold { text-decoration: none; }
 .like-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
 .like-btn.liked { color: #e0526a; }
 .like-btn:active { transform: scale(0.88); }
+.like-btn svg { transition: transform 0.2s var(--ease); }
+/* Satisfying heart-beat on the like action only (transient .pop class) */
+.like-btn.pop svg { animation: heartBeat 0.52s var(--ease); transform-origin: center; }
+@keyframes heartBeat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.42); }
+  45% { transform: scale(0.9); }
+  70% { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
 .like-count { font-variant-numeric: tabular-nums; }
 
 /* ph card as button + meta row */
@@ -1748,6 +1765,18 @@ a.btn-gold { text-decoration: none; }
 .tb-plus { display: grid; place-items: center; width: 46px; height: 46px; margin-top: -12px; border-radius: 50%; background: var(--gold); color: var(--on-gold); box-shadow: 0 6px 18px rgba(201,168,119,0.42); transition: transform 0.25s var(--ease), background 0.2s; }
 .tb-create:active .tb-plus { transform: scale(0.92); }
 .tb-plus.open { transform: rotate(45deg); background: var(--gold-bright); }
+
+/* Tactile, native-feeling tabs: press-scale on tap, a soft gold halo + lift on
+   the active tab so it reads as "here" without a hard indicator line. */
+.tb-ico { transition: transform 0.32s var(--ease); }
+.tb-item.active .tb-ico { transform: translateY(-1px); }
+.tb-item:active .tb-ico { transform: scale(0.84); }
+.tb-item.active .tb-ico::after {
+  content: ""; position: absolute; inset: -9px; z-index: -1; border-radius: 50%;
+  background: radial-gradient(circle, rgba(201, 168, 119, 0.30), transparent 68%);
+  animation: tb-halo 0.42s var(--ease-out) both;
+}
+@keyframes tb-halo { from { opacity: 0; transform: scale(0.55); } to { opacity: 1; transform: scale(1); } }
 
 /* Create action sheet */
 .tb-sheet-overlay { position: fixed; inset: 0; z-index: 116; background: rgba(6,7,9,0.55); backdrop-filter: blur(4px); animation: plbIn 0.18s var(--ease); }

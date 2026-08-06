@@ -12,6 +12,7 @@ export default function LikeButton({ photo, userId, canLike, onNeedLogin }) {
   const [liked, setLiked] = useState(!!photo.likedByMe);
   const [count, setCount] = useState(photo.likeCount || 0);
   const [busy, setBusy] = useState(false);
+  const [pop, setPop] = useState(false); // transient — plays the heart-beat only on the like action
 
   const click = async (e) => {
     e.stopPropagation();
@@ -20,6 +21,7 @@ export default function LikeButton({ photo, userId, canLike, onNeedLogin }) {
     setBusy(true);
     const next = !liked;
     setLiked(next); setCount((c) => c + (next ? 1 : -1)); // optimistic
+    if (next) { setPop(true); setTimeout(() => setPop(false), 520); }
     try {
       await toggleLike(photo.id, userId, liked);
       // Tell the owner when someone else likes their photo (not on unlike / own photo).
@@ -41,7 +43,7 @@ export default function LikeButton({ photo, userId, canLike, onNeedLogin }) {
   return (
     <button
       type="button"
-      className={`like-btn${liked ? " liked" : ""}`}
+      className={`like-btn${liked ? " liked" : ""}${pop ? " pop" : ""}`}
       onClick={click}
       aria-pressed={liked}
       aria-label={liked ? t("like.remove") : t("like.add")}
