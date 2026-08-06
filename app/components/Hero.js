@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { asset } from "../lib/asset";
 import { totalPhotos, cars } from "../data/cars";
@@ -98,7 +99,19 @@ export default function Hero() {
           {t("hero.sub")}
         </p>
 
-        <div className="hero-meta rise" style={{ animationDelay: "0.58s" }}>
+        <div className="hero-cta rise" style={{ animationDelay: "0.62s" }}>
+          <a className="hero-btn primary" href="#garagen">
+            <span>{t("hero.ctaGarage")}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </a>
+          <Link className="hero-btn ghost" href="/login">
+            {t("hero.ctaJoin")}
+          </Link>
+        </div>
+
+        <div className="hero-meta rise" style={{ animationDelay: "0.74s" }}>
           <div className="stat">
             <b>{carsN}</b>
             <span>{t("hero.cars")}</span>
