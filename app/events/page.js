@@ -12,6 +12,8 @@ import Linkify from "../components/Linkify";
 import { useT } from "../lib/i18n";
 import MeetForm from "../components/MeetForm";
 import MeetWeather from "../components/MeetWeather";
+import MeetShareButton from "../components/MeetShareButton";
+import MeetDetail from "../components/MeetDetail";
 import EmptyState from "../components/EmptyState";
 import Skeleton from "../components/Skeleton";
 
@@ -33,6 +35,7 @@ export default function EventsPage() {
   const [formOpen, setFormOpen] = useState(null); // null | { event? }
   const [noteDrafts, setNoteDrafts] = useState({}); // { [eventId]: string } — own reason editor
   const [savingNote, setSavingNote] = useState(null); // eventId currently saving
+  const [deepMeet, setDeepMeet] = useState(null); // shared ?meet=<id> deep link → opens MeetDetail
 
   const load = async () => {
     const { data: evs } = await supabase
@@ -73,6 +76,24 @@ export default function EventsPage() {
 
   useEffect(() => { load(); }, [session]);
   useEffect(() => { if (ready && session) markSeen("events"); }, [ready, session]);
+
+  // Deep link from a shared meet (?meet=<id>): fetch that meet and open its
+  // detail dialog, so a link sent over Messenger/SMS lands straight on it.
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("meet");
+    if (!id) return;
+    let active = true;
+    (async () => {
+      const { data } = await supabase
+        .from("events")
+        .select("*, creator:profiles!events_created_by_fkey(username)")
+        .eq("id", id)
+        .maybeSingle();
+      if (active && data) setDeepMeet(data);
+    })();
+    return () => { active = false; };
+    // Runs once on mount — events are public to read, so no need to wait for session.
+  }, []);
 
   const setRsvp = async (eventId, status) => {
     if (!user) return;
@@ -192,6 +213,7 @@ export default function EventsPage() {
                   <button type="button" className="md-dir md-cal" onClick={() => downloadICS(ev)}>
                     📆 {t("meet.addToCal")}
                   </button>
+                  <MeetShareButton event={ev} />
                   {ev.description && <p className="event-desc"><Linkify text={ev.description} /></p>}
 
                   <MeetWeather lat={ev.lat} lng={ev.lng} startsAt={ev.starts_at} />
@@ -265,6 +287,15 @@ export default function EventsPage() {
           onClose={() => setFormOpen(null)}
           onCreated={() => load()}
           onSaved={() => load()}
+        />
+      )}
+
+      {deepMeet && (
+        <MeetDetail
+          event={deepMeet}
+          onClose={() => setDeepMeet(null)}
+          onUpdated={(u) => { setDeepMeet(u); load(); }}
+          onDeleted={() => { setDeepMeet(null); load(); }}
         />
       )}
     </main>

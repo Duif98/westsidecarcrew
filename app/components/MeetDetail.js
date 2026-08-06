@@ -14,6 +14,7 @@ import { yrUrl } from "../lib/weather";
 import { directionsUrl } from "../lib/geo";
 import { downloadICS } from "../lib/ics";
 import MeetComments from "./MeetComments";
+import MeetShareButton from "./MeetShareButton";
 import Linkify from "./Linkify";
 import { useT } from "../lib/i18n";
 import { useBackClose } from "../lib/useBackClose";
@@ -187,6 +188,7 @@ export default function MeetDetail({ event: initialEvent, onClose, onUpdated, on
         <button type="button" className="md-dir md-cal" onClick={() => downloadICS(event)}>
           📆 {t("meet.addToCal")}
         </button>
+        <MeetShareButton event={event} />
         {event.description && <p className="md-desc"><Linkify text={event.description} /></p>}
 
         <MeetWeather lat={event.lat} lng={event.lng} startsAt={event.starts_at} />
