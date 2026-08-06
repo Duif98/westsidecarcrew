@@ -1778,6 +1778,25 @@ a.btn-gold { text-decoration: none; }
 }
 @keyframes tb-halo { from { opacity: 0; transform: scale(0.55); } to { opacity: 1; transform: scale(1); } }
 
+/* Scroll-to-top FAB — glides in on deep scroll, sits above the tab bar */
+.scrolltop {
+  position: fixed; z-index: 114; right: var(--pad);
+  bottom: calc(env(safe-area-inset-bottom) + 84px);
+  width: 46px; height: 46px; display: grid; place-items: center; border-radius: 50%;
+  background: var(--glass); backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border: 1px solid var(--line-2); color: var(--gold); cursor: pointer;
+  box-shadow: var(--shadow-2);
+  opacity: 0; transform: translateY(14px) scale(0.9); pointer-events: none;
+  transition: opacity 0.35s var(--ease), transform 0.35s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.scrolltop.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+@media (hover: hover) { .scrolltop:hover { color: var(--gold-bright); border-color: var(--gold); } }
+.scrolltop.show:active { transform: scale(0.9); }
+@media (min-width: 768px) {
+  .scrolltop { right: 24px; bottom: calc(env(safe-area-inset-bottom) + 24px); }
+}
+
 /* Create action sheet */
 .tb-sheet-overlay { position: fixed; inset: 0; z-index: 116; background: rgba(6,7,9,0.55); backdrop-filter: blur(4px); animation: plbIn 0.18s var(--ease); }
 .tb-sheet { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(74px + env(safe-area-inset-bottom)); width: min(360px, calc(100vw - 1.6rem)); background: var(--glass-menu); backdrop-filter: blur(16px); border: 1px solid var(--line-2); border-radius: 16px; padding: 0.4rem; box-shadow: 0 20px 50px rgba(0,0,0,0.45); animation: pushPromptIn 0.25s var(--ease); display: flex; flex-direction: column; gap: 0.15rem; }
@@ -2369,7 +2388,7 @@ button.hub-card { text-align: left; width: 100%; font: inherit; color: inherit; 
 /* Printable PDF report — hidden on screen, only shown when printing */
 .uv-print { display: none; }
 @media print {
-  .uv-noprint, .member-bar, .menu-fab, .lang-switch, .notif-bell, .push-prompt, .tabbar { display: none !important; }
+  .uv-noprint, .member-bar, .menu-fab, .lang-switch, .notif-bell, .push-prompt, .tabbar, .scrolltop { display: none !important; }
   body { background: #fff !important; }
   .uv-print { display: block; color: #111; font-family: Georgia, "Times New Roman", serif; }
   .uv-print h1 { font-size: 20px; margin: 0 0 4px; color: #111; }
