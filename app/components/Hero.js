@@ -72,16 +72,20 @@ export default function Hero() {
               upscaling the wide landscape frame ~3x, and no bigger to download. */}
           <source media="(max-width: 640px)" type="image/avif" srcSet={asset("/hero-gtr-portrait.avif")} />
           <source media="(max-width: 640px)" type="image/webp" srcSet={asset("/hero-gtr-portrait.webp")} />
-          {/* Tablet/desktop: landscape — AVIF first (≈40% smaller), WebP fallback. */}
+          {/* Tablet/desktop: landscape — AVIF first (≈40% smaller), WebP fallback.
+              The hero is object-fit:cover in a full-height box, so a narrow/tall
+              window (e.g. an ultrawide split into side zones) is height-bound and
+              needs far more than 100vw of pixels — ask for ~2x there so it picks
+              the tall hd file (1707px, enough for any ≤1440p screen) and stays sharp. */}
           <source
             type="image/avif"
             srcSet={`${asset("/hero-gtr-1280.avif")} 1280w, ${asset("/hero-gtr-1920.avif")} 1920w, ${asset("/hero-gtr-hd.avif")} 2560w`}
-            sizes="100vw"
+            sizes="(max-aspect-ratio: 3/2) 200vw, 100vw"
           />
           <source
             type="image/webp"
             srcSet={`${asset("/hero-gtr-1280.webp")} 1280w, ${asset("/hero-gtr-1920.webp")} 1920w, ${asset("/hero-gtr-hd.webp")} 2560w`}
-            sizes="100vw"
+            sizes="(max-aspect-ratio: 3/2) 200vw, 100vw"
           />
           <img src={asset("/hero-gtr-1280.webp")} alt={t("hero.imgAlt")} fetchPriority="high" />
         </picture>
