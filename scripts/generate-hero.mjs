@@ -17,7 +17,11 @@ const SRC =
   "C:/Users/chris/Desktop/Lightroom biler/Mark GTR Lightroom/IMG_6288-Enhanced-NR.jpg";
 const OUT = path.join(ROOT, "public");
 
-const AVIF = { quality: 52, effort: 4 };
+// Landscape fills a large screen with lots of smooth sky/water, where low-quality
+// AVIF shows grain/banding — so it gets a higher quality. The small portrait crop
+// (phones) can stay leaner.
+const AVIF_LAND = { quality: 68, effort: 4 };
+const AVIF_PORT = { quality: 58, effort: 4 };
 const WEBP = { quality: 80, effort: 5 };
 
 const LAND = [["1280", 1280], ["1920", 1920], ["hd", 2560]];
@@ -34,7 +38,7 @@ async function main() {
   for (const [name, w] of LAND) {
     const avif = path.join(OUT, `hero-gtr-${name}.avif`);
     const webp = path.join(OUT, `hero-gtr-${name}.webp`);
-    await sharp(SRC).rotate().resize({ width: w }).avif(AVIF).toFile(avif);
+    await sharp(SRC).rotate().resize({ width: w }).avif(AVIF_LAND).toFile(avif);
     await sharp(SRC).rotate().resize({ width: w }).webp(WEBP).toFile(webp);
     console.log(`landscape ${name} (${w}w): avif ${kb(avif)} · webp ${kb(webp)}`);
   }
@@ -42,7 +46,7 @@ async function main() {
   const pos = PORT_POS === "attention" ? sharp.strategy.attention : PORT_POS;
   const pAvif = path.join(OUT, "hero-gtr-portrait.avif");
   const pWebp = path.join(OUT, "hero-gtr-portrait.webp");
-  await sharp(SRC).rotate().resize({ width: PORT_W, height: PORT_H, fit: "cover", position: pos }).avif(AVIF).toFile(pAvif);
+  await sharp(SRC).rotate().resize({ width: PORT_W, height: PORT_H, fit: "cover", position: pos }).avif(AVIF_PORT).toFile(pAvif);
   await sharp(SRC).rotate().resize({ width: PORT_W, height: PORT_H, fit: "cover", position: pos }).webp(WEBP).toFile(pWebp);
   console.log(`portrait ${PORT_W}x${PORT_H} (${PORT_POS}): avif ${kb(pAvif)} · webp ${kb(pWebp)}`);
 }
