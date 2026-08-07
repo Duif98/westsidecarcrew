@@ -67,13 +67,24 @@ export default function Hero() {
   return (
     <section className="hero" id="top">
       <div className="hero-media" ref={mediaRef}>
-        <img
-          src={asset("/hero-gtr-1280.webp")}
-          srcSet={`${asset("/hero-gtr-1280.webp")} 1280w, ${asset("/hero-gtr-1920.webp")} 1920w, ${asset("/hero-gtr-hd.webp")} 2560w`}
-          sizes="100vw"
-          alt={t("hero.imgAlt")}
-          fetchPriority="high"
-        />
+        <picture>
+          {/* Phones get a tall portrait crop — sharp on a tall screen without
+              upscaling the wide landscape frame ~3x, and no bigger to download. */}
+          <source media="(max-width: 640px)" type="image/avif" srcSet={asset("/hero-gtr-portrait.avif")} />
+          <source media="(max-width: 640px)" type="image/webp" srcSet={asset("/hero-gtr-portrait.webp")} />
+          {/* Tablet/desktop: landscape — AVIF first (≈40% smaller), WebP fallback. */}
+          <source
+            type="image/avif"
+            srcSet={`${asset("/hero-gtr-1280.avif")} 1280w, ${asset("/hero-gtr-1920.avif")} 1920w, ${asset("/hero-gtr-hd.avif")} 2560w`}
+            sizes="100vw"
+          />
+          <source
+            type="image/webp"
+            srcSet={`${asset("/hero-gtr-1280.webp")} 1280w, ${asset("/hero-gtr-1920.webp")} 1920w, ${asset("/hero-gtr-hd.webp")} 2560w`}
+            sizes="100vw"
+          />
+          <img src={asset("/hero-gtr-1280.webp")} alt={t("hero.imgAlt")} fetchPriority="high" />
+        </picture>
       </div>
       <div className="hero-scrim" />
 
