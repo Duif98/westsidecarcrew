@@ -482,18 +482,9 @@ a {
   );
   mix-blend-mode: screen;
 }
-/* Fine film grain so gradients never band and the image gains a photographic
-   texture. Degrades invisibly if the data URI is ever blocked. */
-.hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
+/* (Removed the film-grain overlay — at desktop size its noise read as "grainy"
+   over the large smooth sky. The AVIF image is clean and the light bloom above
+   already gives depth.) */
 
 /* ---------- Hero CTAs ---------- */
 .hero-cta {
